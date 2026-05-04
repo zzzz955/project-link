@@ -56,15 +56,34 @@ gh label create "{label}" --repo {owner/repo} --color "{hex}" --description "{de
 ```
 
 ### 5. Query project fields and current Iteration (Sprint)
-Use `gh project field-list` — simpler and more reliable than GraphQL on Windows:
+
+**Step A — Get field IDs and option IDs** via `gh project field-list`:
 ```powershell
 $env:GH_TOKEN = "{GITHUB_TOKEN}"
 gh project field-list {project_number} --owner {owner} --format json
 ```
-This returns all field IDs and option IDs (Priority, Size, Iteration, etc.) in one call.
-Select the current iteration by matching today's date against `startDate` + `duration`.
+Returns field IDs and single-select option IDs (Priority, Size, Status, etc.).
+**Limitation:** Iteration field shows only its field ID — it does NOT include iteration list (startDate, duration, id).
 
-If field IDs were already resolved earlier in this session, skip re-querying.
+**Step B — Get iteration list** via GraphQL (required for Iteration field):
+
+> **Critical:** GitHub GraphQL API rejects inline literal arguments (`argumentLiteralsIncompatible`).
+> Always pass query arguments as GraphQL variables, and send the full request body via `--input` with a UTF-8 no-BOM temp file.
+> Never use `-f query=` or `--field query=` with hardcoded node IDs or string arguments inline.
+
+```powershell
+$env:GH_TOKEN = "{GITHUB_TOKEN}"
+$utf8NoBom = New-Object System.Text.UTF8Encoding $false
+$tmpFile = [System.IO.Path]::GetTempFileName() + ".json"
+$content = '{"query":"query($projectId: ID!, $fieldName: String!) { node(id: $projectId) { ... on ProjectV2 { field(name: $fieldName) { ... on ProjectV2IterationField { configuration { iterations { id title startDate duration } } } } } } }","variables":{"projectId":"{project_node_id}","fieldName":"Iteration"}}'
+[System.IO.File]::WriteAllText($tmpFile, $content, $utf8NoBom)
+$iterData = gh api graphql --input $tmpFile | ConvertFrom-Json
+Remove-Item $tmpFile
+```
+
+Select the current iteration by matching today's date against `startDate` + `duration` (days).
+
+If field IDs and iteration data were already resolved earlier in this session, skip re-querying.
 
 ### 6. Create the issue
 **Do NOT use `gh issue create --title` with Korean text** — PowerShell parses `[도메인]` as

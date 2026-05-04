@@ -21,7 +21,8 @@ namespace ProjectLink.Core
         TouchInputHandler _touchInput;
 
         readonly Dictionary<int, PathView> _pathViews = new();
-        int _activeColorId;
+        int     _activeColorId;
+        Vector2 _lastDragPos;
 
         void Start()
         {
@@ -71,6 +72,7 @@ namespace ProjectLink.Core
             if (!_drawer.TryStartPath(cell)) return;
 
             _activeColorId = cell.ColorId;
+            _lastDragPos   = worldPos;
             EnsurePathView(_activeColorId);
             _boardView.Refresh();
             _pathViews[_activeColorId].Refresh();
@@ -79,8 +81,18 @@ namespace ProjectLink.Core
         void HandleDragMove(Vector2 worldPos)
         {
             if (_stateMachine.Current != GameState.Drawing) return;
-            var cell = InputSnapper.Snap(worldPos, _board, _cellSize);
-            _drawer.ProcessCell(cell);
+
+            Vector2 delta    = worldPos - _lastDragPos;
+            float   stepSize = _cellSize * 0.5f;
+            int     steps    = Mathf.Max(1, Mathf.CeilToInt(delta.magnitude / stepSize));
+
+            for (int i = 1; i <= steps; i++)
+            {
+                var cell = InputSnapper.Snap(_lastDragPos + delta * (i / (float)steps), _board, _cellSize);
+                _drawer.ProcessCell(cell);
+            }
+
+            _lastDragPos = worldPos;
             _boardView.Refresh();
             _pathViews[_activeColorId].Refresh();
         }

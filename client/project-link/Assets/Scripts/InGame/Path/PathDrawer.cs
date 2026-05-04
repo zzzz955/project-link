@@ -58,8 +58,8 @@ namespace ProjectLink.InGame.Path
                 return;
             }
 
-            if (!IsAdjacent(_activePath.Cells[^1], cell)) return;
-            if (!CanMoveTo(cell)) return;
+            if (!PathValidator.IsAdjacent(_activePath.Cells[^1], cell)) return;
+            if (!PathValidator.CanMoveTo(cell, _activePath.ColorId)) return;
 
             if (cell.IsEmpty) _board.SetPath(cell.X, cell.Y, _activePath.ColorId);
             _activePath.AddCell(cell);
@@ -71,15 +71,7 @@ namespace ProjectLink.InGame.Path
 
             if (_activePath.IsComplete)
             {
-                bool allConnected = true;
-                foreach (int colorId in _board.ColorIds)
-                {
-                    if (!_paths.TryGetValue(colorId, out var path) || !path.IsComplete)
-                    {
-                        allConnected = false;
-                        break;
-                    }
-                }
+                bool allConnected = PathValidator.IsCleared(_board.ColorIds, _paths);
                 _stateMachine.TryTransition(allConnected ? GameState.Completed : GameState.Idle);
             }
             else
@@ -95,11 +87,5 @@ namespace ProjectLink.InGame.Path
         public PathModel GetPath(int colorId) =>
             _paths.TryGetValue(colorId, out var path) ? path : null;
 
-        bool CanMoveTo(Cell cell) =>
-            cell.IsEmpty || (cell.IsNode && cell.ColorId == _activePath.ColorId);
-
-        static bool IsAdjacent(Cell a, Cell b) =>
-            (a.X == b.X && System.Math.Abs(a.Y - b.Y) == 1) ||
-            (a.Y == b.Y && System.Math.Abs(a.X - b.X) == 1);
     }
 }

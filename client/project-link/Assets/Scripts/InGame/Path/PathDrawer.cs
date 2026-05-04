@@ -58,9 +58,33 @@ namespace ProjectLink.InGame.Path
                 return;
             }
 
+            // Diagonal move: insert one L-shaped intermediate cell before target
+            var last = _activePath.Cells[^1];
+            int dx = cell.X - last.X;
+            int dy = cell.Y - last.Y;
+            if (System.Math.Abs(dx) == 1 && System.Math.Abs(dy) == 1)
+            {
+                var hStep = _board.GetCell(last.X + dx, last.Y);
+                var vStep = _board.GetCell(last.X, last.Y + dy);
+
+                Cell mid = null;
+                if (!_activePath.Contains(hStep.X, hStep.Y) && PathValidator.CanMoveTo(hStep, _activePath.ColorId))
+                    mid = hStep;
+                else if (!_activePath.Contains(vStep.X, vStep.Y) && PathValidator.CanMoveTo(vStep, _activePath.ColorId))
+                    mid = vStep;
+
+                if (mid == null) return;
+                AppendCell(mid);
+            }
+
             if (!PathValidator.IsAdjacent(_activePath.Cells[^1], cell)) return;
             if (!PathValidator.CanMoveTo(cell, _activePath.ColorId)) return;
 
+            AppendCell(cell);
+        }
+
+        void AppendCell(Cell cell)
+        {
             if (cell.IsEmpty) _board.SetPath(cell.X, cell.Y, _activePath.ColorId);
             _activePath.AddCell(cell);
         }

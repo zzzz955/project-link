@@ -32,6 +32,8 @@ namespace ProjectLink.Core
             _stateMachine = new GameStateMachine();
             _drawer       = new PathDrawer(_board, _stateMachine);
 
+            FitCameraToBoard();
+
             var boardGo = new GameObject("BoardView");
             boardGo.transform.SetParent(transform);
             _boardView = boardGo.AddComponent<BoardView>();
@@ -98,6 +100,23 @@ namespace ProjectLink.Core
             // Erase completed: sync views (EraseController already refreshed BoardView internally)
             if (from == GameState.Erasing && to == GameState.Idle)
                 foreach (var pv in _pathViews.Values) pv.Refresh();
+        }
+
+        void FitCameraToBoard()
+        {
+            var cam = Camera.main;
+            if (cam == null) return;
+
+            float boardW = _board.Width  * _cellSize;
+            float boardH = _board.Height * _cellSize;
+            float padding = _cellSize;
+
+            float sizeByHeight = (boardH + padding) * 0.5f;
+            float sizeByWidth  = (boardW + padding) * 0.5f / cam.aspect;
+
+            cam.orthographic     = true;
+            cam.orthographicSize = Mathf.Max(sizeByHeight, sizeByWidth);
+            cam.transform.position = new Vector3(0f, 0f, -10f);
         }
 
         void EnsurePathView(int colorId)

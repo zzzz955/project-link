@@ -1,0 +1,4 @@
+interface:
+  display_name: "Project Link Commands"
+  short_description: "Run Project Link repo-local commands"
+  default_prompt: "Use $project-link-commands to run /gen, /sync-check, /git-issue, or git workflows."

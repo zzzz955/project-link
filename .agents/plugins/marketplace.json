@@ -1,0 +1,20 @@
+{
+  "name": "project-link-local",
+  "interface": {
+    "displayName": "Project Link Local"
+  },
+  "plugins": [
+    {
+      "name": "project-link-commands",
+      "source": {
+        "source": "local",
+        "path": "./plugins/project-link-commands"
+      },
+      "policy": {
+        "installation": "INSTALLED_BY_DEFAULT",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

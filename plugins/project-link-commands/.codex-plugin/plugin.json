@@ -1,0 +1,35 @@
+{
+  "name": "project-link-commands",
+  "version": "0.1.0",
+  "description": "Project-local Codex commands migrated from .claude/commands for the Project Link repository.",
+  "author": {
+    "name": "Project Link",
+    "email": "dev@example.com",
+    "url": "https://example.com/project-link"
+  },
+  "homepage": "https://example.com/project-link",
+  "repository": "https://example.com/project-link",
+  "license": "UNLICENSED",
+  "keywords": [
+    "project-link",
+    "commands",
+    "codex"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Project Link Commands",
+    "shortDescription": "Project-local command workflows for Project Link.",
+    "longDescription": "Use Project Link command workflows migrated from .claude/commands, including generation, git, issue, domain, and sync checks.",
+    "developerName": "Project Link",
+    "category": "Productivity",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "/gen",
+      "/sync-check",
+      "/git-issue 서버:로그인 API 구현"
+    ]
+  }
+}

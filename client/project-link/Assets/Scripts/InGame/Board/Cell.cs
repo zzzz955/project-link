@@ -1,40 +1,33 @@
 namespace ProjectLink.InGame.Board
 {
-    public enum CellState { Empty, Node, Path }
+    public enum CellType { Empty, Node, Obstacle, Gimmick }
 
     public class Cell
     {
         public int X { get; }
         public int Y { get; }
-        public CellState State { get; private set; }
-        public int ColorId { get; private set; }
+        public CellType Type { get; private set; }
+        public int NodeGroupId { get; private set; }
+        public int PathOwner { get; private set; }
 
-        public bool IsEmpty => State == CellState.Empty;
-        public bool IsNode  => State == CellState.Node;
-        public bool IsPath  => State == CellState.Path;
+        public bool IsNode     => Type == CellType.Node;
+        public bool IsObstacle => Type == CellType.Obstacle;
+        public bool IsGimmick  => Type == CellType.Gimmick;
+        public bool IsDrawable => Type == CellType.Empty || Type == CellType.Node;
+        public bool HasPath    => PathOwner > 0;
 
-        public Cell(int x, int y)
-        {
-            X = x;
-            Y = y;
-        }
+        // Compat: ColorId = NodeGroupId when node, else PathOwner
+        public bool IsEmpty => Type == CellType.Empty;
+        public bool IsPath  => HasPath;
+        public int  ColorId => IsNode ? NodeGroupId : PathOwner;
 
-        public void SetNode(int colorId)
-        {
-            State   = CellState.Node;
-            ColorId = colorId;
-        }
+        public Cell(int x, int y) { X = x; Y = y; }
 
-        public void SetPath(int colorId)
-        {
-            State   = CellState.Path;
-            ColorId = colorId;
-        }
-
-        public void Clear()
-        {
-            State   = CellState.Empty;
-            ColorId = 0;
-        }
+        public void SetNode(int groupId)   { Type = CellType.Node; NodeGroupId = groupId; }
+        public void SetObstacle()          { Type = CellType.Obstacle; }
+        public void SetGimmick()           { Type = CellType.Gimmick; }
+        public void ClaimPath(int groupId) { PathOwner = groupId; }
+        public void ReleasePath()          { PathOwner = 0; }
+        public void Clear()                => ReleasePath();
     }
 }

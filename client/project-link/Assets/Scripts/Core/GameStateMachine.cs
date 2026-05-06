@@ -11,11 +11,9 @@ namespace ProjectLink.Core
 
         static readonly HashSet<(GameState, GameState)> _validTransitions = new()
         {
-            (GameState.Idle,     GameState.Drawing),
-            (GameState.Drawing,  GameState.Idle),
-            (GameState.Drawing,  GameState.Completed),
-            (GameState.Idle,     GameState.Erasing),
-            (GameState.Erasing,  GameState.Idle),
+            (GameState.Idle,    GameState.Drawing),
+            (GameState.Drawing, GameState.Idle),
+            (GameState.Drawing, GameState.Completed),
         };
 
         public bool TryTransition(GameState next)

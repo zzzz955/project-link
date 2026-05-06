@@ -5,7 +5,7 @@
 |---|---|---|
 | `BootstrapEntry.cs` | `BootstrapEntry` | App entry; instantiates all manager singletons, loads Title scene |
 | `GameContext.cs` | `GameContext` | Static cross-scene state (selected stage ID) |
-| `GameState.cs` | `GameState` | Enum: Idle, Drawing, Erasing, Completed |
+| `GameState.cs` | `GameState` | Enum: Idle, Drawing, Completed |
 | `GameStateMachine.cs` | `GameStateMachine` | Pure FSM with validated transitions + change event |
 | `InGameController.cs` | `InGameController` | Singleton; orchestrates board/input/paths/HUD/timer |
 | `UIManager.cs` | `UIManager` | Canvas layer resolver (Background/HUD/Popup/System) |
@@ -23,12 +23,17 @@
 | symbol | kind | note |
 |---|---|---|
 | `GameContext.SelectedStageId` | prop | set before `SceneLoader.LoadScene("Game")` |
-| `GameState` | enum | Idle \| Drawing \| Erasing \| Completed |
+| `GameState` | enum | Idle \| Drawing \| Completed |
 | `GameStateMachine.Current` | prop | read-only current state |
 | `GameStateMachine.TryTransition(GameState)` | method | returns false if transition invalid |
 | `GameStateMachine.OnStateChanged` | event | `Action<GameState,GameState>` (from, to) |
 | `InGameController.Instance` | prop | singleton; valid during Game scene lifetime |
 | `InGameController.SetInputEnabled(bool)` | method | enables/disables TouchInputHandler |
+| `InGameController._pathViewMap` | field | `Dictionary<PathModel,PathView>`; one PathView per PathModel |
+| `InGameController._activeGroupId` | field | groupId of the currently-drawing path |
+| `InGameController.EnsurePathViews(int)` | method | creates PathView for any new PathModel in the group |
+| `InGameController.RefreshGroupViews(int)` | method | refreshes all PathViews for a given groupId |
+| `InGameController.GetConnectedCount()` | method | counts groups where all nodes are endpoints of complete paths (uses PathValidator.IsGroupConnected) |
 | `UIManager.GetLayer(UILayer)` | method | returns canvas Transform for named layer |
 | `PopupManager.Open<T>()` | method | instantiates T on Popup layer, pushes stack |
 | `PopupManager.CloseTop()` | method | destroys top popup, re-shows previous |
@@ -51,6 +56,8 @@
 ## Rules
 - All singletons pattern: `if (Instance != null) { Destroy(gameObject); return; }` in Awake
 - Popup T must extend `PopupBase`; use `UILayer.Popup` for all overlays
-- FSM valid transitions only: Idle↔Drawing, Drawing→Completed, Idle↔Erasing
+- FSM valid transitions only: Idle↔Drawing, Drawing→Completed
+- `InGameController` calls `ColorPalette.Init(stageData.NodeColors)` and `BoardCameraController.Init` in Start()
 - `InGameController` wires OnTimeUp → HandleTimeUp (cancels drawing, shows TimeoutPopup)
 - Pause popup must call `_timer.Pause()` / `_timer.Resume()` around show/dismiss
+- `InGameController` uses `_board.GroupIds` (not ColorIds) and `stageData.TimeLimit` (not stageData.Info.timeLimit)

@@ -3,6 +3,7 @@ using UnityEngine;
 using ProjectLink.Data;
 using ProjectLink.InGame;
 using ProjectLink.InGame.Board;
+using ProjectLink.InGame.Camera;
 using ProjectLink.InGame.Input;
 using ProjectLink.InGame.Path;
 using ProjectLink.InGame.UI;
@@ -23,12 +24,11 @@ namespace ProjectLink.Core
         PathDrawer        _drawer;
         BoardView         _boardView;
         TouchInputHandler _touchInput;
-        EraseController   _eraseController;
         InGameHUD         _hud;
         StageTimer        _timer;
 
-        readonly Dictionary<int, PathView> _pathViews = new();
-        int     _activeColorId;
+        readonly Dictionary<PathModel, PathView> _pathViewMap = new();
+        int     _activeGroupId;
         Vector2 _lastDragPos;
 
         void Awake()
@@ -44,44 +44,45 @@ namespace ProjectLink.Core
             var stageData = StageLoader.Load(_stageId);
             if (stageData == null) return;
 
+            ColorPalette.Init(stageData.NodeColors);
+
             _board        = new Board(stageData);
             _stateMachine = new GameStateMachine();
             _drawer       = new PathDrawer(_board, _stateMachine);
 
             FitCameraToBoard();
 
+            // Add camera controller for zoom/pan support
+            if (Camera.main != null)
+            {
+                var camCtrl = Camera.main.gameObject.GetComponent<BoardCameraController>();
+                if (camCtrl == null) camCtrl = Camera.main.gameObject.AddComponent<BoardCameraController>();
+                camCtrl.Init(_board, _cellSize);
+            }
+
             var boardGo = new GameObject("BoardView");
             boardGo.transform.SetParent(transform);
             _boardView = boardGo.AddComponent<BoardView>();
             _boardView.Init(_board, _cellSize);
 
-            var gaugeGo = new GameObject("CircularGauge");
-            gaugeGo.transform.SetParent(transform);
-            var gauge = gaugeGo.AddComponent<CircularGauge>();
-
             _touchInput = GetComponent<TouchInputHandler>();
             if (_touchInput == null) _touchInput = gameObject.AddComponent<TouchInputHandler>();
-
-            var eraseGo = new GameObject("EraseController");
-            eraseGo.transform.SetParent(transform);
-            _eraseController = eraseGo.AddComponent<EraseController>();
-            _eraseController.Init(_touchInput, _stateMachine, _drawer, _board, gauge, _boardView, _cellSize);
 
             var hudGo = new GameObject("InGameHUD");
             hudGo.transform.SetParent(transform);
             _hud = hudGo.AddComponent<InGameHUD>();
-            _hud.Init(_stageId, _board.ColorIds.Count, GetConnectedCount, stageData.Info.timeLimit);
+            _hud.Init(_stageId, _board.GroupIds.Count, GetConnectedCount, stageData.TimeLimit);
             _hud.OnPausePressed = OpenPausePopup;
 
             _timer = new StageTimer();
             _timer.OnTimeUp += HandleTimeUp;
-            if (stageData.Info.timeLimit > 0)
-                _timer.Start(stageData.Info.timeLimit);
+            if (stageData.TimeLimit > 0)
+                _timer.Start(stageData.TimeLimit);
 
-            _touchInput.OnDragStart        += HandleDragStart;
-            _touchInput.OnDragMove         += HandleDragMove;
-            _touchInput.OnDragEnd          += HandleDragEnd;
-            _stateMachine.OnStateChanged   += HandleStateChanged;
+            _touchInput.OnDragStart      += HandleDragStart;
+            _touchInput.OnDragMove       += HandleDragMove;
+            _touchInput.OnDragEnd        += HandleDragEnd;
+            _stateMachine.OnStateChanged += HandleStateChanged;
         }
 
         void Update()
@@ -127,11 +128,9 @@ namespace ProjectLink.Core
         {
             if (_drawer == null || _board == null) return 0;
             int count = 0;
-            foreach (int id in _board.ColorIds)
-            {
-                var path = _drawer.GetPath(id);
-                if (path != null && path.IsComplete) count++;
-            }
+            foreach (int groupId in _board.GroupIds)
+                if (PathValidator.IsGroupConnected(_board.GetGroupNodes(groupId), _drawer.GetPaths(groupId)))
+                    count++;
             return count;
         }
 
@@ -140,11 +139,12 @@ namespace ProjectLink.Core
             var cell = InputSnapper.Snap(worldPos, _board, _cellSize);
             if (!_drawer.TryStartPath(cell)) return;
 
-            _activeColorId = cell.ColorId;
+            _activeGroupId = _drawer.ActivePath.ColorId;
             _lastDragPos   = worldPos;
-            EnsurePathView(_activeColorId);
+            CleanupStalePathViews();   // Issue 2: remove views for paths cleared by TryStartPath
+            EnsurePathViews(_activeGroupId);
             _boardView.Refresh();
-            _pathViews[_activeColorId].Refresh();
+            RefreshGroupViews(_activeGroupId);
         }
 
         void HandleDragMove(Vector2 worldPos)
@@ -162,16 +162,37 @@ namespace ProjectLink.Core
             }
 
             _lastDragPos = worldPos;
+            CleanupStalePathViews();   // Issue 1: remove views for overwritten/merged paths
+            EnsurePathViews(_activeGroupId);
             _boardView.Refresh();
-            _pathViews[_activeColorId].Refresh();
+            foreach (var pv in _pathViewMap.Values) pv.Refresh();
         }
 
         void HandleDragEnd(Vector2 worldPos)
         {
             _drawer.EndPath();
+            CleanupStalePathViews();
             _boardView.Refresh();
-            foreach (var pv in _pathViews.Values) pv.Refresh();
+            foreach (var pv in _pathViewMap.Values) pv.Refresh();
             _hud?.Refresh();
+        }
+
+        // Destroys PathView GameObjects for PathModels no longer tracked by PathDrawer.
+        void CleanupStalePathViews()
+        {
+            var active = new HashSet<PathModel>();
+            foreach (var (_, path) in _drawer.AllPaths()) active.Add(path);
+
+            var stale = new List<PathModel>();
+            foreach (var kv in _pathViewMap)
+                if (!active.Contains(kv.Key)) stale.Add(kv.Key);
+
+            foreach (var pm in stale)
+            {
+                if (_pathViewMap.TryGetValue(pm, out var pv) && pv != null)
+                    Destroy(pv.gameObject);
+                _pathViewMap.Remove(pm);
+            }
         }
 
         void HandleStateChanged(GameState from, GameState to)
@@ -183,10 +204,6 @@ namespace ProjectLink.Core
                 var popup = PopupManager.Instance.Open<ClearPopup>();
                 popup.Init(_stageId, 3);
             }
-
-            // Erase completed: sync views (EraseController already refreshed BoardView internally)
-            if (from == GameState.Erasing && to == GameState.Idle)
-                foreach (var pv in _pathViews.Values) pv.Refresh();
         }
 
         void HandleTimeUp()
@@ -198,13 +215,10 @@ namespace ProjectLink.Core
             if (_stateMachine.Current == GameState.Drawing)
                 _drawer.EndPath();
 
-            if (_stateMachine.Current == GameState.Completed) return; // EndPath may have triggered clear
-
-            if (_stateMachine.Current == GameState.Erasing)
-                _eraseController.Cancel();
+            if (_stateMachine.Current == GameState.Completed) return;
 
             _boardView.Refresh();
-            foreach (var pv in _pathViews.Values) pv.Refresh();
+            foreach (var pv in _pathViewMap.Values) pv.Refresh();
             _hud?.SetTimerDisplay(0f);
 
             PopupManager.Instance.Open<TimeoutPopup>().Init(_stageId);
@@ -215,8 +229,8 @@ namespace ProjectLink.Core
             var cam = Camera.main;
             if (cam == null) return;
 
-            float boardW = _board.Width  * _cellSize;
-            float boardH = _board.Height * _cellSize;
+            float boardW  = _board.Width  * _cellSize;
+            float boardH  = _board.Height * _cellSize;
             float padding = _cellSize;
 
             float sizeByHeight = (boardH + padding) * 0.5f;
@@ -227,14 +241,23 @@ namespace ProjectLink.Core
             cam.transform.position = new Vector3(0f, 0f, -10f);
         }
 
-        void EnsurePathView(int colorId)
+        void EnsurePathViews(int groupId)
         {
-            if (_pathViews.ContainsKey(colorId)) return;
-            var go = new GameObject($"PathView_{colorId}");
-            go.transform.SetParent(transform);
-            var pv = go.AddComponent<PathView>();
-            pv.Init(_drawer.GetPath(colorId), _board.Width, _board.Height, _cellSize);
-            _pathViews[colorId] = pv;
+            foreach (var path in _drawer.GetPaths(groupId))
+            {
+                if (_pathViewMap.ContainsKey(path)) continue;
+                var go = new GameObject($"PathView_{groupId}");
+                go.transform.SetParent(transform);
+                var pv = go.AddComponent<PathView>();
+                pv.Init(path, _board.Width, _board.Height, _cellSize);
+                _pathViewMap[path] = pv;
+            }
+        }
+
+        void RefreshGroupViews(int groupId)
+        {
+            foreach (var path in _drawer.GetPaths(groupId))
+                if (_pathViewMap.TryGetValue(path, out var pv)) pv.Refresh();
         }
     }
 }

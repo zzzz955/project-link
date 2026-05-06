@@ -85,7 +85,9 @@ namespace ProjectLink.Utils
         {
             if (string.IsNullOrEmpty(raw)) return Activator.CreateInstance(type);
             if (type == typeof(int))    return int.Parse(raw);
+            if (type == typeof(uint))   return uint.Parse(raw);
             if (type == typeof(long))   return long.Parse(raw);
+            if (type == typeof(ulong))  return ulong.Parse(raw);
             if (type == typeof(float))  return float.Parse(raw, CultureInfo.InvariantCulture);
             if (type == typeof(double)) return double.Parse(raw, CultureInfo.InvariantCulture);
             if (type == typeof(bool))   return bool.Parse(raw);

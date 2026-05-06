@@ -78,6 +78,6 @@ namespace ProjectLink.InGame.Input
         }
 
         static Vector2 ToWorld(Vector2 screenPos) =>
-            Camera.main.ScreenToWorldPoint(screenPos);
+            UnityEngine.Camera.main.ScreenToWorldPoint(screenPos);
     }
 }

@@ -7,6 +7,7 @@
 | `Path/` | Path drawing, validation, line rendering → `Path/AGENTS.md` |
 | `Input/` | Touch input, longpress detection, erase trigger → `Input/AGENTS.md` |
 | `UI/` | HUD, timer display, popups, circular gauge → `UI/AGENTS.md` |
+| `Camera/` | Large board camera zoom and pan → `Camera/AGENTS.md` |
 
 ## Files (directly in InGame/)
 | file | class | role |

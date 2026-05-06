@@ -22,12 +22,16 @@ namespace ProjectLink.InGame.Board
 
         public void Refresh()
         {
-            _renderer.color = _cell.State switch
-            {
-                CellState.Node  => ColorPalette.Get(_cell.ColorId),
-                CellState.Path  => ColorPalette.Get(_cell.ColorId) * new Color(0.65f, 0.65f, 0.65f, 1f),
-                _               => new Color(0.15f, 0.15f, 0.15f),
-            };
+            if (_cell.IsObstacle)
+                _renderer.color = new Color(0.3f, 0.3f, 0.3f);
+            else if (_cell.IsGimmick)
+                _renderer.color = new Color(0.2f, 0.7f, 0.7f);
+            else if (_cell.IsNode)
+                _renderer.color = ColorPalette.Get(_cell.NodeGroupId);
+            else if (_cell.HasPath)
+                _renderer.color = ColorPalette.Get(_cell.PathOwner) * new Color(0.65f, 0.65f, 0.65f, 1f);
+            else
+                _renderer.color = new Color(0.15f, 0.15f, 0.15f);
         }
 
         static Sprite GetSharedSprite()

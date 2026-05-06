@@ -12,6 +12,7 @@ Unity 6000.4.5f1 | URP 2D (17.4.0) | C# | New Input System (1.19.0)
 | `project-link/Assets/Scripts/InGame/Path/` | Path drawing, validation, line rendering → `InGame/Path/AGENTS.md` |
 | `project-link/Assets/Scripts/InGame/Input/` | Touch drag, longpress, cell snap, erase → `InGame/Input/AGENTS.md` |
 | `project-link/Assets/Scripts/InGame/UI/` | HUD, timer, popups, circular gauge → `InGame/UI/AGENTS.md` |
+| `project-link/Assets/Scripts/InGame/Camera/` | Large board zoom + pan → `InGame/Camera/AGENTS.md` |
 | `project-link/Assets/Scripts/OutGame/` | Non-gameplay scenes (Title, Lobby) → `OutGame/AGENTS.md` |
 | `project-link/Assets/Scripts/OutGame/UI/` | Title/Lobby UI helpers, outgame popups → `OutGame/UI/AGENTS.md` |
 | `project-link/Assets/Scripts/Editor/` | Unity Editor automation tools → `Editor/AGENTS.md` |

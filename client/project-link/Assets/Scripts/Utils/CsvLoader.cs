@@ -24,7 +24,7 @@ namespace ProjectLink.Utils
             var lines = text.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
             if (lines.Length < 2) return Array.Empty<T>();
 
-            var headers = lines[0].Split(',');
+            var headers = ParseCsvLine(lines[0]);
             var type    = typeof(T);
             var fields  = new FieldInfo[headers.Length];
             for (int i = 0; i < headers.Length; i++)
@@ -33,7 +33,7 @@ namespace ProjectLink.Utils
             var results = new List<T>(lines.Length - 1);
             for (int r = 1; r < lines.Length; r++)
             {
-                var values = lines[r].Split(',');
+                var values = ParseCsvLine(lines[r]);
                 var obj    = new T();
                 for (int c = 0; c < fields.Length; c++)
                 {
@@ -43,6 +43,42 @@ namespace ProjectLink.Utils
                 results.Add(obj);
             }
             return results.ToArray();
+        }
+
+        static string[] ParseCsvLine(string line)
+        {
+            var fields = new List<string>();
+            var current = string.Empty;
+            bool inQuote = false;
+
+            for (int i = 0; i < line.Length; i++)
+            {
+                char c = line[i];
+                if (c == '"')
+                {
+                    if (inQuote && i + 1 < line.Length && line[i + 1] == '"')
+                    {
+                        current += '"';
+                        i++;
+                    }
+                    else
+                    {
+                        inQuote = !inQuote;
+                    }
+                }
+                else if (c == ',' && !inQuote)
+                {
+                    fields.Add(current.Trim());
+                    current = string.Empty;
+                }
+                else
+                {
+                    current += c;
+                }
+            }
+
+            fields.Add(current.Trim());
+            return fields.ToArray();
         }
 
         static object ConvertValue(string raw, Type type)

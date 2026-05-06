@@ -1,0 +1,214 @@
+stringId,languageCode,countryCode,text
+C,C,C,C
+string(64),string(8),string(8),string(256)
+PK,PK,NN,NN
+app_title,EN,US,PROJECT LINK
+app_title,KO,KR,프로젝트 링크
+app_title,ZH_CN,CN,项目连接
+app_title,ZH_TW,TW,專案連線
+app_title,TH,TH,โปรเจกต์ลิงก์
+bootstrap_syncing_puzzle_data,EN,US,SYNCING PUZZLE DATA
+bootstrap_syncing_puzzle_data,KO,KR,퍼즐 데이터 동기화 중
+bootstrap_syncing_puzzle_data,ZH_CN,CN,正在同步拼图数据
+bootstrap_syncing_puzzle_data,ZH_TW,TW,正在同步拼圖資料
+bootstrap_syncing_puzzle_data,TH,TH,กำลังซิงก์ข้อมูลปริศนา
+status_data,EN,US,DATA
+status_data,KO,KR,데이터
+status_data,ZH_CN,CN,数据
+status_data,ZH_TW,TW,資料
+status_data,TH,TH,ข้อมูล
+status_packets,EN,US,PACKETS
+status_packets,KO,KR,패킷
+status_packets,ZH_CN,CN,数据包
+status_packets,ZH_TW,TW,封包
+status_packets,TH,TH,แพ็กเก็ต
+status_account,EN,US,ACCOUNT
+status_account,KO,KR,계정
+status_account,ZH_CN,CN,账号
+status_account,ZH_TW,TW,帳號
+status_account,TH,TH,บัญชี
+bootstrap_server_ready,EN,US,v0.1.0   SERVER READY
+bootstrap_server_ready,KO,KR,v0.1.0   서버 준비 완료
+bootstrap_server_ready,ZH_CN,CN,v0.1.0   服务器就绪
+bootstrap_server_ready,ZH_TW,TW,v0.1.0   伺服器就緒
+bootstrap_server_ready,TH,TH,v0.1.0   เซิร์ฟเวอร์พร้อม
+title_tagline,EN,US,CONNECT COLORS. CLEAR THE FLOW.
+title_tagline,KO,KR,색을 잇고 흐름을 완성하세요.
+title_tagline,ZH_CN,CN,连接颜色。清除通路。
+title_tagline,ZH_TW,TW,連接顏色。清出通路。
+title_tagline,TH,TH,เชื่อมสีให้ครบ เคลียร์เส้นทาง
+title_tap_to_start,EN,US,TAP TO START
+title_tap_to_start,KO,KR,탭해서 시작
+title_tap_to_start,ZH_CN,CN,点击开始
+title_tap_to_start,ZH_TW,TW,點擊開始
+title_tap_to_start,TH,TH,แตะเพื่อเริ่ม
+title_guest_profile_region,EN,US,GUEST PROFILE  |  US REGION
+title_guest_profile_region,KO,KR,게스트 프로필  |  한국 지역
+title_guest_profile_region,ZH_CN,CN,游客档案  |  中国大陆地区
+title_guest_profile_region,ZH_TW,TW,訪客檔案  |  台灣地區
+title_guest_profile_region,TH,TH,โปรไฟล์ผู้เยี่ยมชม  |  ไทย
+footer_notice,EN,US,NOTICE
+footer_notice,KO,KR,공지
+footer_notice,ZH_CN,CN,公告
+footer_notice,ZH_TW,TW,公告
+footer_notice,TH,TH,ประกาศ
+footer_terms,EN,US,TERMS
+footer_terms,KO,KR,약관
+footer_terms,ZH_CN,CN,条款
+footer_terms,ZH_TW,TW,條款
+footer_terms,TH,TH,ข้อกำหนด
+footer_server,EN,US,SERVER
+footer_server,KO,KR,서버
+footer_server,ZH_CN,CN,服务器
+footer_server,ZH_TW,TW,伺服器
+footer_server,TH,TH,เซิร์ฟเวอร์
+lobby_player,EN,US,PLAYER
+lobby_player,KO,KR,플레이어
+lobby_player,ZH_CN,CN,玩家
+lobby_player,ZH_TW,TW,玩家
+lobby_player,TH,TH,ผู้เล่น
+lobby_title_button,EN,US,TITLE
+lobby_title_button,KO,KR,타이틀
+lobby_title_button,ZH_CN,CN,标题
+lobby_title_button,ZH_TW,TW,標題
+lobby_title_button,TH,TH,หน้าแรก
+lobby_stage_map,EN,US,STAGE MAP
+lobby_stage_map,KO,KR,스테이지 맵
+lobby_stage_map,ZH_CN,CN,关卡地图
+lobby_stage_map,ZH_TW,TW,關卡地圖
+lobby_stage_map,TH,TH,แผนที่ด่าน
+lobby_world_1,EN,US,WORLD 1 - STREAM GARDEN
+lobby_world_1,KO,KR,월드 1 - 흐름의 정원
+lobby_world_1,ZH_CN,CN,世界 1 - 溪流花园
+lobby_world_1,ZH_TW,TW,世界 1 - 溪流花園
+lobby_world_1,TH,TH,โลก 1 - สวนสายน้ำ
+lobby_daily,EN,US,DAILY
+lobby_daily,KO,KR,일일
+lobby_daily,ZH_CN,CN,每日
+lobby_daily,ZH_TW,TW,每日
+lobby_daily,TH,TH,รายวัน
+lobby_event,EN,US,EVENT
+lobby_event,KO,KR,이벤트
+lobby_event,ZH_CN,CN,活动
+lobby_event,ZH_TW,TW,活動
+lobby_event,TH,TH,อีเวนต์
+lobby_season,EN,US,SEASON
+lobby_season,KO,KR,시즌
+lobby_season,ZH_CN,CN,赛季
+lobby_season,ZH_TW,TW,賽季
+lobby_season,TH,TH,ซีซัน
+lobby_play_stage,EN,US,PLAY STAGE
+lobby_play_stage,KO,KR,스테이지 플레이
+lobby_play_stage,ZH_CN,CN,开始关卡
+lobby_play_stage,ZH_TW,TW,開始關卡
+lobby_play_stage,TH,TH,เล่นด่าน
+nav_home,EN,US,HOME
+nav_home,KO,KR,홈
+nav_home,ZH_CN,CN,主页
+nav_home,ZH_TW,TW,首頁
+nav_home,TH,TH,หน้าแรก
+nav_stage,EN,US,STAGE
+nav_stage,KO,KR,스테이지
+nav_stage,ZH_CN,CN,关卡
+nav_stage,ZH_TW,TW,關卡
+nav_stage,TH,TH,ด่าน
+nav_shop,EN,US,SHOP
+nav_shop,KO,KR,상점
+nav_shop,ZH_CN,CN,商店
+nav_shop,ZH_TW,TW,商店
+nav_shop,TH,TH,ร้านค้า
+nav_bag,EN,US,BAG
+nav_bag,KO,KR,가방
+nav_bag,ZH_CN,CN,背包
+nav_bag,ZH_TW,TW,背包
+nav_bag,TH,TH,กระเป๋า
+game_drag_hint,EN,US,DRAG BETWEEN MATCHING NODES
+game_drag_hint,KO,KR,같은 색 노드를 드래그로 연결하세요
+game_drag_hint,ZH_CN,CN,拖动连接相同节点
+game_drag_hint,ZH_TW,TW,拖曳連接相同節點
+game_drag_hint,TH,TH,ลากเชื่อมโหนดที่ตรงกัน
+popup_cancel,EN,US,CANCEL
+popup_cancel,KO,KR,취소
+popup_cancel,ZH_CN,CN,取消
+popup_cancel,ZH_TW,TW,取消
+popup_cancel,TH,TH,ยกเลิก
+popup_exit_title,EN,US,EXIT GAME
+popup_exit_title,KO,KR,게임 종료
+popup_exit_title,ZH_CN,CN,退出游戏
+popup_exit_title,ZH_TW,TW,結束遊戲
+popup_exit_title,TH,TH,ออกจากเกม
+popup_exit_message,EN,US,Close Project Link and return to your device?
+popup_exit_message,KO,KR,프로젝트 링크를 닫고 기기로 돌아갈까요?
+popup_exit_message,ZH_CN,CN,关闭项目连接并返回设备?
+popup_exit_message,ZH_TW,TW,關閉專案連線並返回裝置?
+popup_exit_message,TH,TH,ปิดโปรเจกต์ลิงก์แล้วกลับไปยังอุปกรณ์?
+popup_exit_confirm,EN,US,EXIT
+popup_exit_confirm,KO,KR,종료
+popup_exit_confirm,ZH_CN,CN,退出
+popup_exit_confirm,ZH_TW,TW,結束
+popup_exit_confirm,TH,TH,ออก
+popup_return_title,EN,US,RETURN TO TITLE
+popup_return_title,KO,KR,타이틀로 돌아가기
+popup_return_title,ZH_CN,CN,返回标题
+popup_return_title,ZH_TW,TW,返回標題
+popup_return_title,TH,TH,กลับหน้าแรก
+popup_return_message,EN,US,Current lobby selection will be kept. Move back to the title screen?
+popup_return_message,KO,KR,현재 로비 선택은 유지됩니다. 타이틀 화면으로 돌아갈까요?
+popup_return_message,ZH_CN,CN,当前大厅选择将保留。返回标题画面?
+popup_return_message,ZH_TW,TW,目前大廳選擇會保留。返回標題畫面?
+popup_return_message,TH,TH,จะเก็บการเลือกในล็อบบี้ไว้ กลับไปหน้าแรก?
+popup_return_confirm,EN,US,GO TO TITLE
+popup_return_confirm,KO,KR,타이틀로 이동
+popup_return_confirm,ZH_CN,CN,前往标题
+popup_return_confirm,ZH_TW,TW,前往標題
+popup_return_confirm,TH,TH,ไปหน้าแรก
+language_en,EN,US,EN
+language_en,KO,KR,영어
+language_en,ZH_CN,CN,英语
+language_en,ZH_TW,TW,英文
+language_en,TH,TH,อังกฤษ
+language_ko,EN,US,KO
+language_ko,KO,KR,한국어
+language_ko,ZH_CN,CN,韩语
+language_ko,ZH_TW,TW,韓文
+language_ko,TH,TH,เกาหลี
+language_zh_cn,EN,US,ZH-CN
+language_zh_cn,KO,KR,중국어 간체
+language_zh_cn,ZH_CN,CN,简体中文
+language_zh_cn,ZH_TW,TW,簡體中文
+language_zh_cn,TH,TH,จีนตัวย่อ
+language_zh_tw,EN,US,ZH-TW
+language_zh_tw,KO,KR,중국어 번체
+language_zh_tw,ZH_CN,CN,繁体中文
+language_zh_tw,ZH_TW,TW,繁體中文
+language_zh_tw,TH,TH,จีนตัวเต็ม
+language_th,EN,US,TH
+language_th,KO,KR,태국어
+language_th,ZH_CN,CN,泰语
+language_th,ZH_TW,TW,泰文
+language_th,TH,TH,ไทย
+country_us,EN,US,US
+country_us,KO,KR,US
+country_us,ZH_CN,CN,US
+country_us,ZH_TW,TW,US
+country_us,TH,TH,US
+country_kr,EN,US,KR
+country_kr,KO,KR,KR
+country_kr,ZH_CN,CN,KR
+country_kr,ZH_TW,TW,KR
+country_kr,TH,TH,KR
+country_cn,EN,US,CN
+country_cn,KO,KR,CN
+country_cn,ZH_CN,CN,CN
+country_cn,ZH_TW,TW,CN
+country_cn,TH,TH,CN
+country_tw,EN,US,TW
+country_tw,KO,KR,TW
+country_tw,ZH_CN,CN,TW
+country_tw,ZH_TW,TW,TW
+country_tw,TH,TH,TW
+country_th,EN,US,TH
+country_th,KO,KR,TH
+country_th,ZH_CN,CN,TH
+country_th,ZH_TW,TW,TH
+country_th,TH,TH,TH

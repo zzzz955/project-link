@@ -14,7 +14,7 @@
 | symbol | kind | note |
 |--------|------|------|
 | `createServer` | function | Creates the local HTTP API server |
-| `POST /api/stages/generate` | route | Returns an unsaved generated payload with seed and validation status |
+| `POST /api/stages/generate` | route | Returns an unsaved generated payload from size, difficulty, node count, seed, and validation status |
 | `StageRepository.createStage` | method | Adds only the next contiguous `stageId` |
 | `StageRepository.updateStage` | method | Updates only existing stages |
 | `StageRepository.deleteStage` | method | Deletes only the last stage |

@@ -41,7 +41,14 @@ type GenerateSettings = {
   width: number;
   height: number;
   difficulty: number;
+  nodeCount: number;
   seed: string;
+};
+
+type DragState = {
+  action: "node-path" | "cell-paint" | "erase";
+  nodeGroup: number;
+  cells: number[];
 };
 
 type GeneratedStageResponse = Partial<StageRecord> & {
@@ -63,6 +70,7 @@ type GeneratedStageResponse = Partial<StageRecord> & {
 const DEFAULT_WIDTH = 8;
 const DEFAULT_HEIGHT = 8;
 const MAX_BOARD_EDGE = 40;
+const MAX_NODE_GROUPS = 20;
 const CELL_CODES: Array<{ code: CellCode; label: string; value: string }> = [
   { code: "empty", label: "Empty", value: "0" },
   { code: "obstacle", label: "Block", value: "obstacle" },
@@ -122,6 +130,13 @@ function clampDifficulty(value: number): number {
     return 1;
   }
   return Math.min(5, Math.max(1, Math.floor(value)));
+}
+
+function clampNodeCount(value: number): number {
+  if (!Number.isFinite(value)) {
+    return 4;
+  }
+  return Math.min(MAX_NODE_GROUPS, Math.max(1, Math.floor(value)));
 }
 
 function resizeGrid<T>(grid: T[][], width: number, height: number, fill: T): T[][] {
@@ -334,6 +349,55 @@ function stagePayload(stage: StageRecord) {
   };
 }
 
+function toCellIndex(x: number, y: number, width: number): number {
+  return y * width + x;
+}
+
+function toPoint(index: number, width: number): { x: number; y: number } {
+  return { x: index % width, y: Math.floor(index / width) };
+}
+
+function segmentIndices(from: number, to: number, width: number): number[] {
+  const start = toPoint(from, width);
+  const end = toPoint(to, width);
+  const cells: number[] = [];
+  let x = start.x;
+  let y = start.y;
+  const push = () => cells.push(toCellIndex(x, y, width));
+  push();
+  while (x !== end.x) {
+    x += Math.sign(end.x - x);
+    push();
+  }
+  while (y !== end.y) {
+    y += Math.sign(end.y - y);
+    push();
+  }
+  return cells;
+}
+
+function appendDragCells(current: DragState, nextIndex: number, width: number): DragState {
+  const previous = current.cells[current.cells.length - 1];
+  const nextCells = previous === undefined ? [nextIndex] : segmentIndices(previous, nextIndex, width);
+  const merged = [...current.cells];
+  for (const cell of nextCells) {
+    if (merged[merged.length - 1] !== cell) {
+      merged.push(cell);
+    }
+  }
+  return { ...current, cells: merged };
+}
+
+function hexToRgba(hex: string | undefined, alpha: number): string | undefined {
+  if (!hex || !/^#[0-9a-f]{6}$/i.test(hex)) {
+    return undefined;
+  }
+  const red = parseInt(hex.slice(1, 3), 16);
+  const green = parseInt(hex.slice(3, 5), 16);
+  const blue = parseInt(hex.slice(5, 7), 16);
+  return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
+}
+
 function normalizeGeneratedStage(raw: unknown, fallbackStageId: string): { stage: StageRecord; seed: string } {
   const response = (raw ?? {}) as GeneratedStageResponse;
   const board = response.stage ?? response.payload ?? response.data ?? response.result ?? response.generated ?? response;
@@ -353,6 +417,7 @@ function App() {
     width: DEFAULT_WIDTH,
     height: DEFAULT_HEIGHT,
     difficulty: 1,
+    nodeCount: 4,
     seed: "",
   });
   const [generatedSeed, setGeneratedSeed] = useState("");
@@ -360,6 +425,7 @@ function App() {
   const [mode, setMode] = useState<ToolMode>("node");
   const [selectedNode, setSelectedNode] = useState(1);
   const [selectedCell, setSelectedCell] = useState<CellCode>("empty");
+  const [dragState, setDragState] = useState<DragState | undefined>();
   const [validationErrors, setValidationErrors] = useState<ValidationError[]>([]);
   const [status, setStatus] = useState("");
   const [isBusy, setBusy] = useState(false);
@@ -371,6 +437,8 @@ function App() {
     }
     return map;
   }, [nodeColors]);
+
+  const previewCells = useMemo(() => new Set(dragState?.cells ?? []), [dragState]);
 
   const loadStages = useCallback(async () => {
     const payload = await requestJson<unknown>("/api/stages");
@@ -439,16 +507,73 @@ function App() {
     });
   };
 
-  const clearCell = (x: number, y: number) => {
+  const clearCells = (indices: readonly number[]) => {
     updateStage((current) => ({
       ...current,
       nodeMap: current.nodeMap.map((row, rowIndex) =>
-        rowIndex === y ? row.map((cell, colIndex) => (colIndex === x ? 0 : cell)) : row,
+        row.map((cell, colIndex) => (indices.includes(toCellIndex(colIndex, rowIndex, current.boardSize.width)) ? 0 : cell)),
       ),
       cellMap: current.cellMap.map((row, rowIndex) =>
-        rowIndex === y ? row.map((cell, colIndex) => (colIndex === x ? "0" : cell)) : row,
+        row.map((cell, colIndex) => (indices.includes(toCellIndex(colIndex, rowIndex, current.boardSize.width)) ? "0" : cell)),
       ),
     }));
+  };
+
+  const clearCell = (x: number, y: number) => {
+    clearCells([toCellIndex(x, y, stage.boardSize.width)]);
+  };
+
+  const beginCellInteraction = (event: React.PointerEvent<HTMLButtonElement>, x: number, y: number) => {
+    event.preventDefault();
+    const index = toCellIndex(x, y, stage.boardSize.width);
+
+    if (event.button === 2) {
+      clearCell(x, y);
+      setDragState({ action: "erase", nodeGroup: 0, cells: [index] });
+      return;
+    }
+
+    if (event.button !== 0) {
+      return;
+    }
+
+    paintCell(x, y);
+    if (mode === "node" && selectedNode > 0) {
+      setDragState({ action: "node-path", nodeGroup: selectedNode, cells: [index] });
+      return;
+    }
+    setDragState({ action: "cell-paint", nodeGroup: 0, cells: [index] });
+  };
+
+  const continueCellInteraction = (x: number, y: number) => {
+    if (!dragState) {
+      return;
+    }
+
+    const index = toCellIndex(x, y, stage.boardSize.width);
+    const nextDragState = appendDragCells(dragState, index, stage.boardSize.width);
+    setDragState(nextDragState);
+
+    if (dragState.action === "erase") {
+      clearCells(nextDragState.cells);
+    } else if (dragState.action === "cell-paint") {
+      paintCell(x, y);
+    }
+  };
+
+  const finishCellInteraction = (x: number, y: number) => {
+    if (!dragState) {
+      return;
+    }
+
+    if (dragState.action === "node-path") {
+      paintCell(x, y);
+    } else if (dragState.action === "erase") {
+      clearCell(x, y);
+    } else {
+      paintCell(x, y);
+    }
+    setDragState(undefined);
   };
 
   const newStage = () => {
@@ -503,6 +628,7 @@ function App() {
           width: clampSize(generateSettings.width),
           height: clampSize(generateSettings.height),
           difficulty: clampDifficulty(generateSettings.difficulty),
+          nodeCount: clampNodeCount(generateSettings.nodeCount),
           ...(seed ? { seed } : {}),
         }),
       });
@@ -721,6 +847,21 @@ function App() {
             />
           </label>
           <label>
+            <span>Gen Nodes</span>
+            <input
+              type="number"
+              min={1}
+              max={MAX_NODE_GROUPS}
+              value={generateSettings.nodeCount}
+              onChange={(event) =>
+                setGenerateSettings((current) => ({
+                  ...current,
+                  nodeCount: clampNodeCount(Number(event.target.value)),
+                }))
+              }
+            />
+          </label>
+          <label>
             <span>Seed</span>
             <input
               type="text"
@@ -809,8 +950,13 @@ function App() {
           >
             {stage.nodeMap.map((row, y) =>
               row.map((nodeGroup, x) => {
+                const index = toCellIndex(x, y, stage.boardSize.width);
                 const cellCode = stage.cellMap[y]?.[x] ?? "0";
                 const nodeColor = nodeGroup > 0 ? colorByGroup.get(nodeGroup) : undefined;
+                const previewColor =
+                  dragState?.action === "node-path" && previewCells.has(index)
+                    ? hexToRgba(colorByGroup.get(dragState.nodeGroup), 0.24)
+                    : undefined;
                 const cellClass =
                   cellCode === "obstacle" || cellCode === "1"
                     ? "obstacle"
@@ -821,12 +967,14 @@ function App() {
                   <button
                     type="button"
                     key={`${x}-${y}`}
-                    className={`grid-cell ${cellClass}`}
-                    style={{ backgroundColor: nodeColor ?? undefined }}
-                    onClick={() => paintCell(x, y)}
+                    className={`grid-cell ${cellClass}${previewColor ? " path-preview" : ""}`}
+                    style={{ backgroundColor: nodeColor ?? previewColor ?? undefined }}
+                    onPointerDown={(event) => beginCellInteraction(event, x, y)}
+                    onPointerEnter={() => continueCellInteraction(x, y)}
+                    onPointerUp={() => finishCellInteraction(x, y)}
+                    onPointerCancel={() => setDragState(undefined)}
                     onContextMenu={(event) => {
                       event.preventDefault();
-                      clearCell(x, y);
                     }}
                     title={`${x},${y}`}
                   >

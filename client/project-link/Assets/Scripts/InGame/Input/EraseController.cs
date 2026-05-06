@@ -67,7 +67,7 @@ namespace ProjectLink.InGame.Input
             _fillCoroutine = StartCoroutine(FillGauge(cell.ColorId));
         }
 
-        void Cancel()
+        public void Cancel()
         {
             if (_fillCoroutine != null) StopCoroutine(_fillCoroutine);
             _fillCoroutine = null;

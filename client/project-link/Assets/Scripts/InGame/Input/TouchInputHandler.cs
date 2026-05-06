@@ -17,6 +17,7 @@ namespace ProjectLink.InGame.Input
 
         bool    _isPressing;
         bool    _longPressFired;
+        bool    _isDragStarted;
         float   _pressTime;
         Vector2 _pressStartWorld;
 
@@ -29,22 +30,35 @@ namespace ProjectLink.InGame.Input
             {
                 _isPressing      = true;
                 _longPressFired  = false;
+                _isDragStarted   = false;
                 _pressTime       = 0f;
                 _pressStartWorld = ToWorld(pointer.position.ReadValue());
-                OnDragStart?.Invoke(_pressStartWorld);
+                // OnDragStart is deferred until movement is confirmed so that
+                // a longpress on a completed path is not pre-empted by TryStartPath.
             }
 
             if (_isPressing && pointer.press.isPressed)
             {
                 var worldPos = ToWorld(pointer.position.ReadValue());
-                OnDragMove?.Invoke(worldPos);
+                float moved  = Vector2.Distance(worldPos, _pressStartWorld);
 
                 _pressTime += Time.deltaTime;
-                float moved = Vector2.Distance(worldPos, _pressStartWorld);
 
-                if (!_longPressFired
-                    && _pressTime  >= _longPressThreshold
-                    && moved       <= _longPressMoveLimit)
+                if (_longPressFired)
+                {
+                    // longpress active — movement is ignored
+                }
+                else if (_isDragStarted)
+                {
+                    OnDragMove?.Invoke(worldPos);
+                }
+                else if (moved > _longPressMoveLimit)
+                {
+                    _isDragStarted = true;
+                    OnDragStart?.Invoke(_pressStartWorld);
+                    OnDragMove?.Invoke(worldPos);
+                }
+                else if (_pressTime >= _longPressThreshold)
                 {
                     _longPressFired = true;
                     OnLongPressStart?.Invoke(_pressStartWorld);

@@ -41,6 +41,13 @@ function parseEnv(content) {
 }
 
 // ── Load config ───────────────────────────────────────────────────────────────
+function firstEnv(env, keys, fallback = '') {
+  for (const key of keys) {
+    if (env[key] !== undefined && env[key] !== '') return env[key];
+  }
+  return fallback;
+}
+
 function load() {
   const iniPath = path.join(ROOT, 'template.ini');
   const envPath = path.join(ROOT, '.env');
@@ -69,7 +76,8 @@ function load() {
       dbSchema:        path.join(ROOT, p['db_schema']        || 'server/db/schema.json'),
       clientGenerated:        path.join(ROOT, p['client_generated']         || 'client/src/generated/'),
       clientScriptsGenerated: path.join(ROOT, p['client_scripts_generated'] || 'client/src/generated/scripts/'),
-      serverGenerated:        path.join(ROOT, p['server_generated']         || 'server/src/generated/'),
+      serverGenerated:        path.join(ROOT, p['server_generated']         || 'server/generated/'),
+      serverScriptsGenerated: path.join(ROOT, p['server_scripts_generated'] || 'server/generated/scripts/'),
       migrationsDir:   path.join(ROOT, p['migrations_dir']   || 'server/db/migrations/'),
       protoGenerated:  path.join(ROOT, p['proto_generated']  || 'generated/proto/'),
     },
@@ -78,6 +86,7 @@ function load() {
       clientTargets:   (ini['data-gen']?.['client_targets']  || 'CS,C').split(',').map(s => s.trim()),
       serverTargets:   (ini['data-gen']?.['server_targets']  || 'CS,S').split(',').map(s => s.trim()),
       clientNamespace: ini['data-gen']?.['client_namespace'] || 'Generated.Data',
+      serverNamespace: ini['data-gen']?.['server_namespace'] || 'ProjectLink.Generated.Data',
     },
 
     packetGen: {
@@ -93,13 +102,13 @@ function load() {
     },
 
     db: {
-      type:     env['DB_TYPE']     || 'postgresql',
-      host:     env['DB_HOST']     || 'localhost',
-      port:     parseInt(env['DB_PORT'] || '5432', 10),
-      name:     env['DB_NAME']     || 'game_db',
-      user:     env['DB_USER']     || '',
-      password: env['DB_PASSWORD'] || '',
-      file:     env['DB_FILE']     || '',
+      type:     firstEnv(env, ['DB_TYPE'], 'postgresql'),
+      host:     firstEnv(env, ['DB_HOST', 'POSTGRES_HOST'], 'localhost'),
+      port:     parseInt(firstEnv(env, ['DB_PORT', 'POSTGRES_HOST_PORT', 'POSTGRES_PORT'], '5432'), 10),
+      name:     firstEnv(env, ['DB_NAME', 'POSTGRES_DB'], 'game_db'),
+      user:     firstEnv(env, ['DB_USER', 'POSTGRES_USER']),
+      password: firstEnv(env, ['DB_PASSWORD', 'POSTGRES_PASSWORD']),
+      file:     firstEnv(env, ['DB_FILE']),
     },
 
     typeMap: {

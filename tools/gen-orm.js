@@ -279,7 +279,7 @@ async function connectDB(dbType) {
     } else {
       console.error(`[gen-orm] ERROR: DB connection failed (${dbType}://${host}:${port}/${name})`);
       console.error(`  ${e.message}`);
-      console.error('  Check .env: DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASSWORD');
+      console.error('  Check .env: DB_HOST/DB_PORT and POSTGRES_DB/POSTGRES_USER/POSTGRES_PASSWORD');
     }
     process.exit(1);
   }

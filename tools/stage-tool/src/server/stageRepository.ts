@@ -125,7 +125,8 @@ function recordToStage(record: Record<string, string>): Stage {
     timeLimit: parseInt(record.timeLimit, 10),
     difficulty: parseInt(record.difficulty, 10),
     nodeMap: record.nodeMap,
-    cellMap: record.cellMap
+    cellMap: record.cellMap,
+    generatorSeed: parseInt(record.generatorSeed || "0", 10)
   });
 }
 
@@ -141,6 +142,6 @@ function stageToRecord(stage: Stage, existing: Record<string, string> = {}): Rec
     nodeMap: encodeFixedBase36(stage.nodeMap),
     cellMap: encodeFixedBase36(stage.cellMap),
     stageMeta: existing.stageMeta || "{}",
-    generatorSeed: existing.generatorSeed || "0"
+    generatorSeed: stage.generatorSeed === undefined ? (existing.generatorSeed || "0") : String(stage.generatorSeed)
   };
 }

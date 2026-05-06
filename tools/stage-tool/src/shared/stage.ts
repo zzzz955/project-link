@@ -11,6 +11,7 @@ export interface Stage {
   difficulty: number;
   nodeMap: number[];
   cellMap: CellCode[];
+  generatorSeed?: number;
 }
 
 export interface StagePayload {
@@ -20,6 +21,7 @@ export interface StagePayload {
   difficulty: number;
   nodeMap: number[] | string;
   cellMap: CellCode[] | number[] | string;
+  generatorSeed?: number;
 }
 
 export interface NodeColor {

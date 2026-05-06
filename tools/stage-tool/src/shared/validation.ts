@@ -8,13 +8,14 @@ import {
   ValidationIssue
 } from "./stage";
 import { normalizeMap } from "./codec";
+import { validateStageSolvable } from "./solver";
 
 const MIN_SIZE = 1;
 const MAX_SIZE = 128;
 const MIN_TIME_LIMIT = 0;
 const MAX_TIME_LIMIT = 86400;
-const MIN_DIFFICULTY = 0;
-const MAX_DIFFICULTY = 100;
+const MIN_DIFFICULTY = 1;
+const MAX_DIFFICULTY = 5;
 const MAX_CELL_CODE = 36 ** 2 - 1;
 
 export function validateStageSequence(stageIds: readonly number[]): void {
@@ -128,15 +129,20 @@ export function normalizeAndValidateStage(stageId: number, payload: StagePayload
 
   throwIfIssues(issues);
 
-  return {
+  const stage = {
     stageId,
     width: payload.width,
     height: payload.height,
     timeLimit: payload.timeLimit,
     difficulty: payload.difficulty,
     nodeMap,
-    cellMap
+    cellMap,
+    generatorSeed: payload.generatorSeed
   };
+  const solverResult = validateStageSolvable(stage);
+  throwIfIssues(solverResult.issues);
+
+  return stage;
 }
 
 function assertPositiveId(value: unknown, field: string, issues: ValidationIssue[]): value is number {

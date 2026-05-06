@@ -14,6 +14,7 @@ type StageRecord = {
   difficulty: number;
   nodeMap: number[][];
   cellMap: string[][];
+  generatorSeed?: number;
 };
 
 type StageSummary = {
@@ -34,6 +35,29 @@ type CellCode = "empty" | "obstacle" | "reserved";
 type ValidationError = {
   path?: string;
   message: string;
+};
+
+type GenerateSettings = {
+  width: number;
+  height: number;
+  difficulty: number;
+  seed: string;
+};
+
+type GeneratedStageResponse = Partial<StageRecord> & {
+  payload?: unknown;
+  stage?: unknown;
+  data?: unknown;
+  result?: unknown;
+  generated?: unknown;
+  seed?: string | number;
+  generatedSeed?: string | number;
+  generatorSeed?: string | number;
+  metadata?: {
+    seed?: string | number;
+    generatedSeed?: string | number;
+    generatorSeed?: string | number;
+  };
 };
 
 const DEFAULT_WIDTH = 8;
@@ -93,6 +117,13 @@ function clampSize(value: number): number {
   return Math.min(MAX_BOARD_EDGE, Math.max(1, Math.floor(value)));
 }
 
+function clampDifficulty(value: number): number {
+  if (!Number.isFinite(value)) {
+    return 1;
+  }
+  return Math.min(5, Math.max(1, Math.floor(value)));
+}
+
 function resizeGrid<T>(grid: T[][], width: number, height: number, fill: T): T[][] {
   return Array.from({ length: height }, (_, y) =>
     Array.from({ length: width }, (_, x) => grid[y]?.[x] ?? fill),
@@ -121,6 +152,7 @@ function normalizeStage(raw: unknown, fallbackStageId = ""): StageRecord {
     difficulty: Number(data.difficulty ?? 1),
     nodeMap: toRows(nodeMap, width, height, 0),
     cellMap: toRows(cellMap, width, height, "0"),
+    generatorSeed: Number((data as { generatorSeed?: number }).generatorSeed ?? 0) || undefined,
   };
 }
 
@@ -240,13 +272,39 @@ function toApiError(payload: unknown, fallback: string): Error & { validation?: 
     issues?: Array<string | { field?: string; path?: string; message: string }>;
   };
   error.message = String(data?.message ?? data?.error ?? fallback);
-  const errors = data?.validationErrors ?? data?.errors ?? data?.issues;
-  if (Array.isArray(errors)) {
-    error.validation = errors.map((item) =>
-      typeof item === "string" ? { message: item } : { path: item.path ?? item.field, message: item.message },
-    );
+  const errors = normalizeValidationErrors(data);
+  if (errors.length > 0) {
+    error.validation = errors;
   }
   return error;
+}
+
+function normalizeValidationErrors(payload: unknown): ValidationError[] {
+  const data = payload as {
+    errors?: Array<string | ValidationError>;
+    validationErrors?: Array<string | ValidationError>;
+    issues?: Array<string | { field?: string; path?: string; message: string }>;
+    solverIssues?: Array<string | { field?: string; path?: string; message: string }>;
+    solver?: {
+      errors?: Array<string | ValidationError>;
+      issues?: Array<string | { field?: string; path?: string; message: string }>;
+    };
+  };
+  const errors =
+    data?.validationErrors ??
+    data?.errors ??
+    data?.issues ??
+    data?.solverIssues ??
+    data?.solver?.issues ??
+    data?.solver?.errors;
+
+  if (!Array.isArray(errors)) {
+    return [];
+  }
+
+  return errors.map((item) =>
+    typeof item === "string" ? { message: item } : { path: item.path ?? item.field, message: item.message },
+  );
 }
 
 function flattenGrid<T>(grid: T[][]): T[] {
@@ -272,6 +330,17 @@ function stagePayload(stage: StageRecord) {
     difficulty: stage.difficulty,
     nodeMap: flattenGrid(stage.nodeMap),
     cellMap: flattenGrid(stage.cellMap).map(encodeCellValue),
+    ...(stage.generatorSeed ? { generatorSeed: stage.generatorSeed } : {}),
+  };
+}
+
+function normalizeGeneratedStage(raw: unknown, fallbackStageId: string): { stage: StageRecord; seed: string } {
+  const response = (raw ?? {}) as GeneratedStageResponse;
+  const board = response.stage ?? response.payload ?? response.data ?? response.result ?? response.generated ?? response;
+  const seed = response.generatedSeed ?? response.seed ?? response.generatorSeed ?? response.metadata?.generatedSeed ?? response.metadata?.seed ?? response.metadata?.generatorSeed ?? "";
+  return {
+    stage: normalizeStage(board, fallbackStageId),
+    seed: seed === "" || seed === undefined ? "" : String(seed),
   };
 }
 
@@ -280,6 +349,13 @@ function App() {
   const [stage, setStage] = useState<StageRecord>(() => createStage());
   const [selectedStageId, setSelectedStageId] = useState("");
   const [draftStageId, setDraftStageId] = useState("");
+  const [generateSettings, setGenerateSettings] = useState<GenerateSettings>({
+    width: DEFAULT_WIDTH,
+    height: DEFAULT_HEIGHT,
+    difficulty: 1,
+    seed: "",
+  });
+  const [generatedSeed, setGeneratedSeed] = useState("");
   const [nodeColors, setNodeColors] = useState<NodeColor[]>(FALLBACK_NODE_COLORS);
   const [mode, setMode] = useState<ToolMode>("node");
   const [selectedNode, setSelectedNode] = useState(1);
@@ -311,6 +387,7 @@ function App() {
       setStage(nextStage);
       setSelectedStageId(nextStage.stageId);
       setDraftStageId(nextStage.stageId);
+      setGeneratedSeed("");
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "Load failed");
     } finally {
@@ -381,29 +458,66 @@ function App() {
     setStage(next);
     setSelectedStageId("");
     setDraftStageId(next.stageId);
+    setGeneratedSeed("");
     setValidationErrors([]);
     setStatus("");
   };
 
   const validateBeforeSave = async (current: StageRecord): Promise<boolean> => {
     try {
-      const payload = await requestJson<{ errors?: ValidationError[]; valid?: boolean }>(
+      const payload = await requestJson<unknown>(
         `/api/stages/${encodeURIComponent(current.stageId)}/validate`,
         {
           method: "POST",
           body: JSON.stringify(stagePayload(current)),
         },
       );
-      const errors = payload?.errors ?? [];
+      const errors = normalizeValidationErrors(payload);
       setValidationErrors(errors);
-      return errors.length === 0 && payload?.valid !== false;
+      const valid = (payload as { valid?: boolean; ok?: boolean }).valid ?? (payload as { ok?: boolean }).ok;
+      if (errors.length === 0 && valid === false) {
+        setValidationErrors([{ message: "Solver validation failed" }]);
+        return false;
+      }
+      return errors.length === 0;
     } catch (error) {
       const apiError = error as Error & { validation?: ValidationError[] };
       if (apiError.validation?.length) {
         setValidationErrors(apiError.validation);
         return false;
       }
-      return true;
+      setValidationErrors([{ message: apiError.message || "Validation failed" }]);
+      return false;
+    }
+  };
+
+  const generateStage = async () => {
+    setBusy(true);
+    setStatus("");
+    setValidationErrors([]);
+    try {
+      const seed = generateSettings.seed.trim();
+      const payload = await requestJson<unknown>("/api/stages/generate", {
+        method: "POST",
+        body: JSON.stringify({
+          width: clampSize(generateSettings.width),
+          height: clampSize(generateSettings.height),
+          difficulty: clampDifficulty(generateSettings.difficulty),
+          ...(seed ? { seed } : {}),
+        }),
+      });
+      const next = normalizeGeneratedStage(payload, draftStageId);
+      setStage(next.stage);
+      setSelectedStageId("");
+      setDraftStageId(next.stage.stageId);
+      setGeneratedSeed(next.seed);
+      setStatus("Generated");
+    } catch (error) {
+      const apiError = error as Error & { validation?: ValidationError[] };
+      setValidationErrors(apiError.validation ?? [{ message: apiError.message || "Generate failed" }]);
+      setStatus("Generate failed");
+    } finally {
+      setBusy(false);
     }
   };
 
@@ -441,6 +555,7 @@ function App() {
 
       setStage(current);
       setSelectedStageId(current.stageId);
+      setGeneratedSeed("");
       await loadStages();
       setStatus("Saved");
     } catch (error) {
@@ -467,6 +582,7 @@ function App() {
       setStage(next);
       setSelectedStageId("");
       setDraftStageId("");
+      setGeneratedSeed("");
       setStatus("Deleted");
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "Delete failed");
@@ -546,11 +662,11 @@ function App() {
             <span>Difficulty</span>
             <input
               type="number"
-              min={0}
-              max={100}
+              min={1}
+              max={5}
               value={stage.difficulty}
               onChange={(event) =>
-                updateStage((current) => ({ ...current, difficulty: Math.max(0, Number(event.target.value) || 0) }))
+                updateStage((current) => ({ ...current, difficulty: clampDifficulty(Number(event.target.value)) }))
               }
             />
           </label>
@@ -561,6 +677,63 @@ function App() {
             <button type="button" className="danger" onClick={deleteStage} disabled={isBusy || !draftStageId}>
               Delete
             </button>
+          </div>
+        </div>
+
+        <div className="generate-bar" aria-label="Stage generator">
+          <label>
+            <span>Gen W</span>
+            <input
+              type="number"
+              min={1}
+              max={MAX_BOARD_EDGE}
+              value={generateSettings.width}
+              onChange={(event) =>
+                setGenerateSettings((current) => ({ ...current, width: clampSize(Number(event.target.value)) }))
+              }
+            />
+          </label>
+          <label>
+            <span>Gen H</span>
+            <input
+              type="number"
+              min={1}
+              max={MAX_BOARD_EDGE}
+              value={generateSettings.height}
+              onChange={(event) =>
+                setGenerateSettings((current) => ({ ...current, height: clampSize(Number(event.target.value)) }))
+              }
+            />
+          </label>
+          <label>
+            <span>Gen Diff</span>
+            <input
+              type="number"
+              min={1}
+              max={5}
+              value={generateSettings.difficulty}
+              onChange={(event) =>
+                setGenerateSettings((current) => ({
+                  ...current,
+                  difficulty: clampDifficulty(Number(event.target.value)),
+                }))
+              }
+            />
+          </label>
+          <label>
+            <span>Seed</span>
+            <input
+              type="text"
+              value={generateSettings.seed}
+              onChange={(event) => setGenerateSettings((current) => ({ ...current, seed: event.target.value }))}
+            />
+          </label>
+          <button type="button" onClick={generateStage} disabled={isBusy}>
+            Generate
+          </button>
+          <div className="metadata" aria-label="Generated metadata">
+            <span>Generated seed</span>
+            <strong>{generatedSeed || "-"}</strong>
           </div>
         </div>
 

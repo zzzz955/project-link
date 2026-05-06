@@ -1,7 +1,7 @@
 import http, { IncomingMessage, ServerResponse } from "http";
 import { createReadStream, existsSync } from "fs";
 import path from "path";
-import { StagePayload, ValidationError } from "../shared";
+import { GenerateStageInput, generateStagePayload, StagePayload, ValidationError } from "../shared";
 import { StageRepository } from "./stageRepository";
 
 interface JsonResponse {
@@ -42,6 +42,11 @@ async function route(repository: StageRepository, request: IncomingMessage, resp
 
   if (method === "GET" && pathname === "/api/node-colors") {
     return { status: 200, body: await repository.listNodeColors() };
+  }
+
+  if (method === "POST" && pathname === "/api/stages/generate") {
+    const input = await readJsonBody<GenerateStageInput>(request);
+    return { status: 200, body: generateStagePayload(input) };
   }
 
   const validateMatch = /^\/api\/stages\/(\d+)\/validate$/.exec(pathname);

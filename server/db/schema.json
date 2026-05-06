@@ -1,0 +1,53 @@
+{
+  "database": "projectlink_db",
+  "tables": [
+    {
+      "name": "sessions",
+      "columns": [
+        { "name": "id",         "type": "int64",      "constraints": ["PK","AUTO","NN"] },
+        { "name": "user_id",    "type": "string(36)", "constraints": ["NN"] },
+        { "name": "session_id", "type": "string(36)", "constraints": ["NN","UQ"] },
+        { "name": "created_at", "type": "datetime",   "constraints": ["NN"] },
+        { "name": "expires_at", "type": "datetime",   "constraints": ["NN"] },
+        { "name": "active",     "type": "bool",       "constraints": ["NN"], "default": "true" }
+      ],
+      "indexes": [{ "name": "idx_sessions_user_id", "columns": ["user_id"] }]
+    },
+    {
+      "name": "stage_progress",
+      "comment": "PK is composite (user_id, stage_id)",
+      "columns": [
+        { "name": "user_id",    "type": "string(36)", "constraints": ["PK","NN"] },
+        { "name": "stage_id",   "type": "int32",      "constraints": ["PK","NN"] },
+        { "name": "stars",      "type": "int32",      "constraints": ["NN"] },
+        { "name": "cleared_at", "type": "datetime",   "constraints": ["NN"] }
+      ]
+    },
+    {
+      "name": "client_meta",
+      "columns": [
+        { "name": "client_version",   "type": "string(20)", "constraints": ["PK","NN"] },
+        { "name": "meta_hash",        "type": "string",     "constraints": ["NN"] },
+        { "name": "protocol_version", "type": "string(20)", "constraints": ["NN"] },
+        { "name": "created_at",       "type": "datetime",   "constraints": ["NN"] }
+      ]
+    },
+    {
+      "name": "currency_logs",
+      "comment": "Append-only audit log — never UPDATE or DELETE",
+      "columns": [
+        { "name": "id",             "type": "int64",      "constraints": ["PK","AUTO","NN"] },
+        { "name": "user_id",        "type": "string(36)", "constraints": ["NN"] },
+        { "name": "transaction_id", "type": "string(36)", "constraints": ["NN"] },
+        { "name": "currency_type",  "type": "string(32)", "constraints": ["NN"] },
+        { "name": "delta",          "type": "int64",      "constraints": ["NN"] },
+        { "name": "balance_before", "type": "int64",      "constraints": ["NN"] },
+        { "name": "balance_after",  "type": "int64",      "constraints": ["NN"] },
+        { "name": "reason",         "type": "string",     "constraints": ["NN"] },
+        { "name": "correlation_id", "type": "string(36)", "constraints": ["NN"] },
+        { "name": "created_at",     "type": "datetime",   "constraints": ["NN"] }
+      ],
+      "indexes": [{ "name": "idx_currency_logs_user_id", "columns": ["user_id"] }]
+    }
+  ]
+}

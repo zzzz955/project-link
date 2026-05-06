@@ -21,6 +21,8 @@ dist/
 build/
 client/dist/
 server/dist/
+**/bin/
+**/obj/
 *.exe
 *.obj
 *.o

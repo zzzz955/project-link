@@ -10,8 +10,10 @@ namespace ProjectLink.Data.Generated
         public const string ResourcePath = "data/string/clientstring";
 
         public string stringId;
-        public string languageCode;
-        public string countryCode;
-        public string text;
+        public string EN;
+        public string KO;
+        public string ZH_CN;
+        public string ZH_TW;
+        public string TH;
     }
 }

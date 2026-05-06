@@ -104,19 +104,18 @@ namespace ProjectLink.Core
         void LoadStrings()
         {
             _strings.Clear();
+            foreach (LanguageCode lang in Enum.GetValues(typeof(LanguageCode)))
+                _strings[lang] = new Dictionary<string, string>();
+
             var rows = CsvLoader.Load<Clientstring>(Clientstring.ResourcePath);
             for (int i = 0; i < rows.Length; i++)
             {
-                if (!TryParseLanguage(rows[i].languageCode, out var language))
-                    continue;
-
-                if (!_strings.TryGetValue(language, out var languageStrings))
-                {
-                    languageStrings = new Dictionary<string, string>();
-                    _strings[language] = languageStrings;
-                }
-
-                languageStrings[rows[i].stringId] = rows[i].text;
+                var row = rows[i];
+                _strings[LanguageCode.EN][row.stringId]    = row.EN;
+                _strings[LanguageCode.KO][row.stringId]    = row.KO;
+                _strings[LanguageCode.ZH_CN][row.stringId] = row.ZH_CN;
+                _strings[LanguageCode.ZH_TW][row.stringId] = row.ZH_TW;
+                _strings[LanguageCode.TH][row.stringId]    = row.TH;
             }
         }
 

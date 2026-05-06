@@ -10,10 +10,12 @@ namespace ProjectLink.OutGame.UI
         [SerializeField] string stringId;
 
         TextMeshProUGUI _label;
+        TMP_FontAsset _defaultFont;
 
         void Awake()
         {
             _label = GetComponent<TextMeshProUGUI>();
+            _defaultFont = _label != null ? _label.font : null;
             Refresh();
         }
 
@@ -39,8 +41,26 @@ namespace ProjectLink.OutGame.UI
             if (_label == null)
                 _label = GetComponent<TextMeshProUGUI>();
 
-            if (_label != null && !string.IsNullOrEmpty(stringId))
-                _label.text = LocalizationManager.Get(stringId);
+            if (_label == null || string.IsNullOrEmpty(stringId))
+                return;
+
+            _label.text = LocalizationManager.Get(stringId);
+            ApplyFont();
+        }
+
+        void ApplyFont()
+        {
+            var registry = FontRegistry.Instance;
+            if (registry == null || LocalizationManager.Instance == null)
+                return;
+
+            bool isBold = (_label.fontStyle & FontStyles.Bold) != 0;
+            var lang = LocalizationManager.Instance.CurrentLanguage;
+
+            if (registry.TryGetFonts(lang, out var regular, out var bold))
+                _label.font = isBold && bold != null ? bold : regular != null ? regular : _defaultFont;
+            else
+                _label.font = _defaultFont;
         }
     }
 }

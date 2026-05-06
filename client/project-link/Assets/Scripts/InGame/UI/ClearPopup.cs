@@ -1,7 +1,8 @@
+using ProjectLink.Core;
+using ProjectLink.OutGame.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using ProjectLink.Core;
 
 namespace ProjectLink.InGame.UI
 {
@@ -23,7 +24,7 @@ namespace ProjectLink.InGame.UI
             var panelImg = panelGo.AddComponent<Image>();
             panelImg.color = new Color(0.1f, 0.1f, 0.15f, 1f);
 
-            AddLabel(panelGo.transform, "STAGE CLEAR", 72, Color.white,
+            AddLocalizedLabel(panelGo.transform, "game_stage_clear", 72, Color.white,
                 new Vector2(0f, 220f), new Vector2(560f, 100f));
 
             float starSpacing = 120f;
@@ -42,9 +43,9 @@ namespace ProjectLink.InGame.UI
                 starImg.color = new Color(1f, 0.85f, 0f, 1f);
             }
 
-            var nextBtn  = AddButton(panelGo.transform, "NEXT",  new Vector2(0f,  -80f));
-            var retryBtn = AddButton(panelGo.transform, "RETRY", new Vector2(0f, -190f));
-            var lobbyBtn = AddButton(panelGo.transform, "LOBBY", new Vector2(0f, -300f));
+            var nextBtn  = AddLocalizedButton(panelGo.transform, "game_next",  new Vector2(0f,  -80f));
+            var retryBtn = AddLocalizedButton(panelGo.transform, "game_retry", new Vector2(0f, -190f));
+            var lobbyBtn = AddLocalizedButton(panelGo.transform, "game_lobby", new Vector2(0f, -300f));
 
             nextBtn.onClick.AddListener(() =>
             {
@@ -68,9 +69,9 @@ namespace ProjectLink.InGame.UI
 
         public override void OnBackPressed() { }
 
-        Button AddButton(Transform parent, string label, Vector2 anchoredPos)
+        Button AddLocalizedButton(Transform parent, string stringId, Vector2 anchoredPos)
         {
-            var go = new GameObject(label + "Btn");
+            var go = new GameObject(stringId + "Btn");
             go.transform.SetParent(parent, false);
             var rect = go.AddComponent<RectTransform>();
             rect.anchorMin        = new Vector2(0.5f, 0.5f);
@@ -80,26 +81,13 @@ namespace ProjectLink.InGame.UI
             rect.anchoredPosition = anchoredPos;
             go.AddComponent<Image>().color = new Color(0.2f, 0.5f, 0.9f, 1f);
             var btn = go.AddComponent<Button>();
-
-            var textGo = new GameObject("Label");
-            textGo.transform.SetParent(go.transform, false);
-            var textRect = textGo.AddComponent<RectTransform>();
-            textRect.anchorMin = Vector2.zero;
-            textRect.anchorMax = Vector2.one;
-            textRect.offsetMin = Vector2.zero;
-            textRect.offsetMax = Vector2.zero;
-            var tmp = textGo.AddComponent<TextMeshProUGUI>();
-            tmp.text      = label;
-            tmp.fontSize  = 44;
-            tmp.alignment = TextAlignmentOptions.Center;
-            tmp.color     = Color.white;
-
+            AddLocalizedLabel(go.transform, stringId, 44, Color.white, Vector2.zero, new Vector2(400f, 90f));
             return btn;
         }
 
-        void AddLabel(Transform parent, string text, float fontSize, Color color, Vector2 anchoredPos, Vector2 size)
+        void AddLocalizedLabel(Transform parent, string stringId, float fontSize, Color color, Vector2 anchoredPos, Vector2 size)
         {
-            var go = new GameObject("TitleLabel");
+            var go = new GameObject("Label");
             go.transform.SetParent(parent, false);
             var rect = go.AddComponent<RectTransform>();
             rect.anchorMin        = new Vector2(0.5f, 0.5f);
@@ -108,10 +96,11 @@ namespace ProjectLink.InGame.UI
             rect.sizeDelta        = size;
             rect.anchoredPosition = anchoredPos;
             var tmp = go.AddComponent<TextMeshProUGUI>();
-            tmp.text      = text;
             tmp.fontSize  = fontSize;
             tmp.alignment = TextAlignmentOptions.Center;
             tmp.color     = color;
+            tmp.raycastTarget = false;
+            go.AddComponent<LocalizedText>().SetStringId(stringId);
         }
     }
 }

@@ -24,6 +24,12 @@ CMD: `tools/gen-all.bat` | `npm run gen:all`
 - CONFIG priority: `.env` > `template.ini` > hardcoded defaults
 - `_` prefix files/dirs are skipped by all gen tools (examples, drafts)
 
+## Agent Context Convention
+- `AGENTS.md` is the single source of truth for AI agent instructions
+- Edit only `AGENTS.md`; never edit `CLAUDE.md` directly
+- `CLAUDE.md` must remain a Claude Code compatibility wrapper that imports `@AGENTS.md`
+- Use validation scripts/skills to detect drift between `CLAUDE.md` wrappers and `AGENTS.md`
+
 ## Formats
 FILE (data):   `[domain]_[table].csv`          e.g. `characters_base.csv`
 FILE (packet): `[domain].packet.json`           e.g. `player.packet.json`

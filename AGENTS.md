@@ -7,6 +7,7 @@
 | `tools/` | Automation pipeline (gen-data, gen-packets, gen-orm) | → `tools/AGENTS.md` |
 | `client/` | Client app — stack defined by user | → `client/AGENTS.md` |
 | `server/` | Server app + DB schema — stack defined by user | → `server/AGENTS.md` |
+| `TODO-List/` | Release TODO tracker — per-area task lists + progress summary | → `TODO-List/AGENTS.md` |
 
 ## Pipeline
 ```

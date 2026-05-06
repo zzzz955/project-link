@@ -13,6 +13,14 @@ Scene: `Assets/Scenes/Game.unity`
 
 ---
 
+## Client-First Constraints
+
+- [ ] InGame UI reads stage/progress through `GameContext` + `IProgressService`, not server classes
+- [ ] Clear flow calls local/mock progress save first; HTTP sync is deferred to `06_progression_save.md`
+- [ ] Loading/error UI can be tested with mock service states
+
+---
+
 ## Clear Popup
 
 Triggered by `GameStateMachine` on clear state entry via `PopupManager`.
@@ -39,4 +47,6 @@ Triggered by `GameStateMachine` on clear state entry via `PopupManager`.
 - [ ] Step 1: arrow + "Drag to connect" tooltip shown before first input
 - [ ] Step 2: "Fill all cells" text shown after first pipe is completed
 - [ ] Dismiss: auto-hide on correct gesture; skip button always visible
-- [ ] Persistence: save `tutorialSeen` flag via `SaveService` (see `06_progression_save.md`)
+- [ ] Persistence: save `tutorialSeen` flag via client progress/settings boundary (see `06_progression_save.md`)
+
+<!-- changed: InGame UI tasks now keep server sync behind the client service boundary -->

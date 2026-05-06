@@ -14,6 +14,15 @@ Scenes: `Assets/Scenes/Title.unity`, `Assets/Scenes/Lobby.unity`
 
 ---
 
+## Client-First Constraints
+
+- [ ] Title auth entry uses `IAuthService` mock/local mode before real auth server
+- [ ] Lobby reads unlock/star state through `IProgressService`
+- [ ] Lobby loading/error states are testable without a running server
+- [ ] Scene navigation remains available when auth/progress server is offline
+
+---
+
 ## Lobby Scene UI
 
 - [ ] Scrollable stage grid
@@ -35,3 +44,5 @@ Accessible from both Title and Lobby via `PopupManager`.
 - [ ] Haptic toggle → calls `HapticManager.SetEnabled(bool)`
 - [ ] Close button
 - [ ] Persist both settings to `PlayerPrefs` on change; load on Bootstrap
+
+<!-- changed: OutGame UI tasks now prioritize mock/local services so scene flow stays free before server wiring -->

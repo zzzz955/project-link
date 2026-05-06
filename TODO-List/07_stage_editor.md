@@ -1,48 +1,23 @@
-# 07 — Stage Editor (Unity Editor Tool)
+# 07 — Stage Editor (Web Admin Tool)
 
-Type: `EditorWindow` — Editor-only, not available at runtime.
-Location: `client/project-link/Assets/Editor/StageEditorWindow.cs` (create `Editor/` folder)
-Output: CSV rows appended to `shared/datas/ingame/` — fed into `npm run gen:data` pipeline.
+> **구현 예정** — Unity Editor Tool 방식 폐기. 웹 서버 Admin API를 통해 자동 생성되는 형태로 전환 예정.
 
 ---
 
-## Editor Window
+## 방향
 
-- [ ] Create `Assets/Editor/` directory
-- [ ] Implement `StageEditorWindow : EditorWindow`; open via menu `Tools > Stage Editor`
-- [ ] Grid size input: width (2–10) × height (2–10)
-- [ ] Color slot panel: list of active colors (pulled from `ColorPalette.cs`)
-  - Select a color, then click two cells to place endpoint pair
-  - Click an occupied cell again to clear it
-- [ ] Grid render: draw cells as colored circles/squares using `GUI`/`EditorGUI`
-- [ ] Stage ID field: auto-increments from last row in CSV; editable
+- 스테이지 데이터는 웹 Admin UI에서 입력 → 서버 API 호출 → DB 저장
+- 서버가 `shared/datas/ingame/` CSV 또는 DB 직접 export 형태로 생성 파이프라인과 연동
+- Unity 클라이언트는 생성된 데이터를 소비만 하며 편집 로직 미포함
 
 ---
 
-## Validation
+## 구현 예정 항목
 
-- [ ] "Validate" button — runs solver before allowing export
-- [ ] Solver: backtracking DFS
-  - All cells must be fillable
-  - Each color must have exactly 2 endpoints
-  - Returns: solvable (bool) + one example solution path (for preview)
-- [ ] Display error inline if validation fails; block export
-- [ ] Show solution preview overlay on valid result
+- [ ] Web Admin: 스테이지 편집 UI (그리드, 색상 배치)
+- [ ] Web Admin: 유효성 검사 (백트래킹 솔버) 및 프리뷰
+- [ ] Server API: 스테이지 생성 / 수정 / 삭제 엔드포인트
+- [ ] Server: CSV export 또는 gen-data 파이프라인 연동
+- [ ] Client: 생성된 스테이지 데이터 로드 (읽기 전용)
 
----
-
-## Export
-
-- [ ] "Export" button (enabled only after successful validation)
-- [ ] Append one row to `shared/datas/ingame/ingame_stage_nodes.csv`
-- [ ] Append one row to `shared/datas/ingame/ingame_stage_info.csv`
-- [ ] Column format must match existing CSV headers exactly
-- [ ] After export: dialog prompting to run `npm run gen:data`
-
----
-
-## CSV Format Reference
-
-Source files: `shared/datas/ingame/`
-Generated C# models: `Assets/Scripts/Data/Generated/ingame/IngameStageNodes.cs`, `IngameStageInfo.cs`
-Match column names from generated model field names exactly.
+<!-- changed: Unity EditorWindow 방식 폐기, 웹 서버 기반 자동 생성으로 전환 -->

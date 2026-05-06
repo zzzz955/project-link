@@ -17,16 +17,27 @@ StageProgressData {
 
 ---
 
+## Client Boundary First
+
+Before server sync, all UI/scene code must access progress through a service interface.
+
+- [ ] Create `IProgressService` wrapper around current `DataManager`
+- [ ] Move Lobby unlock/star reads behind `IProgressService`
+- [ ] Move Tutorial `tutorialSeen` reads/writes behind `IProgressService` or settings boundary
+- [ ] Add mock implementation with artificial delay/failure for UI testing
+- [ ] Keep `DataManager` as the local persistence implementation
+
+---
+
 ## Local Save
 
-- [ ] Implement `SaveService` in `Core/`
-  - `SaveStageProgress(stageId, stars)` — write to local JSON
-  - `GetStageProgress(stageId) → StageProgressData?`
-  - `GetAllProgress() → List<StageProgressData>`
-  - `SetFlag(string key, bool value)` — for tutorial-seen, etc.
-- [ ] Storage: JSON file at `Application.persistentDataPath/save.json`
-- [ ] Load on Bootstrap startup; save immediately on stage clear
-- [ ] `SaveService` registered in Bootstrap DDL
+> `DataManager` (`Core/DataManager.cs`) already handles local save via PlayerPrefs + JsonUtility. No separate `SaveService` needed.
+
+- [x] Stage progress: `ClearStage(stageId, stars)`, `IsStageCleared`, `GetStarRating`, `IsStageUnlocked`
+- [x] Settings: `SoundVolume`, `SfxVolume`, `HapticEnabled`
+- [x] Flags: `SetFlag(string key, bool value)`, `GetFlag(string key, bool defaultValue)` — implemented in `DataManager`
+- [x] Load on Awake; save immediately on mutation
+- [ ] Register `DataManager` prefab in Bootstrap DDL (if not already done)
 
 ---
 
@@ -57,3 +68,5 @@ Add to `server/db/schema.json`:
 ```
 
 Run `npm run gen:orm` after updating schema.
+
+<!-- changed: local progress now becomes the client-first adapter before server sync is wired -->

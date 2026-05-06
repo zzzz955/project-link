@@ -1,5 +1,6 @@
 # AI Agent
 .claude/settings.local.json
+.agents/cache/
 
 # Secrets
 .env

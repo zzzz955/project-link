@@ -12,6 +12,7 @@ description: Project Link repository command workflows. Use when the user invoke
 3. Read only the matching command file.
 4. Follow the command file exactly, adapted to Codex tools and the repository's `AGENTS.md` convention.
 5. Keep command behavior project-local; do not use global skills for these workflows.
+6. When editing a command, keep the mirrored `.claude/commands/<name>.md` file in sync unless the user explicitly asks to change only one side.
 
 ## Command Map
 
@@ -31,3 +32,4 @@ description: Project Link repository command workflows. Use when the user invoke
 - Interpret `CLAUDE.md` references in legacy command text as `AGENTS.md` unless the command explicitly needs Claude compatibility wrappers.
 - Use PowerShell commands in this Windows project.
 - Preserve the repository rule that `AGENTS.md` is the single source of truth and `CLAUDE.md` wrappers are not edited directly.
+- For `/git-issue`, prefer the command file's single PowerShell script flow: read `.env` once, set `$env:GH_TOKEN` once when present, reuse `.agents/cache/git-issue-project-cache.json` for project metadata when fresh, then create the issue, add it to the project, and set fields using the returned project item id.

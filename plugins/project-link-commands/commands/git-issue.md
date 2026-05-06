@@ -1,134 +1,398 @@
-Create a GitHub issue and add it to the project with appropriate metadata.
+Create a GitHub issue and add it to the configured GitHub Projects v2 board with metadata.
 
-Arguments: $ARGUMENTS — format: `{도메인}:{이슈명}` e.g. `서버:로그인 API 구현`, `클라:플레이어 이동 처리`
+Arguments: `$ARGUMENTS` format: `{area}:{issue_name}`
+
+Examples:
+- `공통:TODO-List 구조화 작업`
+- `서버:로그인 API 구현`
+- `클라:플레이어 이동 처리`
 
 ## Prerequisites
-Read `.env` and verify the following are set. If any are missing, STOP and notify the user:
-- `GITHUB_TOKEN`
+
+Read `.env` once at the start of the PowerShell script.
+
+Required config:
 - `GITHUB_REPO_URL`
 - `GITHUB_DEFAULT_PROJECT`
 - `GITHUB_DEFAULT_ASSIGNEE`
 
+Authentication:
+- Prefer `GITHUB_TOKEN` from `.env`; set `$env:GH_TOKEN` once at the top of the script.
+- If `GITHUB_TOKEN` is missing, `gh auth status` must already be authenticated.
+- If both `.env` token and global `gh` auth are unavailable, STOP and notify the user.
+- Never print tokens or write them to logs.
+
 ## Issue Title Convention
+
+```text
+[{area}] {issue_name}
 ```
-[{도메인}] {이슈명}
+
+Example:
+
+```text
+[공통] TODO-List 구조화 작업
 ```
-Example: `[서버] 로그인 API 구현`
 
 ## Environment: Windows / PowerShell
-**ALL shell commands MUST use the PowerShell tool — never the Bash tool.**
-Set `GH_TOKEN` at the start of every PowerShell command block:
-```powershell
-$env:GH_TOKEN = "{GITHUB_TOKEN}"
-```
 
-## Steps
+Use PowerShell for every shell command.
 
-### 1. Parse arguments
-- Extract `{도메인}` and `{이슈명}` from $ARGUMENTS (split on first `:`).
-- If malformed, ask the user to clarify.
+Fragile GitHub CLI cases to avoid:
+- Do not use `gh issue create --title` for Korean text or titles beginning with `[area]`; use REST API with a UTF-8 no-BOM temp JSON file.
+- Do not use `gh issue list --search` for exact Korean titles with spaces; list JSON and filter in PowerShell.
+- Do not send GraphQL with `-f query=` or inline literal arguments; use GraphQL variables and `--input` with a UTF-8 no-BOM temp JSON file.
+- If `rg` fails locally, use PowerShell `Get-ChildItem` / `Select-String` fallback.
 
-### 2. Date fields
-- Start date and Target date: leave blank — the user sets these directly in GitHub.
+## Project Metadata
 
-### 3. Determine Priority and Size (autonomous — no confirmation needed)
-Assess based on the issue name and domain and set immediately.
+Determine these autonomously without confirmation:
+- Priority: choose an existing project option, usually `P2` unless the issue is urgent or blocking.
+- Size: choose one of `XS`, `S`, `M`, `L`, `XL`.
+- Labels: select from existing labels, then create missing labels as needed.
 
-Priority options (use the option name as-is from the project's Priority field):
-- Check actual option names via `gh project field-list` — they may be P0/P1/P2/P3/P4 or Urgent/High/Medium/Low.
+Set these project fields:
+- `Priority`
+- `Size`
+- `Iteration` set to the current sprint by matching today's date against `startDate <= today < startDate + duration`.
 
-Size options: `XS` / `S` / `M` / `L` / `XL`
+Leave these blank:
+- `Start date`
+- `Target date`
+- `Status`
 
-Report chosen values in the final summary. User will adjust in GitHub if needed.
+## Single-Script Flow
 
-### 4. Determine labels
-Select appropriate labels (e.g. `bug`, `enhancement`, `feature`, `data`, `packet`, `db`, `infra`).
+Although GitHub Projects v2 requires dependent API steps, run them in one PowerShell script whenever possible:
 
-List existing labels:
-```powershell
-$env:GH_TOKEN = "{GITHUB_TOKEN}"
-gh label list --repo {owner/repo}
-```
+1. Parse `.env`, repo, project, and arguments.
+2. Resolve project field IDs, option IDs, and iterations from `.agents/cache/git-issue-project-cache.json` when fresh.
+3. Create missing labels.
+4. Create the issue.
+5. Add the issue to the project, receiving `item.id`.
+6. Set Priority, Size, and Iteration on that project item.
 
-Create any missing label:
-```powershell
-gh label create "{label}" --repo {owner/repo} --color "{hex}" --description "{desc}"
-```
+Project field IDs and option IDs exist before the issue exists, so they can be queried or cached before issue creation. Only `item.id` requires the issue to be created and added first.
 
-### 5. Query project fields and current Iteration (Sprint)
+## Cache Policy
 
-**Step A — Get field IDs and option IDs** via `gh project field-list`:
-```powershell
-$env:GH_TOKEN = "{GITHUB_TOKEN}"
-gh project field-list {project_number} --owner {owner} --format json
-```
-Returns field IDs and single-select option IDs (Priority, Size, Status, etc.).
-**Limitation:** Iteration field shows only its field ID — it does NOT include iteration list (startDate, duration, id).
+- Cache path: `.agents/cache/git-issue-project-cache.json`
+- Cache contents: owner, repo, project title, project number/id, project fields/options, iteration configuration, cached timestamp.
+- Default TTL: 24 hours.
+- Refresh the cache when it is missing, expired, for a different repo/project, missing required fields/options, or has no iteration matching today.
+- Do not cache issue IDs, project item IDs, labels, assignees, or token values.
+- Treat the cache as local runtime state; it must not be committed.
 
-**Step B — Get iteration list** via GraphQL (required for Iteration field):
+## Canonical PowerShell Template
 
-> **Critical:** GitHub GraphQL API rejects inline literal arguments (`argumentLiteralsIncompatible`).
-> Always pass query arguments as GraphQL variables, and send the full request body via `--input` with a UTF-8 no-BOM temp file.
-> Never use `-f query=` or `--field query=` with hardcoded node IDs or string arguments inline.
+Before running, replace `$argumentsText`, `$priorityName`, `$sizeName`, and `$labels` based on the user's request.
 
 ```powershell
-$env:GH_TOKEN = "{GITHUB_TOKEN}"
-$utf8NoBom = New-Object System.Text.UTF8Encoding $false
-$tmpFile = [System.IO.Path]::GetTempFileName() + ".json"
-$content = '{"query":"query($projectId: ID!, $fieldName: String!) { node(id: $projectId) { ... on ProjectV2 { field(name: $fieldName) { ... on ProjectV2IterationField { configuration { iterations { id title startDate duration } } } } } } }","variables":{"projectId":"{project_node_id}","fieldName":"Iteration"}}'
-[System.IO.File]::WriteAllText($tmpFile, $content, $utf8NoBom)
-$iterData = gh api graphql --input $tmpFile | ConvertFrom-Json
-Remove-Item $tmpFile
-```
+$ErrorActionPreference = 'Stop'
 
-Select the current iteration by matching today's date against `startDate` + `duration` (days).
+$argumentsText = '{area}:{issue_name}'
+$priorityName = '{priority}' # e.g. P2
+$sizeName = '{size}'         # XS/S/M/L/XL
+$labels = @('{label}')
+$cacheTtlHours = 24
 
-If field IDs and iteration data were already resolved earlier in this session, skip re-querying.
+function Read-DotEnv($path) {
+  $vars = @{}
+  if (Test-Path -LiteralPath $path) {
+    Get-Content -LiteralPath $path | ForEach-Object {
+      if ($_ -match '^\s*([^#][^=]+)=(.*)$') {
+        $vars[$matches[1].Trim()] = $matches[2].Trim().Trim('"').Trim("'")
+      }
+    }
+  }
+  return $vars
+}
 
-### 6. Create the issue
-**Do NOT use `gh issue create --title` with Korean text** — PowerShell parses `[도메인]` as
-array notation and splits on spaces, causing argument errors.
+function Write-Utf8JsonTemp($value) {
+  $utf8NoBom = New-Object System.Text.UTF8Encoding $false
+  $tmpFile = [System.IO.Path]::GetTempFileName() + '.json'
+  $json = $value | ConvertTo-Json -Compress -Depth 20
+  [System.IO.File]::WriteAllText($tmpFile, $json, $utf8NoBom)
+  return $tmpFile
+}
 
-Instead, use the REST API with a UTF-8 no-BOM temp file:
-```powershell
-$env:GH_TOKEN = "{GITHUB_TOKEN}"
-$utf8NoBom = New-Object System.Text.UTF8Encoding $false
-$tmpFile = [System.IO.Path]::GetTempFileName() + ".json"
-$content = '{"title":"[{도메인}] {이슈명}","body":"","assignees":["{assignee}"],"labels":["{label}"]}'
-[System.IO.File]::WriteAllText($tmpFile, $content, $utf8NoBom)
-$result = gh api repos/{owner}/{repo}/issues --method POST --input $tmpFile | ConvertFrom-Json
-Remove-Item $tmpFile
-$issueUrl = $result.html_url
-```
+function Invoke-GhJsonInput($apiArgs, $payload) {
+  $tmpFile = Write-Utf8JsonTemp $payload
+  try {
+    return & gh @apiArgs --input $tmpFile | ConvertFrom-Json
+  }
+  finally {
+    if (Test-Path -LiteralPath $tmpFile) {
+      Remove-Item -LiteralPath $tmpFile
+    }
+  }
+}
 
-**Why temp file:** PowerShell pipe (`|`) transmits UTF-16, which GitHub's API cannot parse.
-`[System.IO.File]::WriteAllText` with explicit UTF-8 no-BOM encoding is the only reliable method.
+function Read-JsonFile($path) {
+  if (-not (Test-Path -LiteralPath $path)) {
+    return $null
+  }
 
-### 7. Add the issue to the project and set fields
-**API constraint:** GitHub Projects v2 requires 2 separate steps — Step A result feeds Step B.
+  try {
+    return Get-Content -LiteralPath $path -Raw | ConvertFrom-Json
+  }
+  catch {
+    return $null
+  }
+}
 
-Step A — add to project (returns item.id):
-```powershell
-$env:GH_TOKEN = "{GITHUB_TOKEN}"
-$item = gh project item-add {project_number} --owner {owner} --url $issueUrl --format json | ConvertFrom-Json
+function Write-JsonFile($path, $value) {
+  $dir = Split-Path -Parent $path
+  if ($dir -and -not (Test-Path -LiteralPath $dir)) {
+    New-Item -ItemType Directory -Force -Path $dir | Out-Null
+  }
+
+  $utf8NoBom = New-Object System.Text.UTF8Encoding $false
+  $json = $value | ConvertTo-Json -Depth 50
+  [System.IO.File]::WriteAllText($path, $json, $utf8NoBom)
+}
+
+function Test-ProjectCache($cache, $owner, $repoFull, $projectTitle, $ttlHours) {
+  if (-not $cache) {
+    return $false
+  }
+
+  if ($cache.cacheVersion -ne 1 -or $cache.owner -ne $owner -or $cache.repo -ne $repoFull -or $cache.projectTitle -ne $projectTitle) {
+    return $false
+  }
+
+  try {
+    $cachedAt = [DateTimeOffset]::Parse([string]$cache.cachedAt)
+  }
+  catch {
+    return $false
+  }
+
+  if ([DateTimeOffset]::UtcNow -gt $cachedAt.AddHours([double]$ttlHours)) {
+    return $false
+  }
+
+  if (-not $cache.project.id -or -not $cache.project.number) {
+    return $false
+  }
+
+  $fields = @($cache.fields)
+  foreach ($fieldName in @('Priority', 'Size', 'Iteration')) {
+    if (-not ($fields | Where-Object { $_.name -eq $fieldName } | Select-Object -First 1)) {
+      return $false
+    }
+  }
+
+  $iterations = @($cache.iterations | Where-Object { $_ })
+  if ($iterations.Count -eq 0) {
+    return $false
+  }
+
+  return $true
+}
+
+function Get-ProjectMetadataFromGitHub($owner, $repoFull, $projectTitle) {
+  $projects = gh project list --owner $owner --format json | ConvertFrom-Json
+  $project = $projects.projects | Where-Object { $_.title -eq $projectTitle } | Select-Object -First 1
+  if (-not $project) {
+    throw "Project not found: $projectTitle"
+  }
+
+  $fieldList = gh project field-list $project.number --owner $owner --format json | ConvertFrom-Json
+
+  $iterationQuery = 'query($projectId: ID!, $fieldName: String!) { node(id: $projectId) { ... on ProjectV2 { field(name: $fieldName) { ... on ProjectV2IterationField { configuration { iterations { id title startDate duration } } } } } } }'
+  $iterationPayload = @{
+    query = $iterationQuery
+    variables = @{
+      projectId = $project.id
+      fieldName = 'Iteration'
+    }
+  }
+  $iterationData = Invoke-GhJsonInput @('api', 'graphql') $iterationPayload
+
+  return [pscustomobject]@{
+    cacheVersion = 1
+    owner = $owner
+    repo = $repoFull
+    projectTitle = $projectTitle
+    cachedAt = [DateTimeOffset]::UtcNow.ToString('o')
+    project = [pscustomobject]@{
+      id = $project.id
+      number = $project.number
+      title = $project.title
+      url = $project.url
+    }
+    fields = @($fieldList.fields)
+    iterations = @($iterationData.data.node.field.configuration.iterations)
+  }
+}
+
+function Select-CurrentIteration($iterations) {
+  $today = (Get-Date).Date
+  return @($iterations) |
+    Where-Object {
+      $start = ([DateTime]$_.startDate).Date
+      $end = $start.AddDays([int]$_.duration)
+      $today -ge $start -and $today -lt $end
+    } |
+    Select-Object -First 1
+}
+
+$envVars = Read-DotEnv '.env'
+foreach ($required in @('GITHUB_REPO_URL', 'GITHUB_DEFAULT_PROJECT', 'GITHUB_DEFAULT_ASSIGNEE')) {
+  if (-not $envVars[$required]) {
+    throw "Missing required .env value: $required"
+  }
+}
+
+if ($envVars['GITHUB_TOKEN']) {
+  $env:GH_TOKEN = $envVars['GITHUB_TOKEN']
+} else {
+  gh auth status | Out-Null
+}
+
+if ($argumentsText -notmatch '^\s*([^:]+):(.+)$') {
+  throw 'Malformed arguments. Expected format: {area}:{issue_name}'
+}
+
+$area = $matches[1].Trim()
+$issueName = $matches[2].Trim()
+$title = "[$area] $issueName"
+
+$repoUrl = $envVars['GITHUB_REPO_URL']
+if ($repoUrl -notmatch 'github\.com[:/]([^/]+)/(.+?)(?:\.git)?/?$') {
+  throw "Unsupported GITHUB_REPO_URL: $repoUrl"
+}
+
+$owner = $matches[1]
+$repoName = $matches[2]
+$repoFull = "$owner/$repoName"
+$assignee = $envVars['GITHUB_DEFAULT_ASSIGNEE']
+$projectTitle = $envVars['GITHUB_DEFAULT_PROJECT']
+$cachePath = Join-Path (Join-Path (Get-Location) '.agents/cache') 'git-issue-project-cache.json'
+
+$existingIssue = gh issue list --repo $repoFull --state all --json number,title,url,state --limit 200 |
+  ConvertFrom-Json |
+  Where-Object { $_.title -eq $title } |
+  Select-Object -First 1
+
+if ($existingIssue) {
+  throw "Exact title already exists: $($existingIssue.url)"
+}
+
+$projectCache = Read-JsonFile $cachePath
+if (-not (Test-ProjectCache $projectCache $owner $repoFull $projectTitle $cacheTtlHours)) {
+  $projectCache = Get-ProjectMetadataFromGitHub $owner $repoFull $projectTitle
+  Write-JsonFile $cachePath $projectCache
+}
+
+$project = $projectCache.project
+$fields = @($projectCache.fields)
+$priorityField = $fields | Where-Object { $_.name -eq 'Priority' } | Select-Object -First 1
+$sizeField = $fields | Where-Object { $_.name -eq 'Size' } | Select-Object -First 1
+$iterationField = $fields | Where-Object { $_.name -eq 'Iteration' } | Select-Object -First 1
+
+$priorityOption = $priorityField.options | Where-Object { $_.name -eq $priorityName } | Select-Object -First 1
+$sizeOption = $sizeField.options | Where-Object { $_.name -eq $sizeName } | Select-Object -First 1
+
+$currentIteration = Select-CurrentIteration $projectCache.iterations
+if (-not $priorityOption -or -not $sizeOption -or -not $currentIteration) {
+  $projectCache = Get-ProjectMetadataFromGitHub $owner $repoFull $projectTitle
+  Write-JsonFile $cachePath $projectCache
+  $project = $projectCache.project
+  $fields = @($projectCache.fields)
+  $priorityField = $fields | Where-Object { $_.name -eq 'Priority' } | Select-Object -First 1
+  $sizeField = $fields | Where-Object { $_.name -eq 'Size' } | Select-Object -First 1
+  $iterationField = $fields | Where-Object { $_.name -eq 'Iteration' } | Select-Object -First 1
+  $priorityOption = $priorityField.options | Where-Object { $_.name -eq $priorityName } | Select-Object -First 1
+  $sizeOption = $sizeField.options | Where-Object { $_.name -eq $sizeName } | Select-Object -First 1
+  $currentIteration = Select-CurrentIteration $projectCache.iterations
+}
+
+foreach ($field in @($priorityField, $sizeField, $iterationField, $priorityOption, $sizeOption, $currentIteration)) {
+  if (-not $field) {
+    throw 'Required project field, option, or current iteration was not found.'
+  }
+}
+
+$labelDefaults = @{
+  bug = @{ color = 'd73a4a'; description = "Something isn't working" }
+  documentation = @{ color = '0075ca'; description = 'Improvements or additions to documentation' }
+  enhancement = @{ color = 'a2eeef'; description = 'New feature or request' }
+  feature = @{ color = 'a2eeef'; description = 'Feature work' }
+  data = @{ color = '5319e7'; description = 'Data pipeline or game data work' }
+  packet = @{ color = '0e8a16'; description = 'Packet/protocol work' }
+  db = @{ color = 'c2e0c6'; description = 'Database schema or ORM work' }
+  infra = @{ color = '6f42c1'; description = 'Infrastructure and tooling work' }
+}
+
+$existingLabels = gh label list --repo $repoFull --limit 200 --json name | ConvertFrom-Json
+$existingLabelNames = @($existingLabels | ForEach-Object { $_.name })
+
+foreach ($label in $labels) {
+  if ($existingLabelNames -notcontains $label) {
+    $default = $labelDefaults[$label]
+    if (-not $default) {
+      $default = @{ color = 'ededed'; description = 'Project work' }
+    }
+    gh label create $label --repo $repoFull --color $default.color --description $default.description | Out-Null
+  }
+}
+
+$issuePayload = @{
+  title = $title
+  body = ''
+  assignees = @($assignee)
+  labels = $labels
+}
+$issue = Invoke-GhJsonInput @('api', "repos/$repoFull/issues", '--method', 'POST') $issuePayload
+$issueUrl = $issue.html_url
+
+$item = gh project item-add $project.number --owner $owner --url $issueUrl --format json | ConvertFrom-Json
 $itemId = $item.id
+
+$fieldResults = @()
+try {
+  gh project item-edit --id $itemId --project-id $project.id --field-id $priorityField.id --single-select-option-id $priorityOption.id | Out-Null
+  $fieldResults += @{ Field = 'Priority'; Value = $priorityName; Status = 'OK' }
+} catch {
+  $fieldResults += @{ Field = 'Priority'; Value = $priorityName; Status = 'FAILED'; Error = $_.Exception.Message }
+}
+
+try {
+  gh project item-edit --id $itemId --project-id $project.id --field-id $sizeField.id --single-select-option-id $sizeOption.id | Out-Null
+  $fieldResults += @{ Field = 'Size'; Value = $sizeName; Status = 'OK' }
+} catch {
+  $fieldResults += @{ Field = 'Size'; Value = $sizeName; Status = 'FAILED'; Error = $_.Exception.Message }
+}
+
+try {
+  gh project item-edit --id $itemId --project-id $project.id --field-id $iterationField.id --iteration-id $currentIteration.id | Out-Null
+  $fieldResults += @{ Field = 'Iteration'; Value = $currentIteration.title; Status = 'OK' }
+} catch {
+  $fieldResults += @{ Field = 'Iteration'; Value = $currentIteration.title; Status = 'FAILED'; Error = $_.Exception.Message }
+}
+
+[pscustomobject]@{
+  Issue = "#$($issue.number)"
+  Url = $issueUrl
+  Title = $title
+  Assignee = $assignee
+  Labels = ($labels -join ', ')
+  Priority = $priorityName
+  Size = $sizeName
+  Iteration = $currentIteration.title
+  Fields = $fieldResults
+} | ConvertTo-Json -Depth 10
 ```
 
-Step B — set fields via `gh project item-edit`:
-```powershell
-$env:GH_TOKEN = "{GITHUB_TOKEN}"
-$projectId = "{project_node_id}"   # PVT_... from field-list or project list
-# Priority
-gh project item-edit --id $itemId --project-id $projectId --field-id {priority_field_id} --single-select-option-id {priority_option_id}
-# Size
-gh project item-edit --id $itemId --project-id $projectId --field-id {size_field_id} --single-select-option-id {size_option_id}
-# Iteration
-gh project item-edit --id $itemId --project-id $projectId --field-id {iteration_field_id} --iteration-id {iteration_id}
-```
+## Report
 
-Fields to set: Priority, Size, Iteration (current sprint).
-Fields to leave blank: Start date, Target date, Status.
-
-### 8. Report
-Output the created issue URL and a summary of all fields set.
-If any field failed to set, note it clearly so the user can fix it manually.
+Final output must be compact:
+- created issue URL
+- assignee
+- labels
+- Priority
+- Size
+- Iteration
+- any failed field updates

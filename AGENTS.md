@@ -18,18 +18,33 @@ server/db/schema.json        -> gen:orm     -> DB CREATE/ALTER TABLE (+ migratio
 CMD: `tools/gen-all.bat` | `tools/gen-data.bat` | `tools/gen-packets.bat` | `tools/gen-orm.bat` | `npm run gen:all`
 
 ## Rules
-- NEVER edit `*/generated/*` - edit source, re-run gen
-- NEVER commit `.env` - use `.env.example`
-- NEVER store secrets in `template.ini` - secrets go in `.env`
-- NEW_DIR: create `AGENTS.md` for it + update parent `## Nav` section
+- NEVER edit `*/generated/*` — edit source, re-run gen
+- NEVER commit `.env` — use `.env.example`
+- NEVER store secrets in `template.ini` — secrets go in `.env`
 - CONFIG priority: `.env` > `template.ini` > hardcoded defaults
 - `_` prefix files/dirs are skipped by all gen tools (examples, drafts)
+
+## Documentation Convention
+Every directory containing client/server/design/data/packet content must be documented.
+This convention is enforced by AI agents; violations should be fixed before committing.
+
+**AGENTS.md** — AI-agent instructions, written in English, token-efficient:
+- Leaf dirs: `## Files` table (file→class→role) + `## Symbols` table (symbol→kind→note) + `## Rules`
+- Parent/nav dirs: `## Nav` table (path→role→link) + minimal `## Rules`
+- Symbols use `ClassName.MemberName` notation — directly grep/Serena-searchable
+- When new files are added to a directory → update that directory's `## Files` and `## Symbols`
+- When a new subdirectory is created → create its AGENTS.md + update parent's `## Nav`
+- When existing logic changes → update the affected symbol entries in AGENTS.md
+
+**CLAUDE.md** — Claude Code context loader (wrapper only):
+- Every directory that has an `AGENTS.md` must also have a `CLAUDE.md`
+- Contents must be exactly one line: `@AGENTS.md`
+- Never write instructions directly into `CLAUDE.md` — use `AGENTS.md` instead
 
 ## Agent Context Convention
 - `AGENTS.md` is the single source of truth for AI agent instructions
 - Edit only `AGENTS.md`; never edit `CLAUDE.md` directly
-- `CLAUDE.md` must remain a Claude Code compatibility wrapper that imports `@AGENTS.md`
-- Use validation scripts/skills to detect drift between `CLAUDE.md` wrappers and `AGENTS.md`
+- `CLAUDE.md` must remain a Claude Code compatibility wrapper: contents = `@AGENTS.md`
 
 ## Formats
 FILE (data):   `[domain]_[table].csv`          e.g. `characters_base.csv`

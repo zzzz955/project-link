@@ -1,12 +1,19 @@
-# Editor Tools
+# Editor — Unity Editor automation tools
 
-## Role
-Unity Editor-only automation for project setup, scene composition, validation, and content generation.
+## Files
+| file | class | role |
+|---|---|---|
+| `ProjectLinkUIBuilder.cs` | `ProjectLinkUIBuilder` | [MenuItem] scene UI rebuilder for Title/Lobby/Game |
+
+## Symbols
+| symbol | kind | note |
+|---|---|---|
+| `ProjectLinkUIBuilder.BuildCurrentSceneUI()` | method | [MenuItem] rebuilds active scene runtime UI |
+| `ProjectLinkUIBuilder.BuildAllSceneUI()` | method | [MenuItem] rebuilds UI for all game scenes |
+| `ProjectLinkUIBuilder.BuildAllSceneUIBatch()` | method | CI/batch variant; no dialogs |
 
 ## Rules
-- Put files in an `Editor` assembly/folder so they are excluded from player builds.
-- Prefer UnityEditor APIs over direct `.unity` YAML edits.
-- Do not touch `Assets/Resources/Data/` or `Assets/Scripts/Data/Generated/`.
-- Scene builders must be idempotent: remove or update their own generated roots before recreating.
-- Keep generated scene root names stable for diff readability.
-
+- Editor-only folder; auto-excluded from player builds (Unity convention)
+- Scene builders must be idempotent: destroy existing generated roots before recreating
+- Stable root object names required for clean diffs
+- Never touch `Assets/Resources/Data/` or `Assets/Scripts/Data/Generated/`

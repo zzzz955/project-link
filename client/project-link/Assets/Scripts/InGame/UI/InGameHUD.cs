@@ -43,7 +43,7 @@ namespace ProjectLink.InGame.UI
         {
             if (_timerText == null) return;
             int s = Mathf.Max(0, Mathf.FloorToInt(remaining));
-            _timerText.text  = s >= 60 ? $"{s / 60}:{s % 60:D2}" : s.ToString();
+            _timerText.text  = $"{s / 60:D2}:{s % 60:D2}";
             _timerText.color = s <= 10 ? _timerUrgent : _timerNormal;
         }
 

@@ -13,7 +13,7 @@ Navigation and progress tracker for all remaining work before release.
 | [04_ad_system.md](04_ad_system.md) | Ad System (AdMob) | TODO |
 | [05_auth_system.md](05_auth_system.md) | Auth System | TODO |
 | [06_progression_save.md](06_progression_save.md) | Progression Save | IN_PROGRESS |
-| [07_stage_editor.md](07_stage_editor.md) | Stage Editor (Web Admin Tool) | TODO |
+| [07_stage_editor.md](07_stage_editor.md) | Stage Editor (Web Admin Tool) | IN_PROGRESS |
 | [08_sound_vfx.md](08_sound_vfx.md) | Sound & VFX Polish | TODO |
 | [09_platform_build.md](09_platform_build.md) | Platform Build (Android) | TODO |
 | [10_server.md](10_server.md) | Server (ASP.NET) | IN_PROGRESS |

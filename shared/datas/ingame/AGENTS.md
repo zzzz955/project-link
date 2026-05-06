@@ -1,28 +1,44 @@
-# shared/datas/ingame — In-game Stage Data
+# shared/datas/ingame - In-game Stage Data
 
 ## Tables
 | file | rows | key |
 |------|------|-----|
-| `ingame_stage_info.csv` | One row per stage | `stageId` (PK) |
-| `ingame_stage_nodes.csv` | Two rows per color per stage | `stageId + colorId + nodeIndex` |
+| `ingame_stage.csv` | One row per stage | `stageId` (PK) |
+| `ingame_node_colors.csv` | One row per node group color | `nodeGroupId` (PK) |
+| `ingame_stage_info.csv` | Legacy one row per stage | `stageId` (PK) |
+| `ingame_stage_nodes.csv` | Legacy node endpoint rows | `stageId + colorId + nodeIndex` |
 
 ## Schema
+**ingame_stage**
+- `stageId` int32 PK - contiguous stage identifier; valid range must be `1..maxStageId`
+- `width` int32 NN - grid columns
+- `height` int32 NN - grid rows
+- `timeLimit` int32 NN - per-stage countdown in seconds; 0 = no limit
+- `difficulty` int32 NN - stage difficulty for generator/client display
+- `boardEncoding` string(32) NN - board codec id; current value `b36w2-rm-v1`
+- `nodeMap` string NN - row-major base36 fixed-width 2-char node group layer; `00` empty, `01..0K` node groups
+- `cellMap` string NN - row-major base36 fixed-width 2-char cell layer; `00` empty, `01` obstacle, `02+` gimmicks
+- `stageMeta` string NN - compact JSON object for extensible gimmick/generator metadata
+- `generatorSeed` uint32 NN - seed used for generated stages; 0 = manually authored/unknown
+
+**ingame_node_colors**
+- `nodeGroupId` int32 PK - node group id used by `nodeMap`
+- `hexColor` string(16) NN - canonical color rendered by client and stage tool
+- `displayName` string(32) NN - authoring label
+
 **ingame_stage_info**
-- `stageId` int32 PK — unique stage identifier
-- `width` int32 NN — grid columns
-- `height` int32 NN — grid rows
-- `timeLimit` int32 — per-stage countdown in seconds; 0 = no limit (optional)
+- Legacy table kept until client loader migration is complete.
 
 **ingame_stage_nodes**
-- `stageId` int32 NN — references ingame_stage_info.stageId
-- `colorId` int32 NN — color identifier (1-based, unique per stage)
-- `nodeIndex` int32 NN — 1 = first endpoint, 2 = second endpoint
-- `x` int32 NN — column (0-based, left = 0)
-- `y` int32 NN — row (0-based, top = 0)
+- Legacy table kept until client loader migration is complete.
 
-## Sample Data
-- Stage 1: 4x4, 2 colors — Red (0,0)→(3,3), Blue (3,0)→(0,3)
-- Stage 2: 5x5, 3 colors — Red (0,0)→(4,4), Blue (4,0)→(0,4), Green (2,0)→(2,4)
+## Rules
+- Stage IDs must remain contiguous. Add only `maxStageId + 1`; delete only `maxStageId`; update only existing stages.
+- `nodeMap` and `cellMap` length must equal `width * height * 2`.
+- A node cell cannot also contain an obstacle or gimmick.
+- Node groups use `1..20`; each group present in a stage must have an even node count.
+- Client and tools must render node colors from `ingame_node_colors.csv`, not hardcoded palettes.
+- Do not manually edit generated copies; edit these source CSVs and run `npm run gen:data`.
 
-## Planned Additions
-- `ingame_stage_info.csv`: `difficulty` column (post-MVP)
+## Legacy
+- `ingame_stage_info.csv` and `ingame_stage_nodes.csv` are retained for the current Unity client until the stage loader/path rule refactor lands.

@@ -1,23 +1,48 @@
-# 07 — Stage Editor (Web Admin Tool)
+# 07 - Stage Editor (Web Admin Tool)
 
-> **구현 예정** — Unity Editor Tool 방식 폐기. 웹 서버 Admin API를 통해 자동 생성되는 형태로 전환 예정.
+## Direction
 
----
+- Build a local TypeScript web tool for stage authoring, validation, and CSV writes.
+- Edit source CSVs under `shared/datas/ingame/`; never edit generated files directly.
+- Production builds consume generated/static data and must not expose stage mutation.
+- CI must run the same stage validator used by the tool before data changes are merged.
 
-## 방향
+## Data Model
 
-- 스테이지 데이터는 웹 Admin UI에서 입력 → 서버 API 호출 → DB 저장
-- 서버가 `shared/datas/ingame/` CSV 또는 DB 직접 export 형태로 생성 파이프라인과 연동
-- Unity 클라이언트는 생성된 데이터를 소비만 하며 편집 로직 미포함
+- [ ] Migrate stage authoring to `ingame_stage.csv` as one row per stage.
+- [ ] Use `nodeMap` + `cellMap` row-major base36 fixed-width 2-char layers.
+- [ ] Use `ingame_node_colors.csv` as the canonical node group color table.
+- [ ] Keep legacy `ingame_stage_info.csv` and `ingame_stage_nodes.csv` until Unity client migration is complete.
 
----
+## Stage Tool
 
-## 구현 예정 항목
+- [ ] Web UI: explicit `stageId` lookup/add/update/delete.
+- [ ] Web UI: visual grid editor for node groups, obstacles, and future gimmicks.
+- [ ] Web UI: board size, time limit, difficulty, seed, and extensible stage metadata.
+- [ ] Server API: `GET /api/stages`, `GET /api/stages/:stageId`.
+- [ ] Server API: `POST /api/stages/:stageId`, `PUT /api/stages/:stageId`, `DELETE /api/stages/:stageId`.
+- [ ] Server API: `GET /api/node-colors`.
+- [ ] Server: atomic CSV write with metadata rows preserved.
 
-- [ ] Web Admin: 스테이지 편집 UI (그리드, 색상 배치)
-- [ ] Web Admin: 유효성 검사 (백트래킹 솔버) 및 프리뷰
-- [ ] Server API: 스테이지 생성 / 수정 / 삭제 엔드포인트
-- [ ] Server: CSV export 또는 gen-data 파이프라인 연동
-- [ ] Client: 생성된 스테이지 데이터 로드 (읽기 전용)
+## Validation
 
-<!-- changed: Unity EditorWindow 방식 폐기, 웹 서버 기반 자동 생성으로 전환 -->
+- [ ] Stage IDs must be contiguous from `1..maxStageId`.
+- [ ] Add only `maxStageId + 1`; delete only `maxStageId`; update only existing stages.
+- [ ] `nodeMap` and `cellMap` length must equal `width * height * 2`.
+- [ ] Node cells cannot overlap obstacles or gimmicks.
+- [ ] Node groups must be in `1..20` and each present group must have an even node count.
+- [ ] Save only when structural validation and solver validation pass.
+- [ ] CI command must fail on stage sequence gaps or invalid stage rows.
+
+## Client Rule Refactor
+
+- [ ] Load node colors from generated `ingame_node_colors` data.
+- [ ] Replace hardcoded `ColorPalette` stage colors with data-driven hex colors.
+- [ ] Support incomplete path persistence.
+- [ ] Allow drawing to resume from an unfinished path tail.
+- [ ] Replace long-press erase with overwrite behavior: drawing onto a filled non-obstacle/non-gimmick cell clears the previous path cell and paints the active group.
+- [ ] Clear condition: every node in every group must remain connected as valid pairs.
+- [ ] Support large-board camera zoom and pan.
+- [ ] Consider chunked/mesh/tilemap board rendering before large board rollout.
+
+<!-- changed: stage editor scope updated for nodeMap/cellMap, node color table, contiguous CRUD, validation, and path rule refactor -->

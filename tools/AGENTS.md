@@ -11,6 +11,7 @@
 | `gen-data.bat` | Runs gen-data only |
 | `gen-packets.bat` | Runs gen-packets only |
 | `gen-orm.bat` | Runs gen-orm only |
+| `stage-tool/` | Local TypeScript web tool for stage CRUD, validation, and visualization |
 
 ## Rules
 - ALL scripts read config from `config-loader.js` - never hardcode paths

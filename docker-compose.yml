@@ -1,0 +1,52 @@
+name: ${COMPOSE_PROJECT_NAME:-project-link}
+
+services:
+  api:
+    build:
+      context: ./server
+      dockerfile: src/ProjectLink.API/Dockerfile
+    ports:
+      - "${API_HOST_PORT:-8080}:${API_CONTAINER_PORT:-8080}"
+    environment:
+      ASPNETCORE_HTTP_PORTS: ${API_CONTAINER_PORT:-8080}
+      ConnectionStrings__Postgres: Host=${POSTGRES_CONTAINER_HOST:-db};Port=${POSTGRES_CONTAINER_PORT:-5432};Database=${POSTGRES_DB:-projectlink_db};Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD:-change_me}
+      Redis__Connection: ${REDIS_CONTAINER_HOST:-redis}:${REDIS_CONTAINER_PORT:-6379}
+      Jwt__Authority: ${JWT_AUTHORITY:-}
+      Jwt__Audience: ${JWT_AUDIENCE:-projectlink}
+      App__ClientId: ${APP_CLIENT_ID:-projectlink}
+      App__AllowedClientVersion: ${APP_ALLOWED_CLIENT_VERSION:-1.0.0}
+      App__AllowedProtocolVersion: ${APP_ALLOWED_PROTOCOL_VERSION:-1}
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+  db:
+    image: postgres:16-alpine
+    ports:
+      - "${POSTGRES_HOST_PORT:-5432}:${POSTGRES_CONTAINER_PORT:-5432}"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-projectlink_db}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change_me}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-projectlink_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "${REDIS_HOST_PORT:-6379}:${REDIS_CONTAINER_PORT:-6379}"
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+volumes:
+  pgdata:
+  redisdata:

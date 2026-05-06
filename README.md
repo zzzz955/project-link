@@ -59,11 +59,21 @@ game-development-template/
 
 ```bash
 DB_TYPE=postgresql      # postgresql | mysql | sqlite
-DB_HOST=localhost
+POSTGRES_DB=projectlink_db
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=...
+
+API_HOST_PORT=8080
+API_CONTAINER_PORT=8080
+POSTGRES_HOST_PORT=5432
+POSTGRES_CONTAINER_HOST=db
+POSTGRES_CONTAINER_PORT=5432
+REDIS_HOST_PORT=6379
+REDIS_CONTAINER_HOST=redis
+REDIS_CONTAINER_PORT=6379
+
+DB_HOST=localhost       # host-side tools
 DB_PORT=5432
-DB_NAME=game_db
-DB_USER=game_user
-DB_PASSWORD=...
 
 GITHUB_TOKEN=...
 GITHUB_REPO_URL=https://github.com/{owner}/{repo}

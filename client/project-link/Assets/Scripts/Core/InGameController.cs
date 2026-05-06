@@ -6,12 +6,15 @@ using ProjectLink.InGame.Input;
 using ProjectLink.InGame.Path;
 using ProjectLink.InGame.UI;
 using ProjectLink.Utils;
+using UnityEngine.InputSystem;
 
 namespace ProjectLink.Core
 {
     public class InGameController : MonoBehaviour
     {
-        [SerializeField] int   _stageId  = 1;
+        public static InGameController Instance { get; private set; }
+
+        int               _stageId;
         [SerializeField] float _cellSize = 1f;
 
         Board             _board;
@@ -19,13 +22,22 @@ namespace ProjectLink.Core
         PathDrawer        _drawer;
         BoardView         _boardView;
         TouchInputHandler _touchInput;
+        InGameHUD         _hud;
 
         readonly Dictionary<int, PathView> _pathViews = new();
         int     _activeColorId;
         Vector2 _lastDragPos;
 
+        void Awake()
+        {
+            if (Instance != null) { Destroy(gameObject); return; }
+            Instance = this;
+        }
+
         void Start()
         {
+            _stageId = GameContext.SelectedStageId;
+
             var stageData = StageLoader.Load(_stageId);
             if (stageData == null) return;
 
@@ -52,18 +64,58 @@ namespace ProjectLink.Core
             var erase = eraseGo.AddComponent<EraseController>();
             erase.Init(_touchInput, _stateMachine, _drawer, _board, gauge, _boardView, _cellSize);
 
+            var hudGo = new GameObject("InGameHUD");
+            hudGo.transform.SetParent(transform);
+            _hud = hudGo.AddComponent<InGameHUD>();
+            _hud.Init(_stageId, _board.ColorIds.Count, GetConnectedCount);
+            _hud.OnPausePressed = OpenPausePopup;
+
             _touchInput.OnDragStart        += HandleDragStart;
             _touchInput.OnDragMove         += HandleDragMove;
             _touchInput.OnDragEnd          += HandleDragEnd;
             _stateMachine.OnStateChanged   += HandleStateChanged;
         }
 
+        void Update()
+        {
+            if (Keyboard.current == null || !Keyboard.current.escapeKey.wasPressedThisFrame) return;
+            if (PopupManager.Instance != null && PopupManager.Instance.HasPopup) return;
+
+            OpenPausePopup();
+        }
+
         void OnDestroy()
         {
+            if (Instance == this) Instance = null;
             if (_touchInput == null) return;
             _touchInput.OnDragStart -= HandleDragStart;
             _touchInput.OnDragMove  -= HandleDragMove;
             _touchInput.OnDragEnd   -= HandleDragEnd;
+        }
+
+        public void SetInputEnabled(bool enabled)
+        {
+            if (_touchInput != null) _touchInput.enabled = enabled;
+        }
+
+        void OpenPausePopup()
+        {
+            if (PopupManager.Instance == null || PopupManager.Instance.HasPopup) return;
+
+            SetInputEnabled(false);
+            PopupManager.Instance.Open<PausePopup>().Init(() => SetInputEnabled(true));
+        }
+
+        int GetConnectedCount()
+        {
+            if (_drawer == null || _board == null) return 0;
+            int count = 0;
+            foreach (int id in _board.ColorIds)
+            {
+                var path = _drawer.GetPath(id);
+                if (path != null && path.IsComplete) count++;
+            }
+            return count;
         }
 
         void HandleDragStart(Vector2 worldPos)
@@ -102,12 +154,18 @@ namespace ProjectLink.Core
             _drawer.EndPath();
             _boardView.Refresh();
             foreach (var pv in _pathViews.Values) pv.Refresh();
+            _hud?.Refresh();
         }
 
         void HandleStateChanged(GameState from, GameState to)
         {
             if (to == GameState.Completed)
+            {
                 HapticManager.PlayConnected();
+                DataManager.Instance.ClearStage(_stageId, 3);
+                var popup = PopupManager.Instance.Open<ClearPopup>();
+                popup.Init(_stageId, 3);
+            }
 
             // Erase completed: sync views (EraseController already refreshed BoardView internally)
             if (from == GameState.Erasing && to == GameState.Idle)

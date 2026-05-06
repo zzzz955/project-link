@@ -17,17 +17,27 @@ namespace ProjectLink.Core
         }
 
         [Serializable]
+        class FlagPair
+        {
+            public string key;
+            public bool value;
+        }
+
+        [Serializable]
         class SaveData
         {
             public List<int> clearedStages = new();
             public List<StageStarPair> starRatings = new();
+            public List<FlagPair> flags = new();
             public float soundVolume = 1f;
             public float sfxVolume = 1f;
             public bool hapticEnabled = true;
+            public string languageCode = string.Empty;
         }
 
         private HashSet<int> _clearedStages = new();
         private Dictionary<int, int> _starRatings = new();
+        private Dictionary<string, bool> _flags = new();
         private SaveData _save = new();
 
         private const string PREFS_KEY = "SaveData";
@@ -58,6 +68,17 @@ namespace ProjectLink.Core
         public bool IsStageUnlocked(int stageId) =>
             stageId == 1 || _clearedStages.Contains(stageId - 1);
 
+        // --- Flags ---
+
+        public void SetFlag(string key, bool value)
+        {
+            _flags[key] = value;
+            Save();
+        }
+
+        public bool GetFlag(string key, bool defaultValue = false) =>
+            _flags.TryGetValue(key, out bool value) ? value : defaultValue;
+
         // --- Settings ---
 
         public float SoundVolume
@@ -78,6 +99,12 @@ namespace ProjectLink.Core
             set { _save.hapticEnabled = value; Save(); }
         }
 
+        public string LanguageCode
+        {
+            get => _save.languageCode;
+            set { _save.languageCode = value; Save(); }
+        }
+
         // --- Persistence ---
 
         public void Save()
@@ -87,6 +114,10 @@ namespace ProjectLink.Core
             _save.starRatings = new List<StageStarPair>();
             foreach (var kv in _starRatings)
                 _save.starRatings.Add(new StageStarPair { stageId = kv.Key, stars = kv.Value });
+
+            _save.flags = new List<FlagPair>();
+            foreach (var kv in _flags)
+                _save.flags.Add(new FlagPair { key = kv.Key, value = kv.Value });
 
             PlayerPrefs.SetString(PREFS_KEY, JsonUtility.ToJson(_save));
             PlayerPrefs.Save();
@@ -103,6 +134,10 @@ namespace ProjectLink.Core
             _starRatings = new Dictionary<int, int>();
             foreach (var pair in _save.starRatings)
                 _starRatings[pair.stageId] = pair.stars;
+
+            _flags = new Dictionary<string, bool>();
+            foreach (var pair in _save.flags)
+                _flags[pair.key] = pair.value;
 
             // TODO: 서버 동기화 - 로컬 데이터와 서버 데이터 병합 처리
         }

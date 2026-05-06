@@ -7,6 +7,7 @@ namespace ProjectLink.Core
         void Start()
         {
             CreateManager<DataManager>("DataManager");
+            CreateManager<LocalizationManager>("LocalizationManager");
             CreateManager<SoundManager>("SoundManager");
             CreateManager<HapticManager>("HapticManager");
             CreateManager<UIManager>("UIManager");

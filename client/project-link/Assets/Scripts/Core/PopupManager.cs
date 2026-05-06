@@ -14,6 +14,7 @@ namespace ProjectLink.Core
         public static PopupManager Instance { get; private set; }
 
         private readonly Stack<PopupBase> _stack = new();
+        private int _lastPushFrame = -1;
 
         public bool HasPopup => _stack.Count > 0;
         public int Count => _stack.Count;
@@ -27,7 +28,7 @@ namespace ProjectLink.Core
 
         void Update()
         {
-            if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame && HasPopup)
+            if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame && HasPopup && Time.frameCount > _lastPushFrame)
                 CloseTop();
         }
 
@@ -37,6 +38,7 @@ namespace ProjectLink.Core
                 prev.gameObject.SetActive(false);
 
             _stack.Push(popup);
+            _lastPushFrame = Time.frameCount;
         }
 
         public void CloseTop()
@@ -55,6 +57,18 @@ namespace ProjectLink.Core
                 Destroy(_stack.Pop().gameObject);
         }
 
-        // TODO: prefab 로드·인스턴스화 후 Push 호출하는 Open<T> 추가
+        public T Open<T>() where T : PopupBase
+        {
+            var go = new GameObject(typeof(T).Name);
+            go.transform.SetParent(UIManager.Instance.GetLayer(UILayer.Popup), false);
+            var rect = go.AddComponent<RectTransform>();
+            rect.anchorMin = Vector2.zero;
+            rect.anchorMax = Vector2.one;
+            rect.offsetMin = Vector2.zero;
+            rect.offsetMax = Vector2.zero;
+            var popup = go.AddComponent<T>();
+            Push(popup);
+            return popup;
+        }
     }
 }

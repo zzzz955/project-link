@@ -1,6 +1,6 @@
-stageId,width,height
-CS,CS,CS
-int32,int32,int32
-PK,NN,NN
-1,4,4
-2,5,5
+stageId,width,height,timeLimit
+CS,CS,CS,CS
+int32,int32,int32,int32
+PK,NN,NN,
+1,4,4,60
+2,5,5,90

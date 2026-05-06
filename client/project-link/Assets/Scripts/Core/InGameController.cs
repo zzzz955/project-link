@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using ProjectLink.Data;
+using ProjectLink.InGame;
 using ProjectLink.InGame.Board;
 using ProjectLink.InGame.Input;
 using ProjectLink.InGame.Path;
@@ -22,7 +23,9 @@ namespace ProjectLink.Core
         PathDrawer        _drawer;
         BoardView         _boardView;
         TouchInputHandler _touchInput;
+        EraseController   _eraseController;
         InGameHUD         _hud;
+        StageTimer        _timer;
 
         readonly Dictionary<int, PathView> _pathViews = new();
         int     _activeColorId;
@@ -61,14 +64,19 @@ namespace ProjectLink.Core
 
             var eraseGo = new GameObject("EraseController");
             eraseGo.transform.SetParent(transform);
-            var erase = eraseGo.AddComponent<EraseController>();
-            erase.Init(_touchInput, _stateMachine, _drawer, _board, gauge, _boardView, _cellSize);
+            _eraseController = eraseGo.AddComponent<EraseController>();
+            _eraseController.Init(_touchInput, _stateMachine, _drawer, _board, gauge, _boardView, _cellSize);
 
             var hudGo = new GameObject("InGameHUD");
             hudGo.transform.SetParent(transform);
             _hud = hudGo.AddComponent<InGameHUD>();
-            _hud.Init(_stageId, _board.ColorIds.Count, GetConnectedCount);
+            _hud.Init(_stageId, _board.ColorIds.Count, GetConnectedCount, stageData.Info.timeLimit);
             _hud.OnPausePressed = OpenPausePopup;
+
+            _timer = new StageTimer();
+            _timer.OnTimeUp += HandleTimeUp;
+            if (stageData.Info.timeLimit > 0)
+                _timer.Start(stageData.Info.timeLimit);
 
             _touchInput.OnDragStart        += HandleDragStart;
             _touchInput.OnDragMove         += HandleDragMove;
@@ -78,6 +86,10 @@ namespace ProjectLink.Core
 
         void Update()
         {
+            _timer?.Tick();
+            if (_timer != null && _timer.HasLimit && !_timer.IsExpired)
+                _hud?.SetTimerDisplay(_timer.Remaining);
+
             if (Keyboard.current == null || !Keyboard.current.escapeKey.wasPressedThisFrame) return;
             if (PopupManager.Instance != null && PopupManager.Instance.HasPopup) return;
 
@@ -103,7 +115,12 @@ namespace ProjectLink.Core
             if (PopupManager.Instance == null || PopupManager.Instance.HasPopup) return;
 
             SetInputEnabled(false);
-            PopupManager.Instance.Open<PausePopup>().Init(() => SetInputEnabled(true));
+            _timer?.Pause();
+            PopupManager.Instance.Open<PausePopup>().Init(() =>
+            {
+                SetInputEnabled(true);
+                _timer?.Resume();
+            });
         }
 
         int GetConnectedCount()
@@ -170,6 +187,27 @@ namespace ProjectLink.Core
             // Erase completed: sync views (EraseController already refreshed BoardView internally)
             if (from == GameState.Erasing && to == GameState.Idle)
                 foreach (var pv in _pathViews.Values) pv.Refresh();
+        }
+
+        void HandleTimeUp()
+        {
+            if (_stateMachine.Current == GameState.Completed) return;
+
+            SetInputEnabled(false);
+
+            if (_stateMachine.Current == GameState.Drawing)
+                _drawer.EndPath();
+
+            if (_stateMachine.Current == GameState.Completed) return; // EndPath may have triggered clear
+
+            if (_stateMachine.Current == GameState.Erasing)
+                _eraseController.Cancel();
+
+            _boardView.Refresh();
+            foreach (var pv in _pathViews.Values) pv.Refresh();
+            _hud?.SetTimerDisplay(0f);
+
+            PopupManager.Instance.Open<TimeoutPopup>().Init(_stageId);
         }
 
         void FitCameraToBoard()

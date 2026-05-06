@@ -12,11 +12,15 @@ namespace ProjectLink.InGame.UI
 
         TextMeshProUGUI _pipeCounterText;
         TextMeshProUGUI _stageLabelText;
+        TextMeshProUGUI _timerText;
         Func<int>       _getConnectedCount;
         int             _totalColors;
         RectTransform   _root;
 
-        public void Init(int stageId, int totalColors, Func<int> getConnectedCount)
+        static readonly Color _timerNormal  = new(1f, 0.85f, 0.3f, 1f);
+        static readonly Color _timerUrgent  = new(1f, 0.35f, 0.3f, 1f);
+
+        public void Init(int stageId, int totalColors, Func<int> getConnectedCount, int timeLimitSeconds = 0)
         {
             _totalColors       = totalColors;
             _getConnectedCount = getConnectedCount;
@@ -24,7 +28,7 @@ namespace ProjectLink.InGame.UI
             var parent = UIManager.Instance.GetLayer(UILayer.HUD);
             DestroyStaleHud(parent);
             _root = CreateRoot(parent);
-            BuildTopHud(_root, stageId, totalColors);
+            BuildTopHud(_root, stageId, totalColors, timeLimitSeconds > 0);
             BuildObjectiveStrip(_root, totalColors);
             BuildToolDock(_root);
         }
@@ -33,6 +37,14 @@ namespace ProjectLink.InGame.UI
         {
             if (_pipeCounterText == null) return;
             _pipeCounterText.text = $"{_getConnectedCount()} / {_totalColors}";
+        }
+
+        public void SetTimerDisplay(float remaining)
+        {
+            if (_timerText == null) return;
+            int s = Mathf.Max(0, Mathf.FloorToInt(remaining));
+            _timerText.text  = s >= 60 ? $"{s / 60}:{s % 60:D2}" : s.ToString();
+            _timerText.color = s <= 10 ? _timerUrgent : _timerNormal;
         }
 
         void OnDestroy()
@@ -60,7 +72,7 @@ namespace ProjectLink.InGame.UI
             return rect;
         }
 
-        void BuildTopHud(RectTransform root, int stageId, int totalColors)
+        void BuildTopHud(RectTransform root, int stageId, int totalColors, bool showTimer)
         {
             var bar = AddPanel(root, "TopHUD", new Vector2(0f, -72f), new Vector2(960f, 112f), new Color(0.035f, 0.045f, 0.07f, 0.9f));
             bar.anchorMin = new Vector2(0.5f, 1f);
@@ -68,7 +80,10 @@ namespace ProjectLink.InGame.UI
             bar.pivot = new Vector2(0.5f, 1f);
 
             _pipeCounterText = AddLabel(bar, $"0 / {totalColors}", 34, FontStyles.Bold, new Color(0.2f, 0.95f, 0.8f, 1f), new Vector2(-360f, 0f), new Vector2(190f, 72f), TextAlignmentOptions.Center);
-            _stageLabelText = AddLabel(bar, $"STAGE {stageId}", 36, FontStyles.Bold, Color.white, Vector2.zero, new Vector2(360f, 72f), TextAlignmentOptions.Center);
+            _stageLabelText  = AddLabel(bar, $"STAGE {stageId}", 36, FontStyles.Bold, Color.white, Vector2.zero, new Vector2(260f, 72f), TextAlignmentOptions.Center);
+
+            if (showTimer)
+                _timerText = AddLabel(bar, "--", 32, FontStyles.Bold, _timerNormal, new Vector2(260f, 0f), new Vector2(120f, 72f), TextAlignmentOptions.Center);
 
             var pause = AddPanel(bar, "PauseButton", new Vector2(386f, 0f), new Vector2(82f, 82f), new Color(1f, 1f, 1f, 0.12f));
             var pauseButton = pause.gameObject.AddComponent<Button>();

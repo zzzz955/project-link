@@ -33,6 +33,7 @@ game_next,NEXT,다음,下一关,下一關,ต่อไป
 game_retry,RETRY,다시하기,重试,重試,ลองใหม่
 game_lobby,LOBBY,로비,大厅,大廳,ล็อบบี้
 game_resume,RESUME,계속,继续,繼續,เล่นต่อ
+game_time_up,TIME'S UP,시간 초과,时间到,時間到,หมดเวลา
 popup_cancel,CANCEL,취소,取消,取消,ยกเลิก
 popup_exit_title,EXIT GAME,게임 종료,退出游戏,結束遊戲,ออกจากเกม
 popup_exit_message,Close Project Link and return to your device?,프로젝트 링크를 닫고 기기로 돌아갈까요?,关闭项目连接并返回设备?,關閉專案連線並返回裝置?,ปิดโปรเจกต์ลิงก์แล้วกลับไปยังอุปกรณ์?

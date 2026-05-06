@@ -11,6 +11,7 @@
 - `stageId` int32 PK — unique stage identifier
 - `width` int32 NN — grid columns
 - `height` int32 NN — grid rows
+- `timeLimit` int32 — per-stage countdown in seconds; 0 = no limit (optional)
 
 **ingame_stage_nodes**
 - `stageId` int32 NN — references ingame_stage_info.stageId
@@ -24,4 +25,4 @@
 - Stage 2: 5x5, 3 colors — Red (0,0)→(4,4), Blue (4,0)→(0,4), Green (2,0)→(2,4)
 
 ## Planned Additions
-- `ingame_stage_info.csv`: `difficulty`, `time_limit` columns (post-MVP)
+- `ingame_stage_info.csv`: `difficulty` column (post-MVP)

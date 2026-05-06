@@ -8,5 +8,6 @@ namespace ProjectLink.Generated.Data
     public int stageId { get; set; }
     public int width { get; set; }
     public int height { get; set; }
+    public int timeLimit { get; set; }
     }
 }

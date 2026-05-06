@@ -1,226 +1,89 @@
-# Game Design Spec (Strict Constraint Version)
+# InGame Game Rules
 
-## 🎯 Objective (절대 조건)
-플레이어는 보드 위에 존재하는 모든 색상 쌍을 각각 하나의 연속된 경로로 연결해야 한다.
+## Stage Data
 
-- 각 색상은 정확히 2개의 노드만 가진다
-- 모든 색상 쌍이 연결되면 즉시 클리어 상태로 전이된다
-- 하나라도 연결되지 않은 색상이 있으면 클리어할 수 없다
-- 빈 셀이 남아있어도 클리어 가능하다 (전체 셀 채우기 불필요)
+- Stage data uses two row-major map layers:
+  - `nodeMap`: node group placement.
+  - `cellMap`: obstacles, gimmicks, and other non-node cell metadata.
+- `nodeMap` group IDs are `1..20`.
+- Node group colors are loaded from `ingame_node_colors.csv`.
+- Nodes with the same `nodeGroupId` share the same gameplay property and display color.
+- Each present node group must contain an even number of nodes.
+- Nodes in the same group must be connectable as valid pairs.
+- Obstacles and gimmicks are encoded in `cellMap`.
 
----
+## Board
 
-## 🧩 Player Input (입력 제약)
-플레이어 입력은 터치 기반 드래그 하나만 허용된다
+- The board is a rectangular 2D grid.
+- Coordinates are integer `(x, y)` cells inside the board bounds.
+- A cell can contain one primary authored feature from the stage data:
+  - Empty cell.
+  - Node.
+  - Obstacle.
+  - Gimmick.
+- Runtime path ownership is separate from authored stage data.
 
-허용:
-- 노드 위에서 드래그 시작
-- 인접한 빈 셀 또는 동일 색상 목적지 노드로 이동
+## Node Groups
 
-금지:
-- 노드가 아닌 위치에서 드래그 시작
-- 동시에 두 개 이상의 입력
-- 경로를 건너뛰는 이동 (비인접 이동)
-- 다른 색상 경로/노드가 점유한 셀로의 이동
+- A node group represents one color/property family.
+- Valid group IDs are `1..20`.
+- The visual color for each group comes from `ingame_node_colors.csv`.
+- Every node in a group must be paired with another node from the same group.
+- A group with an odd node count is invalid stage data.
 
-드래그 종료 처리:
-- 드래그가 종료된 시점에 Drawing 정보를 토대로 연결 가능 여부를 판별한다
-- 목적지 노드에 도달하지 않은 채 드래그 종료 시 현재 경로 전체 리셋
+## Drawing
 
----
+- Drawing starts from a node or from the tail of an incomplete path owned by the active group.
+- Incomplete paths persist after input ends.
+- An incomplete path can resume only from its current tail.
+- Movement is orthogonal only: up, down, left, right.
+- Drawing cannot pass through obstacles or gimmicks unless a future gimmick-specific rule explicitly allows it.
+- Drawing into a node is valid only when the node belongs to the active group and completes a valid pair.
+- Drawing over an already-filled non-obstacle/non-gimmick cell overwrites that cell:
+  - Clear previous path ownership for the cell.
+  - Paint the cell as part of the active group path.
+  - Recompute affected path connectivity after the overwrite.
 
-## 🟦 Board Definition (보드 제약)
-- 보드는 직사각형 2D Grid이다
-- 모든 좌표는 정수 (x, y)로 표현된다
-- 좌표는 반드시 보드 범위 내에 있어야 한다
+## Path Model
 
-각 셀은 다음 상태 중 하나만 가질 수 있다:
-1. 비어 있음
-2. 노드 포함
-3. 경로 포함
+- Paths are owned by node groups.
+- A group can have multiple valid pair connections when it has more than two nodes.
+- A path segment is valid only when it is orthogonally contiguous.
+- Runtime path state must support:
+  - Active group ownership per painted cell.
+  - Incomplete path persistence.
+  - Tail-only resume for incomplete paths.
+  - Overwrite erase when another group paints an occupied drawable cell.
+  - Connectivity checks that match solver validation.
 
-하나의 셀은 동시에 두 상태를 가질 수 없다
+## Clear Condition
 
----
+- A stage is clear only when every node in every group remains connected as valid pairs.
+- Every present node group must satisfy:
+  - Even node count.
+  - All nodes paired with another node in the same group.
+  - Each pair connected by a valid path.
+  - No pair connection violates obstacles, gimmicks, board bounds, or ownership rules.
+- Filling every empty cell is not required unless a future stage rule explicitly requires it.
 
-## 🔵 Node Definition (노드 제약)
-- 각 노드는 하나의 색상 ID를 가진다
-- 동일한 색상 ID는 반드시 정확히 2개의 노드만 존재해야 한다
+## Invalid Input
 
-노드는:
-- 이동할 수 없다
-- 삭제되지 않는다
-- 경로로 덮어씌워질 수 없다
+- Reject drawing attempts that start outside a valid node or incomplete-path tail.
+- Reject non-orthogonal movement.
+- Reject movement outside board bounds.
+- Reject movement through obstacles or gimmicks unless a future gimmick rule allows it.
+- Reject completion against a node from another group.
+- Preserve existing incomplete paths when input ends before a valid pair is completed.
 
----
+## Large Board Support
 
-## 🟠 Path Definition (경로 제약)
-- 하나의 색상은 최대 1개의 경로만 가질 수 있다
-- 경로는 연속된 인접 셀의 집합이어야 한다
+- Large boards require camera zoom and pan support.
+- Input hit testing must remain accurate under camera transform.
+- Rendering should be prepared for larger grids with tilemap, mesh, chunk, or equivalent batching when needed.
 
-연결 조건:
-- 시작: 반드시 노드에서 시작
-- 종료: 반드시 동일 색상의 다른 노드에서 끝나야 함
+## Data Driven Requirements
 
-이동 가능 셀:
-| 셀 상태 | 이동 가능 여부 |
-|---|---|
-| 빈 셀 | 가능 |
-| 동일 색상 목적지 노드 | 가능 (연결 완성) |
-| 다른 색상 경로 셀 | 불가 (차단) |
-| 다른 색상 노드 셀 | 불가 (차단) |
-| 자기 자신의 이전 경로 셀 | 불가 (자기 교차 금지) |
-
-백트래킹:
-- 드래그를 자신의 이전 경로 셀 위로 되돌리면 해당 셀부터 끝까지의 경로가 제거된다
-
----
-
-## ⚖️ Core Rules (강제 규칙)
-Rule 1: 색상 일치
-경로는 반드시 동일 색상 노드 간에만 생성되어야 한다
-
-Rule 2: 단일 점유
-각 셀은 하나의 경로만 가질 수 있다
-
-Rule 3: 자기 교차 금지
-하나의 경로는 동일 셀을 두 번 이상 방문할 수 없다
-
-Rule 4: 인접 이동
-경로는 반드시 상하좌우 인접 셀로만 이동 가능
-
-Rule 5: 경로 재작성
-같은 색상의 새로운 경로를 시작하면 기존 경로는 즉시 완전히 삭제된다
-
----
-
-## ✏️ Erase Mode (경로 삭제)
-완성된 경로를 삭제하는 전용 모드
-
-진입 조건:
-- 완성된 경로의 노드를 롱프레스
-- 입력 감지: 터치 후 이동이 없을 때만 롱프레스로 인정 (드래그 시작은 이동 감지 후 확정)
-
-동작:
-1. 롱프레스 시작과 동시에 해당 경로 하이라이트 + 노드 주변 원형 게이지 표시
-2. 게이지 충전 시간: 0.6 ~ 0.8초
-3. 게이지 100% 도달 즉시 경로 자동 삭제 → Idle 상태로 복귀
-4. 게이지 완료 전 손을 떼면 취소 (경로 유지)
-5. Erase 모드 진입 후 다른 곳을 터치하면 모드 종료
-
-튜토리얼:
-- 최초 경로 완성 시 한 번만 롱프레스 삭제 기능 툴팁 노출
-
----
-
-## ❌ Invalid State Handling (강제 처리)
-드래그 중 진입 불가 셀 접근 시:
-- 해당 방향으로 경로가 진행되지 않는다 (차단)
-- 경로 끝점 흔들림 애니메이션 + 약한 햅틱 피드백 제공
-- 현재까지 그려진 경로는 유지된다
-
-드래그 종료 시 미완성 경로:
-- 경로 전체 리셋 + 페이드아웃 애니메이션
-
-입력 스냅:
-- 터치 위치가 막힌 셀과 빈 셀 경계에 걸친 경우 유효한 인접 셀로 우선 스냅
-- BFS 자동 경로 탐색은 수행하지 않는다
-
----
-
-## ✅ Completion Condition (클리어 조건)
-드래그 종료 시점에 다음 조건을 판별한다:
-
-모든 색상에 대해:
-1. 경로가 존재한다
-2. 해당 경로가 정확히 두 노드를 연결한다
-3. 모든 규칙을 위반하지 않는다
-
-조건 충족 시 즉시 Completed 상태로 전환
-연결 완성 시 경로 펄스 애니메이션 + 만족감 있는 햅틱 피드백 제공
-
----
-
-## ⏱ Time Limit (시간 제한)
-각 스테이지는 선택적으로 제한 시간을 가질 수 있다 (`stage_info.csv: timeLimit`, 0 = 무제한).
-
-동작:
-- 제한 시간 내에 모든 색상 쌍을 연결하지 못하면 실패 처리
-- 남은 시간이 10초 이하이면 타이머 텍스트가 빨간색으로 전환
-- 일시정지 중에는 타이머가 멈춘다 (Pause/Resume 지원)
-- 시간 초과 시 현재 경로 초기화 → Timeout 팝업 표시 (재시도 / 로비 선택)
-
-클라이언트 어뷰징 방지:
-- `Time.timeScale` 조작 차단: `Time.realtimeSinceStartup` 기반으로 경과 시간 측정
-- 메모리 변조 감지: `DateTime.UtcNow` (OS 시간)를 2차 소스로 교차 검증
-- 두 소스 간 오차가 2초 초과 시 큰 값을 채택 (시간 연장 불가)
-- 서버 연동 후 서버 측 검증 추가 예정
-
----
-
-## 🔁 State Machine (상태 제약)
-허용 상태:
-- Idle
-- Drawing
-- Erasing
-- Completed
-
-전이:
-- Idle → Drawing (노드에서 드래그 시작)
-- Drawing → Idle (드래그 종료 + 미완성)
-- Drawing → Completed (드래그 종료 + 전체 연결 조건 충족)
-- Idle → Erasing (완성된 노드 롱프레스)
-- Erasing → Idle (게이지 완료 삭제 또는 다른 곳 터치)
-
-렌더링:
-- Drawing 상태에서 현재 그려지는 경로는 실시간으로 시각적 렌더링된다
-
----
-
-## 📳 Haptic Feedback (햅틱)
-| 상황 | 피드백 |
-|---|---|
-| 막힌 방향 드래그 시도 | 경로 끝점 흔들림 + 약한 햅틱 |
-| 드래그 종료 (미완성) | 경로 페이드아웃 |
-| 연결 완성 | 경로 펄스 + 만족감 있는 햅틱 |
-| 경로 삭제 완료 | 약한 햅틱 |
-
-- 햅틱은 설정 메뉴에서 토글로 ON/OFF 제어 가능
-- 햅틱 미지원 기기 또는 비활성화 시 무시 처리 (방어 코드 필요)
-
----
-
-## 🧠 Design Intent (의도)
-- 공간 효율적 경로 설계
-- 경로 간 충돌 회피
-- 제한된 보드 내 최적 해 찾기
-
----
-
-## 📦 Data Driven Requirement (필수 요구)
-- 모든 스테이지는 외부 데이터로 정의
-- 하드코딩 금지
-- 프로젝트 CSV 파이프라인 사용 (`shared/datas/**/*.csv` → gen:data → JSON)
-
-MVP 데이터 구조:
-```
-stage_info.csv  : stage_id, width, height
-stage_nodes.csv : stage_id, color_id, node_index, x, y
-```
-- `node_index`: 1 또는 2 (동일 색상의 첫 번째/두 번째 노드 구분)
-- `stage_id + color_id + node_index`로 노드를 유일하게 식별
-
-추후 추가 예정 컬럼:
-- `stage_info.csv`: difficulty, time_limit 등
-
----
-
-## 🛠 TODO (AI Agent Responsibility)
-- Grid 내부 표현 방식
-- 경로 저장 구조 (백트래킹 지원 포함)
-- 드래그 종료 시점 연결 판별 알고리즘
-- 입력 스냅 처리 로직
-- 상태 관리 시스템 (Idle / Drawing / Erasing / Completed)
-- 데이터 테이블 구조 및 gen 파이프라인 연동
-- 햅틱 방어 처리 (플랫폼별 지원 여부 확인)
-- 원형 게이지 UI 컴포넌트
+- Do not hardcode node colors in client game logic.
+- Load generated stage data from the shared data pipeline.
+- Edit source CSVs under `shared/datas/**`; never edit generated files directly.
+- Stage validation must use the same structural rules as runtime and solver validation.

@@ -9,40 +9,37 @@
 
 ## Data Model
 
-- [ ] Migrate stage authoring to `ingame_stage.csv` as one row per stage.
-- [ ] Use `nodeMap` + `cellMap` row-major base36 fixed-width 2-char layers.
-- [ ] Use `ingame_node_colors.csv` as the canonical node group color table.
-- [ ] Keep legacy `ingame_stage_info.csv` and `ingame_stage_nodes.csv` until Unity client migration is complete.
+- [x] Migrate stage authoring to `ingame_stage.csv` as one row per stage.
+- [x] Use `nodeMap` + `cellMap` row-major base36 fixed-width 2-char layers.
+- [x] Use `ingame_node_colors.csv` as the canonical node group color table.
+- [x] Keep legacy `ingame_stage_info.csv` and `ingame_stage_nodes.csv` until Unity client migration is complete.
 
 ## Stage Tool
 
-- [ ] Web UI: explicit `stageId` lookup/add/update/delete.
-- [ ] Web UI: visual grid editor for node groups, obstacles, and future gimmicks.
-- [ ] Web UI: board size, time limit, difficulty, seed, and extensible stage metadata.
-- [ ] Server API: `GET /api/stages`, `GET /api/stages/:stageId`.
-- [ ] Server API: `POST /api/stages/:stageId`, `PUT /api/stages/:stageId`, `DELETE /api/stages/:stageId`.
-- [ ] Server API: `GET /api/node-colors`.
-- [ ] Server: atomic CSV write with metadata rows preserved.
+- [x] Web UI: explicit `stageId` lookup/add/update/delete.
+- [x] Web UI: visual grid editor for node groups, obstacles, and future gimmicks.
+- [x] Web UI: board size, time limit, difficulty, seed, and extensible stage metadata.
+- [x] Web UI: validation preview before save.
+- [x] Web UI: auto-generate stage drafts from board size, difficulty `1..5`, and optional seed.
+- [x] Server API: `GET /api/stages`, `GET /api/stages/:stageId`.
+- [x] Server API: `POST /api/stages/:stageId`, `PUT /api/stages/:stageId`, `DELETE /api/stages/:stageId`.
+- [x] Server API: `POST /api/stages/generate`.
+- [x] Server API: `GET /api/node-colors`.
+- [x] Server: atomic CSV write with metadata rows preserved.
+- [x] Generator: emit generated client/server stage data from source CSV.
 
 ## Validation
 
-- [ ] Stage IDs must be contiguous from `1..maxStageId`.
-- [ ] Add only `maxStageId + 1`; delete only `maxStageId`; update only existing stages.
-- [ ] `nodeMap` and `cellMap` length must equal `width * height * 2`.
-- [ ] Node cells cannot overlap obstacles or gimmicks.
-- [ ] Node groups must be in `1..20` and each present group must have an even node count.
-- [ ] Save only when structural validation and solver validation pass.
-- [ ] CI command must fail on stage sequence gaps or invalid stage rows.
+- [x] Stage IDs must be contiguous from `1..maxStageId`.
+- [x] Add only `maxStageId + 1`; delete only `maxStageId`; update only existing stages.
+- [x] `nodeMap` and `cellMap` length must equal `width * height * 2`.
+- [x] Node cells cannot overlap obstacles or gimmicks.
+- [x] Node groups must be in `1..20` and each present group must have an even node count.
+- [x] Save only when structural validation and solver validation pass.
+- [x] CI command must fail on stage sequence gaps or invalid stage rows.
 
 ## Client Rule Refactor
 
-- [ ] Load node colors from generated `ingame_node_colors` data.
-- [ ] Replace hardcoded `ColorPalette` stage colors with data-driven hex colors.
-- [ ] Support incomplete path persistence.
-- [ ] Allow drawing to resume from an unfinished path tail.
-- [ ] Replace long-press erase with overwrite behavior: drawing onto a filled non-obstacle/non-gimmick cell clears the previous path cell and paints the active group.
-- [ ] Clear condition: every node in every group must remain connected as valid pairs.
-- [ ] Support large-board camera zoom and pan.
-- [ ] Consider chunked/mesh/tilemap board rendering before large board rollout.
+- Runtime client work is tracked in `12_client_rule_refactor.md`.
 
-<!-- changed: stage editor scope updated for nodeMap/cellMap, node color table, contiguous CRUD, validation, and path rule refactor -->
+<!-- changed: Stage Editor implementation checklist completed; runtime client refactor moved to 12_client_rule_refactor.md -->

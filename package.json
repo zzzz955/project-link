@@ -8,9 +8,8 @@
   },
   "scripts": {
     "gen:data":    "node tools/gen-data.js",
-    "gen:packets": "node tools/gen-packets.js",
     "gen:orm":     "node tools/gen-orm.js",
-    "gen:all":     "npm run gen:data && npm run gen:packets && npm run gen:orm",
+    "gen:all":     "npm run gen:data && npm run gen:orm",
     "stage-tool":  "npm --prefix tools/stage-tool run dev",
     "stage-tool:validate": "npm --prefix tools/stage-tool run validate"
   },

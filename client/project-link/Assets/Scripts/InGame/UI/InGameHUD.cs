@@ -1,8 +1,8 @@
 using System;
+using ProjectLink.Core;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using ProjectLink.Core;
 
 namespace ProjectLink.InGame.UI
 {
@@ -11,26 +11,24 @@ namespace ProjectLink.InGame.UI
         public Action OnPausePressed;
 
         TextMeshProUGUI _pipeCounterText;
-        TextMeshProUGUI _stageLabelText;
         TextMeshProUGUI _timerText;
-        Func<int>       _getConnectedCount;
-        int             _totalColors;
-        RectTransform   _root;
+        Func<int> _getConnectedCount;
+        int _totalColors;
+        RectTransform _root;
 
-        static readonly Color _timerNormal  = new(1f, 0.85f, 0.3f, 1f);
-        static readonly Color _timerUrgent  = new(1f, 0.35f, 0.3f, 1f);
+        static readonly Color _timerNormal = Color.white;
+        static readonly Color _timerUrgent = new(1f, 0.25f, 0.3f, 1f);
 
         public void Init(int stageId, int totalColors, Func<int> getConnectedCount, int timeLimitSeconds = 0)
         {
-            _totalColors       = totalColors;
+            _totalColors = totalColors;
             _getConnectedCount = getConnectedCount;
 
             var parent = UIManager.Instance.GetLayer(UILayer.HUD);
             DestroyStaleHud(parent);
             _root = CreateRoot(parent);
-            BuildTopHud(_root, stageId, totalColors, timeLimitSeconds > 0);
-            BuildObjectiveStrip(_root, totalColors);
-            BuildToolDock(_root);
+            BuildHud(_root, stageId, timeLimitSeconds > 0);
+            Refresh();
         }
 
         public void Refresh()
@@ -43,7 +41,7 @@ namespace ProjectLink.InGame.UI
         {
             if (_timerText == null) return;
             int s = Mathf.Max(0, Mathf.FloorToInt(remaining));
-            _timerText.text  = $"{s / 60:D2}:{s % 60:D2}";
+            _timerText.text = $"{s / 60:D2}:{s % 60:D2}";
             _timerText.color = s <= 10 ? _timerUrgent : _timerNormal;
         }
 
@@ -58,114 +56,113 @@ namespace ProjectLink.InGame.UI
             var stale = parent.Find("ModernInGameHUD");
             if (stale != null)
                 Destroy(stale.gameObject);
+
+            stale = parent.Find("WireframeInGameHUD");
+            if (stale != null)
+                Destroy(stale.gameObject);
         }
 
-        RectTransform CreateRoot(Transform parent)
+        static RectTransform CreateRoot(Transform parent)
         {
-            var rootGo = new GameObject("ModernInGameHUD");
+            var rootGo = new GameObject("WireframeInGameHUD");
             rootGo.transform.SetParent(parent, false);
             var rect = rootGo.AddComponent<RectTransform>();
+            Stretch(rect);
+            return rect;
+        }
+
+        void BuildHud(RectTransform root, int stageId, bool showTimer)
+        {
+            AddImageSlot(root, "LevelHeaderSlot", new Vector2(0f, -20f), new Vector2(360f, 160f), true);
+            AddImageSlot(root, "BottomToolBarSlot", new Vector2(0f, 56f), new Vector2(980f, 170f), false);
+
+            var pause = AddHotspot(root, "PauseButton", new Vector2(425f, -78f), new Vector2(120f, 120f), true);
+            pause.onClick.AddListener(() => OnPausePressed?.Invoke());
+
+            AddHotspot(root, "HintButton", new Vector2(-405f, 56f), new Vector2(150f, 150f), false).onClick.AddListener(OpenBuyItemPopup);
+            AddHotspot(root, "UndoButton", new Vector2(-225f, 56f), new Vector2(150f, 150f), false).onClick.AddListener(OpenBuyItemPopup);
+            AddHotspot(root, "ShuffleButton", new Vector2(120f, 56f), new Vector2(140f, 140f), false).onClick.AddListener(OpenBuyItemPopup);
+            AddHotspot(root, "HammerButton", new Vector2(295f, 56f), new Vector2(140f, 140f), false).onClick.AddListener(OpenBuyItemPopup);
+            AddHotspot(root, "PaintButton", new Vector2(470f, 56f), new Vector2(140f, 140f), false).onClick.AddListener(OpenBuyItemPopup);
+
+            _pipeCounterText = AddDynamicLabel(root, "0 / 0", 60, new Vector2(42f, -105f), new Vector2(150f, 80f), true);
+
+            if (showTimer)
+                _timerText = AddDynamicLabel(root, "--:--", 36, new Vector2(-345f, -82f), new Vector2(150f, 58f), true);
+        }
+
+        static RectTransform AddImageSlot(RectTransform parent, string name, Vector2 position, Vector2 size, bool top)
+        {
+            var go = new GameObject(name, typeof(RectTransform), typeof(Image));
+            go.transform.SetParent(parent, false);
+            var rect = go.GetComponent<RectTransform>();
+            rect.anchorMin = top ? new Vector2(0.5f, 1f) : new Vector2(0.5f, 0f);
+            rect.anchorMax = rect.anchorMin;
+            rect.pivot = top ? new Vector2(0.5f, 1f) : new Vector2(0.5f, 0f);
+            rect.anchoredPosition = position;
+            rect.sizeDelta = size;
+
+            var image = go.GetComponent<Image>();
+            image.enabled = false;
+            image.raycastTarget = false;
+            image.preserveAspect = true;
+            return rect;
+        }
+
+        static Button AddHotspot(RectTransform parent, string name, Vector2 position, Vector2 size, bool top)
+        {
+            var go = new GameObject(name, typeof(RectTransform), typeof(Image), typeof(Button));
+            go.transform.SetParent(parent, false);
+            var rect = go.GetComponent<RectTransform>();
+            rect.anchorMin = top ? new Vector2(0.5f, 1f) : new Vector2(0.5f, 0f);
+            rect.anchorMax = rect.anchorMin;
+            rect.pivot = top ? new Vector2(0.5f, 1f) : new Vector2(0.5f, 0f);
+            rect.anchoredPosition = position;
+            rect.sizeDelta = size;
+
+            var image = go.GetComponent<Image>();
+            image.color = new Color(1f, 1f, 1f, 0.001f);
+            image.raycastTarget = true;
+
+            var button = go.GetComponent<Button>();
+            button.targetGraphic = image;
+            button.transition = Selectable.Transition.None;
+            return button;
+        }
+
+        static TextMeshProUGUI AddDynamicLabel(RectTransform parent, string text, float size, Vector2 position, Vector2 rectSize, bool top)
+        {
+            var go = new GameObject("DynamicLabel", typeof(RectTransform), typeof(TextMeshProUGUI));
+            go.transform.SetParent(parent, false);
+            var rect = go.GetComponent<RectTransform>();
+            rect.anchorMin = top ? new Vector2(0.5f, 1f) : new Vector2(0.5f, 0f);
+            rect.anchorMax = rect.anchorMin;
+            rect.pivot = top ? new Vector2(0.5f, 1f) : new Vector2(0.5f, 0f);
+            rect.anchoredPosition = position;
+            rect.sizeDelta = rectSize;
+
+            var label = go.GetComponent<TextMeshProUGUI>();
+            label.text = text;
+            label.fontSize = size;
+            label.fontStyle = FontStyles.Bold;
+            label.color = Color.white;
+            label.alignment = TextAlignmentOptions.Center;
+            label.raycastTarget = false;
+            return label;
+        }
+
+        static void OpenBuyItemPopup()
+        {
+            if (PopupManager.Instance != null)
+                PopupManager.Request(PopupId.BuyItem);
+        }
+
+        static void Stretch(RectTransform rect)
+        {
             rect.anchorMin = Vector2.zero;
             rect.anchorMax = Vector2.one;
             rect.offsetMin = Vector2.zero;
             rect.offsetMax = Vector2.zero;
-            return rect;
-        }
-
-        void BuildTopHud(RectTransform root, int stageId, int totalColors, bool showTimer)
-        {
-            var bar = AddPanel(root, "TopHUD", new Vector2(0f, -72f), new Vector2(960f, 112f), new Color(0.035f, 0.045f, 0.07f, 0.9f));
-            bar.anchorMin = new Vector2(0.5f, 1f);
-            bar.anchorMax = new Vector2(0.5f, 1f);
-            bar.pivot = new Vector2(0.5f, 1f);
-
-            _pipeCounterText = AddLabel(bar, $"0 / {totalColors}", 34, FontStyles.Bold, new Color(0.2f, 0.95f, 0.8f, 1f), new Vector2(-360f, 0f), new Vector2(190f, 72f), TextAlignmentOptions.Center);
-            _stageLabelText  = AddLabel(bar, $"STAGE {stageId}", 36, FontStyles.Bold, Color.white, Vector2.zero, new Vector2(260f, 72f), TextAlignmentOptions.Center);
-
-            if (showTimer)
-                _timerText = AddLabel(bar, "--", 32, FontStyles.Bold, _timerNormal, new Vector2(260f, 0f), new Vector2(120f, 72f), TextAlignmentOptions.Center);
-
-            var pause = AddPanel(bar, "PauseButton", new Vector2(386f, 0f), new Vector2(82f, 82f), new Color(1f, 1f, 1f, 0.12f));
-            var pauseButton = pause.gameObject.AddComponent<Button>();
-            AddLabel(pause, "II", 30, FontStyles.Bold, Color.white, Vector2.zero, new Vector2(82f, 82f), TextAlignmentOptions.Center);
-            pauseButton.onClick.AddListener(() => OnPausePressed?.Invoke());
-        }
-
-        void BuildObjectiveStrip(RectTransform root, int totalColors)
-        {
-            var strip = AddPanel(root, "ObjectiveStrip", new Vector2(0f, -198f), new Vector2(620f, 56f), new Color(1f, 1f, 1f, 0.07f));
-            strip.anchorMin = new Vector2(0.5f, 1f);
-            strip.anchorMax = new Vector2(0.5f, 1f);
-            strip.pivot = new Vector2(0.5f, 1f);
-
-            AddLabel(strip, "CONNECT ALL", 20, FontStyles.UpperCase, new Color(0.75f, 0.8f, 0.88f, 1f), new Vector2(-190f, 0f), new Vector2(180f, 40f), TextAlignmentOptions.Left);
-
-            Color[] colors =
-            {
-                new(0.2f, 0.95f, 0.8f, 1f),
-                new(1f, 0.45f, 0.42f, 1f),
-                new(1f, 0.78f, 0.28f, 1f),
-                new(0.35f, 0.58f, 1f, 1f),
-                new(0.8f, 0.48f, 1f, 1f)
-            };
-
-            int count = Mathf.Clamp(totalColors, 1, 5);
-            for (int i = 0; i < count; i++)
-                AddPanel(strip, $"ColorPip_{i}", new Vector2(70f + i * 58f, 0f), new Vector2(34f, 34f), colors[i % colors.Length]);
-        }
-
-        void BuildToolDock(RectTransform root)
-        {
-            var dock = AddPanel(root, "ToolDock", new Vector2(0f, 54f), new Vector2(780f, 118f), new Color(0.035f, 0.045f, 0.07f, 0.92f));
-            dock.anchorMin = new Vector2(0.5f, 0f);
-            dock.anchorMax = new Vector2(0.5f, 0f);
-            dock.pivot = new Vector2(0.5f, 0f);
-
-            AddTool(dock, "UNDO", new Vector2(-248f, 0f), new Color(0.35f, 0.58f, 1f, 1f));
-            AddTool(dock, "ERASE", Vector2.zero, new Color(1f, 0.45f, 0.42f, 1f));
-            AddTool(dock, "HINT", new Vector2(248f, 0f), new Color(1f, 0.78f, 0.28f, 1f));
-        }
-
-        void AddTool(RectTransform parent, string label, Vector2 position, Color accent)
-        {
-            var tool = AddPanel(parent, label + "Tool", position, new Vector2(190f, 78f), new Color(1f, 1f, 1f, 0.08f));
-            AddPanel(tool, "Accent", new Vector2(-68f, 0f), new Vector2(14f, 42f), accent);
-            AddLabel(tool, label, 24, FontStyles.Bold, Color.white, new Vector2(18f, 0f), new Vector2(120f, 42f), TextAlignmentOptions.Center);
-        }
-
-        TextMeshProUGUI AddLabel(RectTransform parent, string text, float fontSize, FontStyles style, Color color, Vector2 position, Vector2 size, TextAlignmentOptions alignment)
-        {
-            var go = new GameObject("Label");
-            go.transform.SetParent(parent, false);
-            var rect = go.AddComponent<RectTransform>();
-            rect.anchorMin = new Vector2(0.5f, 0.5f);
-            rect.anchorMax = new Vector2(0.5f, 0.5f);
-            rect.pivot = new Vector2(0.5f, 0.5f);
-            rect.anchoredPosition = position;
-            rect.sizeDelta = size;
-
-            var tmp = go.AddComponent<TextMeshProUGUI>();
-            tmp.text = text;
-            tmp.fontSize = fontSize;
-            tmp.fontStyle = style;
-            tmp.color = color;
-            tmp.alignment = alignment;
-            tmp.raycastTarget = false;
-            return tmp;
-        }
-
-        RectTransform AddPanel(RectTransform parent, string name, Vector2 position, Vector2 size, Color color)
-        {
-            var go = new GameObject(name);
-            go.transform.SetParent(parent, false);
-            var rect = go.AddComponent<RectTransform>();
-            rect.anchorMin = new Vector2(0.5f, 0.5f);
-            rect.anchorMax = new Vector2(0.5f, 0.5f);
-            rect.pivot = new Vector2(0.5f, 0.5f);
-            rect.anchoredPosition = position;
-            rect.sizeDelta = size;
-            go.AddComponent<Image>().color = color;
-            return rect;
         }
     }
 }

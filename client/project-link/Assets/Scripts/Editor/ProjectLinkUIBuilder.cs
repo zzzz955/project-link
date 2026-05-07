@@ -1,8 +1,10 @@
+using System.Collections.Generic;
+using ProjectLink.Core;
 using ProjectLink.OutGame.UI;
-using TMPro;
 using UnityEditor;
 using UnityEditor.Events;
 using UnityEditor.SceneManagement;
+using UnityEditor.U2D.Sprites;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem.UI;
@@ -15,13 +17,27 @@ namespace ProjectLink.EditorTools
     {
         const float Width = 1080f;
         const float Height = 1920f;
+        const string ResourceRoot = "Assets/Resources/UI";
+        const string PopupPrefabRoot = "Assets/Resources/Prefabs/UI";
+        static readonly Color BackgroundSlot = new(0.04f, 0.08f, 0.14f, 0.18f);
+        static readonly Color ContentSlot = new(0.12f, 0.35f, 0.7f, 0.24f);
+        static readonly Color ButtonSlot = new(0.1f, 0.55f, 0.95f, 0.42f);
+        static readonly Color AccentButtonSlot = new(0.12f, 0.85f, 0.35f, 0.48f);
+        static readonly Color ScrollSlot = new(0.1f, 0.16f, 0.25f, 0.32f);
 
-        static readonly Color Ink = new(0.06f, 0.08f, 0.12f, 1f);
-        static readonly Color Aqua = new(0.19f, 0.91f, 0.78f, 1f);
-        static readonly Color Coral = new(1f, 0.42f, 0.38f, 1f);
-        static readonly Color Lemon = new(1f, 0.78f, 0.32f, 1f);
-        static readonly Color White = new(0.96f, 0.98f, 1f, 1f);
-        static readonly Color Muted = new(0.63f, 0.7f, 0.78f, 1f);
+        readonly struct RectSpec
+        {
+            public RectSpec(string name, Vector2 position, Vector2 size)
+            {
+                Name = name;
+                Position = position;
+                Size = size;
+            }
+
+            public string Name { get; }
+            public Vector2 Position { get; }
+            public Vector2 Size { get; }
+        }
 
         [MenuItem("Tools/Project Link/UI Build/Build Current Scene UI")]
         public static void BuildCurrentSceneUI()
@@ -33,6 +49,8 @@ namespace ProjectLink.EditorTools
         [MenuItem("Tools/Project Link/UI Build/Build All Scene UI")]
         public static void BuildAllSceneUI()
         {
+            BuildPopupPrefabs();
+
             if (!Application.isBatchMode)
                 EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo();
 
@@ -58,6 +76,103 @@ namespace ProjectLink.EditorTools
             BuildAllSceneUI();
         }
 
+        [MenuItem("Tools/Project Link/UI Build/Build Popup Prefabs")]
+        public static void BuildPopupPrefabs()
+        {
+            EnsureFolder("Assets/Resources/Prefabs");
+            EnsureFolder(PopupPrefabRoot);
+
+            CreateWireframePopupPrefab<ReturnTitlePopup>("ReturnTitlePopup", ConfirmPopupSlots(), ConfirmPopupButtons());
+            CreateWireframePopupPrefab<ExitGamePopup>("ExitGamePopup", ConfirmPopupSlots(), ConfirmPopupButtons());
+
+            CreateWireframePopupPrefab<SettingPopup>("SettingPopup", new[]
+            {
+                new RectSpec("PanelImageSlot", Vector2.zero, new Vector2(850f, 1500f)),
+                new RectSpec("TitleImageSlot", new Vector2(0f, 580f), new Vector2(620f, 130f)),
+                new RectSpec("BgmRowSlot", new Vector2(0f, 350f), new Vector2(760f, 130f)),
+                new RectSpec("SfxRowSlot", new Vector2(0f, 195f), new Vector2(760f, 130f)),
+                new RectSpec("HapticsRowSlot", new Vector2(0f, 40f), new Vector2(760f, 130f)),
+                new RectSpec("NotificationRowSlot", new Vector2(0f, -115f), new Vector2(760f, 130f)),
+                new RectSpec("LanguageRowSlot", new Vector2(0f, -270f), new Vector2(760f, 130f)),
+                new RectSpec("AccountRowSlot", new Vector2(0f, -455f), new Vector2(760f, 155f))
+            }, new[]
+            {
+                new RectSpec("CloseIconButton", new Vector2(382f, 672f), new Vector2(112f, 112f)),
+                new RectSpec("BgmToggleButton", new Vector2(255f, 350f), new Vector2(170f, 90f)),
+                new RectSpec("SfxToggleButton", new Vector2(255f, 195f), new Vector2(170f, 90f)),
+                new RectSpec("HapticsToggleButton", new Vector2(255f, 40f), new Vector2(170f, 90f)),
+                new RectSpec("NotificationsToggleButton", new Vector2(255f, -115f), new Vector2(170f, 90f)),
+                new RectSpec("LanguageDropdownButton", new Vector2(160f, -270f), new Vector2(270f, 95f)),
+                new RectSpec("AccountLinkButton", new Vector2(230f, -455f), new Vector2(250f, 110f)),
+                new RectSpec("CloseButton", new Vector2(-180f, -595f), new Vector2(310f, 120f)),
+                new RectSpec("SaveButton", new Vector2(180f, -595f), new Vector2(310f, 120f))
+            });
+
+            CreateWireframePopupPrefab<BuyItemPopup>("BuyItemPopup", new[]
+            {
+                new RectSpec("PanelImageSlot", Vector2.zero, new Vector2(900f, 1500f)),
+                new RectSpec("TitleImageSlot", new Vector2(0f, 610f), new Vector2(520f, 120f)),
+                new RectSpec("FeaturedItemCardSlot", new Vector2(0f, 285f), new Vector2(660f, 430f)),
+                new RectSpec("UndoItemSlot", new Vector2(-265f, -125f), new Vector2(245f, 340f)),
+                new RectSpec("PaintItemSlot", new Vector2(0f, -125f), new Vector2(245f, 340f)),
+                new RectSpec("ShuffleItemSlot", new Vector2(265f, -125f), new Vector2(245f, 340f)),
+                new RectSpec("PricePanelSlot", new Vector2(0f, -535f), new Vector2(760f, 310f))
+            }, new[]
+            {
+                new RectSpec("CloseIconButton", new Vector2(338f, 675f), new Vector2(112f, 112f)),
+                new RectSpec("UndoItemButton", new Vector2(-265f, -125f), new Vector2(245f, 340f)),
+                new RectSpec("PaintItemButton", new Vector2(0f, -125f), new Vector2(245f, 340f)),
+                new RectSpec("ShuffleItemButton", new Vector2(265f, -125f), new Vector2(245f, 340f)),
+                new RectSpec("BuyButton", new Vector2(0f, -590f), new Vector2(560f, 130f))
+            });
+
+            CreateWireframePopupPrefab<EnergyPopup>("EnergyPopup", new[]
+            {
+                new RectSpec("PanelImageSlot", Vector2.zero, new Vector2(820f, 1450f)),
+                new RectSpec("TitleImageSlot", new Vector2(0f, 560f), new Vector2(560f, 210f)),
+                new RectSpec("EnergyIconSlot", new Vector2(0f, 260f), new Vector2(410f, 340f)),
+                new RectSpec("EnergyAmountSlot", new Vector2(0f, 40f), new Vector2(360f, 95f)),
+                new RectSpec("MessageSlot", new Vector2(0f, -115f), new Vector2(600f, 120f))
+            }, new[]
+            {
+                new RectSpec("CloseIconButton", new Vector2(285f, 660f), new Vector2(112f, 112f)),
+                new RectSpec("WatchAdButton", new Vector2(0f, -360f), new Vector2(700f, 130f)),
+                new RectSpec("RefillButton", new Vector2(0f, -570f), new Vector2(700f, 140f))
+            });
+
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+        }
+
+        static RectSpec[] ConfirmPopupSlots()
+        {
+            return new[]
+            {
+                new RectSpec("PanelImageSlot", Vector2.zero, new Vector2(780f, 620f)),
+                new RectSpec("TitleImageSlot", new Vector2(0f, 160f), new Vector2(600f, 100f)),
+                new RectSpec("MessageSlot", new Vector2(0f, 25f), new Vector2(620f, 150f))
+            };
+        }
+
+        static RectSpec[] ConfirmPopupButtons()
+        {
+            return new[]
+            {
+                new RectSpec("CloseIconButton", new Vector2(330f, 250f), new Vector2(96f, 96f)),
+                new RectSpec("CancelButton", new Vector2(-180f, -185f), new Vector2(300f, 115f)),
+                new RectSpec("ConfirmButton", new Vector2(180f, -185f), new Vector2(300f, 115f))
+            };
+        }
+
+        [MenuItem("Tools/Project Link/UI Build/Configure UI Texture Imports")]
+        public static void ConfigureUiTextureImports()
+        {
+            ConfigureSpriteSheet($"{ResourceRoot}/AssetResource1.png", 4, 6, "AssetResource1");
+            ConfigureSpriteSheet($"{ResourceRoot}/AssetResource2.png", 3, 5, "AssetResource2");
+            ConfigureSpriteSheet($"{ResourceRoot}/AssetResource3.png", 3, 3, "AssetResource3");
+            AssetDatabase.SaveAssets();
+        }
+
         static void BuildScene(string sceneName)
         {
             EnsureEventSystem();
@@ -79,7 +194,7 @@ namespace ProjectLink.EditorTools
                     BuildLobby(safe, router);
                     break;
                 case "Game":
-                    BuildGameShell(safe);
+                    BuildGameShell(safe, router);
                     break;
                 default:
                     Debug.LogWarning($"No static UI builder registered for scene '{sceneName}'.");
@@ -95,8 +210,7 @@ namespace ProjectLink.EditorTools
                 Object.DestroyImmediate(existing);
 
             var root = new GameObject(rootName, typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
-            var rect = root.GetComponent<RectTransform>();
-            Stretch(rect);
+            Stretch(root.GetComponent<RectTransform>());
 
             var canvas = root.GetComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
@@ -122,7 +236,7 @@ namespace ProjectLink.EditorTools
 
         static void EnsureEventSystem()
         {
-            if (Object.FindFirstObjectByType<EventSystem>() != null) return;
+            if (Object.FindAnyObjectByType<EventSystem>() != null) return;
 
             var go = new GameObject("EventSystem", typeof(EventSystem), typeof(InputSystemUIInputModule));
             Undo.RegisterCreatedObjectUndo(go, "Create EventSystem");
@@ -130,325 +244,397 @@ namespace ProjectLink.EditorTools
 
         static void BuildBootstrap(RectTransform safe)
         {
-            AddFullBleed(safe, Ink);
-            AddGrid(safe, new Color(1f, 1f, 1f, 0.05f), 120f);
-
-            AddLocalizedLabel(safe, "app_title", 76, FontStyles.Bold, White, new Vector2(0f, 120f), new Vector2(760f, 120f));
-            AddLocalizedLabel(safe, "bootstrap_syncing_puzzle_data", 28, FontStyles.UpperCase, Muted, new Vector2(0f, 46f), new Vector2(620f, 52f));
-
-            var rail = AddPanel(safe, "LoadingRail", new Vector2(0f, -52f), new Vector2(620f, 18f), new Color(1f, 1f, 1f, 0.12f));
-            var fill = AddPanel(rail, "LoadingFill", new Vector2(-99f, 0f), new Vector2(420f, 18f), Aqua);
-            SetLeft(fill);
-
-            AddStatusRow(safe, -222f, "status_data", "status_packets", "status_account");
-            AddLocalizedLabel(safe, "bootstrap_server_ready", 24, FontStyles.Normal, Muted, new Vector2(0f, -760f), new Vector2(520f, 44f));
+            AddImageSlot(safe, "BackgroundImageSlot", Vector2.zero, new Vector2(Width, Height));
+            AddImageSlot(safe, "LogoImageSlot", new Vector2(0f, 305f), new Vector2(650f, 620f));
+            AddImageSlot(safe, "LoadingLabelSlot", new Vector2(0f, -430f), new Vector2(420f, 85f));
+            AddImageSlot(safe, "ProgressTrackImageSlot", new Vector2(0f, -555f), new Vector2(650f, 70f));
+            AddImageSlot(safe, "ProgressFillImageSlot", new Vector2(-170f, -555f), new Vector2(310f, 54f));
         }
 
         static void BuildTitle(RectTransform safe, RuntimeNavigationButtons router)
         {
-            AddFullBleed(safe, Ink);
-            AddGrid(safe, new Color(1f, 1f, 1f, 0.04f), 135f);
-            AddPanel(safe, "GearButton", new Vector2(450f, -68f), new Vector2(76f, 76f), new Color(1f, 1f, 1f, 0.1f));
-            AddLanguageSelector(safe);
+            AddImageSlot(safe, "BackgroundImageSlot", Vector2.zero, new Vector2(Width, Height));
+            AddImageSlot(safe, "LogoImageSlot", new Vector2(0f, 280f), new Vector2(720f, 640f));
 
-            AddPreviewBoard(safe, new Vector2(0f, 220f), 560f, 7);
+            var start = AddWireButton(safe, "StartButton", new Vector2(0f, -410f), new Vector2(720f, 150f));
+            UnityEventTools.AddPersistentListener(start.onClick, router.LoadLobby);
 
-            AddLocalizedLabel(safe, "app_title", 88, FontStyles.Bold, White, new Vector2(0f, -178f), new Vector2(820f, 120f));
-            AddLocalizedLabel(safe, "title_tagline", 28, FontStyles.UpperCase, Muted, new Vector2(0f, -255f), new Vector2(760f, 54f));
+            var language = AddWireButton(safe, "LanguageButton", new Vector2(-220f, -685f), new Vector2(360f, 120f));
+            UnityEventTools.AddPersistentListener(language.onClick, router.OpenSettingsPopup);
 
-            var play = AddLocalizedButton(safe, "PlayButton", "title_tap_to_start", new Vector2(0f, -520f), new Vector2(760f, 112f), Aqua, Ink);
-            UnityEventTools.AddPersistentListener(play.onClick, router.LoadLobby);
+            var account = AddWireButton(safe, "AccountButton", new Vector2(220f, -685f), new Vector2(360f, 120f));
+            UnityEventTools.AddPersistentListener(account.onClick, router.OpenSettingsPopup);
 
-            AddLocalizedLabel(safe, "title_guest_profile_region", 24, FontStyles.Normal, Muted, new Vector2(0f, -640f), new Vector2(760f, 44f));
-            AddFooterLinks(safe);
+            AddImageSlot(safe, "VersionLabelSlot", new Vector2(0f, -880f), new Vector2(180f, 55f));
         }
 
         static void BuildLobby(RectTransform safe, RuntimeNavigationButtons router)
         {
-            AddFullBleed(safe, new Color(0.055f, 0.07f, 0.1f, 1f));
-            AddResourceHeader(safe);
-            var back = AddLocalizedButton(safe, "TitleBackButton", "lobby_title_button", new Vector2(-428f, -184f), new Vector2(150f, 68f), new Color(1f, 1f, 1f, 0.1f), White);
-            SetTop(back.GetComponent<RectTransform>());
-            UnityEventTools.AddPersistentListener(back.onClick, router.OpenReturnTitlePopup);
+            var background = AddImageSlot(safe, "BackgroundImageSlot", Vector2.zero, new Vector2(Width, Height));
+            Stretch(background);
 
-            AddLocalizedLabel(safe, "lobby_stage_map", 54, FontStyles.Bold, White, new Vector2(-296f, 604f), new Vector2(420f, 78f), TextAlignmentOptions.Left);
-            AddLocalizedLabel(safe, "lobby_world_1", 24, FontStyles.UpperCase, Muted, new Vector2(-250f, 552f), new Vector2(560f, 44f), TextAlignmentOptions.Left);
+            var topBar = AddEdgePanel(safe, "TopBar", true, 0f, 150f, new Vector2(40f, 0f));
+            var topLayout = topBar.gameObject.AddComponent<HorizontalLayoutGroup>();
+            topLayout.padding = new RectOffset(18, 18, 20, 20);
+            topLayout.spacing = 18f;
+            topLayout.childControlWidth = true;
+            topLayout.childControlHeight = true;
+            topLayout.childForceExpandWidth = false;
+            topLayout.childForceExpandHeight = true;
 
-            var mapPanel = AddPanel(safe, "StageMapPanel", new Vector2(0f, 190f), new Vector2(900f, 720f), new Color(1f, 1f, 1f, 0.07f));
-            AddGrid(mapPanel, new Color(1f, 1f, 1f, 0.045f), 90f);
+            UnityEventTools.AddPersistentListener(AddLayoutButton(topBar, "ProfileButton", 120f, 110f).onClick, router.OpenSettingsPopup);
+            AddFlexibleSlot(topBar, "EnergyBarSlot", 280f, 110f);
+            UnityEventTools.AddPersistentListener(AddLayoutButton(topBar, "EnergyPlusButton", 90f, 90f).onClick, router.OpenEnergyPopup);
+            AddFlexibleSlot(topBar, "CoinBarSlot", 310f, 110f);
+            UnityEventTools.AddPersistentListener(AddLayoutButton(topBar, "CoinPlusButton", 90f, 90f).onClick, router.OpenBuyItemPopup);
+            UnityEventTools.AddPersistentListener(AddLayoutButton(topBar, "SettingsButton", 120f, 110f).onClick, router.OpenSettingsPopup);
 
-            var nodeHost = AddPanel(mapPanel, "StageNodeHost", Vector2.zero, new Vector2(820f, 520f), new Color(0f, 0f, 0f, 0f));
-            var nodeTemplate = CreateStageNodeTemplate(mapPanel);
-            var previous = AddButton(mapPanel, "PreviousPageButton", "<", new Vector2(-305f, -304f), new Vector2(96f, 66f), new Color(1f, 1f, 1f, 0.1f), White);
-            var next = AddButton(mapPanel, "NextPageButton", ">", new Vector2(305f, -304f), new Vector2(96f, 66f), new Color(1f, 1f, 1f, 0.1f), White);
-            var pageLabel = AddLabel(mapPanel, "1 / 50", 26, FontStyles.Bold, Muted, new Vector2(0f, -304f), new Vector2(220f, 54f));
+            var content = AddStretchPanel(safe, "TabContent", 170f, 230f, new Vector2(44f, 0f), ContentSlot);
+            var shopPanel = AddChildPanel(content, "ShopPanel", ScrollSlot);
+            var homePanel = AddChildPanel(content, "HomePanel", new Color(0.08f, 0.26f, 0.52f, 0.2f));
+            var rankingPanel = AddChildPanel(content, "RankingPanel", ScrollSlot);
 
-            var mapView = mapPanel.gameObject.AddComponent<LobbyStageMapView>();
-            var so = new SerializedObject(mapView);
-            so.FindProperty("nodeHost").objectReferenceValue = nodeHost;
-            so.FindProperty("stageNodePrefab").objectReferenceValue = nodeTemplate.gameObject;
-            so.FindProperty("pageLabel").objectReferenceValue = pageLabel;
-            so.FindProperty("previousPageButton").objectReferenceValue = previous;
-            so.FindProperty("nextPageButton").objectReferenceValue = next;
-            so.FindProperty("totalStageCount").intValue = 1000;
-            so.FindProperty("stagesPerPage").intValue = 20;
-            so.FindProperty("playableStageCount").intValue = 2;
-            so.ApplyModifiedPropertiesWithoutUndo();
+            BuildLobbyShopPanel(shopPanel);
+            BuildLobbyHomePanel(homePanel, router);
+            BuildLobbyRankingPanel(rankingPanel);
 
-            AddModeChips(safe);
+            var tabs = AddEdgePanel(safe, "BottomTabBar", false, 24f, 180f, new Vector2(80f, 0f));
+            var tabLayout = tabs.gameObject.AddComponent<HorizontalLayoutGroup>();
+            tabLayout.padding = new RectOffset(16, 16, 16, 16);
+            tabLayout.spacing = 14f;
+            tabLayout.childControlWidth = true;
+            tabLayout.childControlHeight = true;
+            tabLayout.childForceExpandWidth = true;
+            tabLayout.childForceExpandHeight = true;
 
-            var start = AddLocalizedButton(safe, "StartStageButton", "lobby_play_stage", new Vector2(0f, -612f), new Vector2(780f, 104f), Lemon, Ink);
-            UnityEventTools.AddIntPersistentListener(start.onClick, router.LoadGameWithStage, 1);
+            var shopTab = AddLayoutButton(tabs, "ShopTabButton", 0f, 140f, true);
+            var homeTab = AddLayoutButton(tabs, "HomeTabButton", 0f, 140f, true);
+            var rankingTab = AddLayoutButton(tabs, "RankingTabButton", 0f, 140f, true);
 
-            AddBottomNav(safe);
+            var tabController = safe.gameObject.AddComponent<LobbyTabController>();
+            tabController.Configure(shopTab, homeTab, rankingTab, shopPanel.gameObject, homePanel.gameObject, rankingPanel.gameObject);
         }
 
-        static void BuildGameShell(RectTransform safe)
+        static void BuildLobbyShopPanel(RectTransform panel)
         {
-            AddLocalizedLabel(safe, "game_drag_hint", 24, FontStyles.UpperCase, new Color(1f, 1f, 1f, 0.38f), new Vector2(0f, -716f), new Vector2(820f, 44f));
+            AddEdgePanel(panel, "ShopHeaderSlot", true, 20f, 120f, new Vector2(32f, 0f));
+            AddScrollView(panel, "ShopScrollView", 160f, 32f, 12, "ShopItemSlot");
         }
 
-        static void AddResourceHeader(RectTransform parent)
+        static void BuildLobbyHomePanel(RectTransform panel, RuntimeNavigationButtons router)
         {
-            var header = AddPanel(parent, "TopResourceBar", new Vector2(0f, -76f), new Vector2(940f, 96f), new Color(1f, 1f, 1f, 0.08f));
-            SetTop(header);
-            AddLocalizedLabel(header, "lobby_player", 28, FontStyles.Bold, White, new Vector2(-346f, 0f), new Vector2(210f, 54f), TextAlignmentOptions.Left);
-            AddChip(header, "HeartChip", "5", new Vector2(108f, 0f), Coral);
-            AddChip(header, "CoinChip", "1 240", new Vector2(270f, 0f), Lemon);
-            AddChip(header, "GemChip", "32", new Vector2(430f, 0f), Aqua);
+            AddImageSlot(panel, "DailyChallengeSlot", new Vector2(-310f, 460f), new Vector2(360f, 130f));
+            AddImageSlot(panel, "ColorCupSlot", new Vector2(310f, 460f), new Vector2(360f, 130f));
+            AddImageSlot(panel, "CurrentStageCardSlot", new Vector2(0f, -10f), new Vector2(430f, 650f));
+            AddImageSlot(panel, "NextStageCardLeftSlot", new Vector2(-395f, -10f), new Vector2(160f, 420f));
+            AddImageSlot(panel, "NextStageCardRightSlot", new Vector2(395f, -10f), new Vector2(160f, 420f));
+            UnityEventTools.AddPersistentListener(AddWireButton(panel, "PlayButton", new Vector2(0f, -330f), new Vector2(460f, 130f)).onClick, router.LoadGame);
         }
 
-        static void AddModeChips(RectTransform parent)
+        static void BuildLobbyRankingPanel(RectTransform panel)
         {
-            AddLocalizedChip(parent, "DailyChip", "lobby_daily", new Vector2(-270f, -255f), Aqua);
-            AddLocalizedChip(parent, "EventChip", "lobby_event", new Vector2(0f, -255f), Coral);
-            AddLocalizedChip(parent, "SeasonChip", "lobby_season", new Vector2(270f, -255f), Lemon);
+            AddEdgePanel(panel, "RankingHeaderSlot", true, 20f, 120f, new Vector2(32f, 0f));
+            AddScrollView(panel, "RankingScrollView", 160f, 32f, 24, "RankingRowSlot");
         }
 
-        static void AddBottomNav(RectTransform parent)
+        static void BuildGameShell(RectTransform safe, RuntimeNavigationButtons router)
         {
-            var nav = AddPanel(parent, "BottomNav", new Vector2(0f, 54f), new Vector2(900f, 116f), new Color(0.04f, 0.055f, 0.08f, 0.94f));
-            SetBottom(nav);
-            AddLocalizedLabel(nav, "nav_home", 22, FontStyles.Bold, Aqua, new Vector2(-315f, -16f), new Vector2(140f, 34f));
-            AddLocalizedLabel(nav, "nav_stage", 22, FontStyles.Bold, White, new Vector2(-105f, -16f), new Vector2(140f, 34f));
-            AddLocalizedLabel(nav, "nav_shop", 22, FontStyles.Bold, Muted, new Vector2(105f, -16f), new Vector2(140f, 34f));
-            AddLocalizedLabel(nav, "nav_bag", 22, FontStyles.Bold, Muted, new Vector2(315f, -16f), new Vector2(140f, 34f));
-            AddPanel(nav, "ActiveIndicator", new Vector2(-105f, 36f), new Vector2(64f, 6f), Aqua);
+            AddImageSlot(safe, "BackgroundImageSlot", Vector2.zero, new Vector2(Width, Height));
+            AddImageSlot(safe, "LevelHeaderSlot", new Vector2(0f, 805f), new Vector2(360f, 160f));
+            AddImageSlot(safe, "PlayfieldSlot", new Vector2(0f, 120f), new Vector2(940f, 1240f));
+            AddImageSlot(safe, "BottomToolBarSlot", new Vector2(0f, -795f), new Vector2(980f, 170f));
+
+            UnityEventTools.AddPersistentListener(AddWireButton(safe, "BackButton", new Vector2(-425f, 805f), new Vector2(120f, 120f)).onClick, router.OpenReturnTitlePopup);
+            UnityEventTools.AddPersistentListener(AddWireButton(safe, "SettingsButton", new Vector2(425f, 805f), new Vector2(120f, 120f)).onClick, router.OpenSettingsPopup);
+            UnityEventTools.AddPersistentListener(AddWireButton(safe, "HintButton", new Vector2(-405f, -795f), new Vector2(150f, 150f)).onClick, router.OpenBuyItemPopup);
+            UnityEventTools.AddPersistentListener(AddWireButton(safe, "UndoButton", new Vector2(-225f, -795f), new Vector2(150f, 150f)).onClick, router.OpenBuyItemPopup);
+            UnityEventTools.AddPersistentListener(AddWireButton(safe, "ShuffleButton", new Vector2(120f, -795f), new Vector2(140f, 140f)).onClick, router.OpenBuyItemPopup);
+            UnityEventTools.AddPersistentListener(AddWireButton(safe, "HammerButton", new Vector2(295f, -795f), new Vector2(140f, 140f)).onClick, router.OpenBuyItemPopup);
+            UnityEventTools.AddPersistentListener(AddWireButton(safe, "PaintButton", new Vector2(470f, -795f), new Vector2(140f, 140f)).onClick, router.OpenBuyItemPopup);
         }
 
-        static RectTransform CreateStageNodeTemplate(RectTransform parent)
+        static RectTransform AddImageSlot(RectTransform parent, string name, Vector2 position, Vector2 size)
         {
-            var node = AddPanel(parent, "StageNodeTemplate", new Vector2(-330f, -80f), new Vector2(96f, 96f), Aqua);
-            var image = node.GetComponent<Image>();
-            image.raycastTarget = true;
-            var button = node.gameObject.AddComponent<Button>();
-            button.targetGraphic = image;
-            AddLabel(node, "1", 38, FontStyles.Bold, Ink, Vector2.zero, new Vector2(80f, 70f)).gameObject.name = "StageLabel";
-            node.gameObject.SetActive(false);
-            return node;
-        }
-
-        static void AddStatusRow(RectTransform parent, float y, params string[] labels)
-        {
-            float startX = -(labels.Length - 1) * 142f;
-            for (int i = 0; i < labels.Length; i++)
-                AddLocalizedChip(parent, $"Status_{labels[i]}", labels[i], new Vector2(startX + i * 284f, y), i == 1 ? Lemon : Aqua);
-        }
-
-        static void AddFooterLinks(RectTransform parent)
-        {
-            AddLocalizedLabel(parent, "footer_notice", 24, FontStyles.Normal, Muted, new Vector2(-250f, -822f), new Vector2(160f, 44f));
-            AddLocalizedLabel(parent, "footer_terms", 24, FontStyles.Normal, Muted, new Vector2(0f, -822f), new Vector2(160f, 44f));
-            AddLocalizedLabel(parent, "footer_server", 24, FontStyles.Normal, Muted, new Vector2(250f, -822f), new Vector2(160f, 44f));
-        }
-
-        static void AddPreviewBoard(RectTransform parent, Vector2 position, float size, int cells)
-        {
-            var board = AddPanel(parent, "PuzzlePreviewBoard", position, new Vector2(size, size), new Color(1f, 1f, 1f, 0.07f));
-            float cell = size / cells;
-            for (int i = 1; i < cells; i++)
-            {
-                AddPanel(board, $"GridV_{i}", new Vector2(-size * 0.5f + cell * i, 0f), new Vector2(2f, size), new Color(1f, 1f, 1f, 0.08f));
-                AddPanel(board, $"GridH_{i}", new Vector2(0f, -size * 0.5f + cell * i), new Vector2(size, 2f), new Color(1f, 1f, 1f, 0.08f));
-            }
-
-            AddPanel(board, "LinkA", new Vector2(-120f, 120f), new Vector2(250f, 16f), Aqua);
-            AddPanel(board, "LinkB", new Vector2(100f, -120f), new Vector2(16f, 250f), Coral);
-            AddPanel(board, "NodeA1", new Vector2(-230f, 120f), new Vector2(58f, 58f), Aqua);
-            AddPanel(board, "NodeA2", new Vector2(5f, 120f), new Vector2(58f, 58f), Aqua);
-            AddPanel(board, "NodeB1", new Vector2(100f, -235f), new Vector2(58f, 58f), Coral);
-            AddPanel(board, "NodeB2", new Vector2(100f, 0f), new Vector2(58f, 58f), Coral);
-        }
-
-        static void AddGrid(RectTransform parent, Color color, float spacing)
-        {
-            for (float x = -Width * 0.5f; x <= Width * 0.5f; x += spacing)
-                AddPanel(parent, $"GridV_{x:0}", new Vector2(x, 0f), new Vector2(2f, Height), color);
-
-            for (float y = -Height * 0.5f; y <= Height * 0.5f; y += spacing)
-                AddPanel(parent, $"GridH_{y:0}", new Vector2(0f, y), new Vector2(Width, 2f), color);
-        }
-
-        static void AddTopIcon(RectTransform parent, string name, string label, Vector2 position)
-        {
-            AddPanel(parent, name, position, new Vector2(76f, 76f), new Color(1f, 1f, 1f, 0.1f));
-            AddLabel(parent, label, 28, FontStyles.Bold, White, position, new Vector2(76f, 76f));
-        }
-
-        static void AddLanguageSelector(RectTransform parent)
-        {
-            var rect = AddPanel(parent, "LanguageSelector", new Vector2(294f, -68f), new Vector2(220f, 76f), new Color(1f, 1f, 1f, 0.1f));
-            SetTop(rect);
-            var image = rect.GetComponent<Image>();
-            image.raycastTarget = true;
-
-            var dropdown = rect.gameObject.AddComponent<TMP_Dropdown>();
-            dropdown.targetGraphic = image;
-            dropdown.captionText = AddLabel(rect, "US", 28, FontStyles.Bold, White, new Vector2(-10f, 0f), new Vector2(140f, 58f));
-            dropdown.captionText.raycastTarget = true;
-            dropdown.template = CreateDropdownTemplate(rect);
-            dropdown.gameObject.AddComponent<LanguageSelector>();
-        }
-
-        static RectTransform CreateDropdownTemplate(RectTransform parent)
-        {
-            var template = AddPanel(parent, "Template", new Vector2(0f, -124f), new Vector2(220f, 320f), new Color(0.04f, 0.055f, 0.08f, 0.98f));
-            SetTop(template);
-            template.gameObject.SetActive(false);
-
-            var viewport = AddPanel(template, "Viewport", Vector2.zero, new Vector2(220f, 320f), new Color(0f, 0f, 0f, 0f));
-            Stretch(viewport);
-            viewport.gameObject.AddComponent<Mask>().showMaskGraphic = false;
-
-            var content = AddPanel(viewport, "Content", new Vector2(0f, -160f), new Vector2(220f, 320f), new Color(0f, 0f, 0f, 0f));
-            content.anchorMin = new Vector2(0f, 1f);
-            content.anchorMax = new Vector2(1f, 1f);
-            content.pivot = new Vector2(0.5f, 1f);
-            content.offsetMin = Vector2.zero;
-            content.offsetMax = Vector2.zero;
-
-            var item = AddPanel(content, "Item", new Vector2(0f, -32f), new Vector2(220f, 64f), new Color(1f, 1f, 1f, 0.08f));
-            item.anchorMin = new Vector2(0f, 1f);
-            item.anchorMax = new Vector2(1f, 1f);
-            item.pivot = new Vector2(0.5f, 1f);
-            item.GetComponent<Image>().raycastTarget = true;
-            var toggle = item.gameObject.AddComponent<Toggle>();
-            toggle.targetGraphic = item.GetComponent<Image>();
-            toggle.graphic = AddPanel(item, "Item Checkmark", new Vector2(-82f, 0f), new Vector2(18f, 18f), Aqua).GetComponent<Image>();
-
-            var label = AddLabel(item, "US", 24, FontStyles.Bold, White, new Vector2(20f, 0f), new Vector2(150f, 44f), TextAlignmentOptions.Left);
-            label.gameObject.name = "Item Label";
-            label.raycastTarget = true;
-
-            var scrollRect = template.gameObject.AddComponent<ScrollRect>();
-            scrollRect.viewport = viewport;
-            scrollRect.content = content;
-            scrollRect.horizontal = false;
-            scrollRect.vertical = false;
-
-            return template;
-        }
-
-        static Button AddButton(RectTransform parent, string name, string label, Vector2 position, Vector2 size, Color background, Color foreground)
-        {
-            var rect = AddPanel(parent, name, position, size, background);
-            var image = rect.GetComponent<Image>();
-            image.raycastTarget = true;
-            var button = rect.gameObject.AddComponent<Button>();
-            button.targetGraphic = image;
-            var colors = button.colors;
-            colors.normalColor = background;
-            colors.highlightedColor = Color.Lerp(background, Color.white, 0.08f);
-            colors.pressedColor = Color.Lerp(background, Color.black, 0.12f);
-            colors.selectedColor = background;
-            button.colors = colors;
-            AddLabel(rect, label, 34, FontStyles.Bold, foreground, Vector2.zero, size);
-            return button;
-        }
-
-        static Button AddLocalizedButton(RectTransform parent, string name, string stringId, Vector2 position, Vector2 size, Color background, Color foreground)
-        {
-            var rect = AddPanel(parent, name, position, size, background);
-            var image = rect.GetComponent<Image>();
-            image.raycastTarget = true;
-            var button = rect.gameObject.AddComponent<Button>();
-            button.targetGraphic = image;
-            var colors = button.colors;
-            colors.normalColor = background;
-            colors.highlightedColor = Color.Lerp(background, Color.white, 0.08f);
-            colors.pressedColor = Color.Lerp(background, Color.black, 0.12f);
-            colors.selectedColor = background;
-            button.colors = colors;
-            AddLocalizedLabel(rect, stringId, 34, FontStyles.Bold, foreground, Vector2.zero, size);
-            return button;
-        }
-
-        static RectTransform AddChip(RectTransform parent, string name, string label, Vector2 position, Color accent)
-        {
-            var chip = AddPanel(parent, name, position, new Vector2(220f, 72f), new Color(1f, 1f, 1f, 0.08f));
-            AddPanel(chip, "Accent", new Vector2(-88f, 0f), new Vector2(18f, 44f), accent);
-            AddLabel(chip, label, 24, FontStyles.Bold, White, new Vector2(24f, 0f), new Vector2(150f, 44f));
-            return chip;
-        }
-
-        static RectTransform AddLocalizedChip(RectTransform parent, string name, string stringId, Vector2 position, Color accent)
-        {
-            var chip = AddPanel(parent, name, position, new Vector2(220f, 72f), new Color(1f, 1f, 1f, 0.08f));
-            AddPanel(chip, "Accent", new Vector2(-88f, 0f), new Vector2(18f, 44f), accent);
-            AddLocalizedLabel(chip, stringId, 24, FontStyles.Bold, White, new Vector2(24f, 0f), new Vector2(150f, 44f));
-            return chip;
-        }
-
-        static RectTransform AddFullBleed(RectTransform parent, Color color)
-        {
-            var rect = AddPanel(parent, "Background", Vector2.zero, Vector2.zero, color);
-            Stretch(rect);
-            rect.SetAsFirstSibling();
-            return rect;
-        }
-
-        static TextMeshProUGUI AddLabel(RectTransform parent, string text, float size, FontStyles style, Color color, Vector2 position, Vector2 rectSize, TextAlignmentOptions alignment = TextAlignmentOptions.Center)
-        {
-            var go = new GameObject("Label", typeof(RectTransform), typeof(TextMeshProUGUI));
+            var go = new GameObject(name, typeof(RectTransform), typeof(Image));
             go.transform.SetParent(parent, false);
-            var rect = go.GetComponent<RectTransform>();
-            rect.anchorMin = new Vector2(0.5f, 0.5f);
-            rect.anchorMax = new Vector2(0.5f, 0.5f);
-            rect.pivot = new Vector2(0.5f, 0.5f);
-            rect.anchoredPosition = position;
-            rect.sizeDelta = rectSize;
+            Center(go.GetComponent<RectTransform>(), position, size);
 
-            var label = go.GetComponent<TextMeshProUGUI>();
-            label.text = text;
-            label.fontSize = size;
-            label.fontStyle = style;
-            label.color = color;
-            label.alignment = alignment;
-            label.raycastTarget = false;
-            return label;
+            var image = go.GetComponent<Image>();
+            image.color = name.Contains("Background") ? BackgroundSlot : ContentSlot;
+            image.raycastTarget = false;
+            image.preserveAspect = true;
+            return go.GetComponent<RectTransform>();
         }
 
-        static TextMeshProUGUI AddLocalizedLabel(RectTransform parent, string stringId, float size, FontStyles style, Color color, Vector2 position, Vector2 rectSize, TextAlignmentOptions alignment = TextAlignmentOptions.Center)
+        static Button AddWireButton(RectTransform parent, string name, Vector2 position, Vector2 size)
         {
-            var label = AddLabel(parent, stringId, size, style, color, position, rectSize, alignment);
-            label.gameObject.AddComponent<LocalizedText>().SetStringId(stringId);
-            return label;
+            var go = new GameObject(name, typeof(RectTransform), typeof(Image), typeof(Button));
+            go.transform.SetParent(parent, false);
+            Center(go.GetComponent<RectTransform>(), position, size);
+
+            var image = go.GetComponent<Image>();
+            image.color = ButtonSlot;
+            image.raycastTarget = true;
+
+            var button = go.GetComponent<Button>();
+            button.targetGraphic = image;
+            button.transition = Selectable.Transition.None;
+            return button;
         }
 
-        static RectTransform AddPanel(RectTransform parent, string name, Vector2 position, Vector2 size, Color color)
+        static RectTransform AddEdgePanel(RectTransform parent, string name, bool top, float margin, float height, Vector2 horizontalPadding)
         {
             var go = new GameObject(name, typeof(RectTransform), typeof(Image));
             go.transform.SetParent(parent, false);
             var rect = go.GetComponent<RectTransform>();
-            rect.anchorMin = new Vector2(0.5f, 0.5f);
-            rect.anchorMax = new Vector2(0.5f, 0.5f);
-            rect.pivot = new Vector2(0.5f, 0.5f);
-            rect.anchoredPosition = position;
-            rect.sizeDelta = size;
+            rect.anchorMin = top ? new Vector2(0f, 1f) : Vector2.zero;
+            rect.anchorMax = top ? Vector2.one : new Vector2(1f, 0f);
+            rect.pivot = top ? new Vector2(0.5f, 1f) : new Vector2(0.5f, 0f);
+            rect.offsetMin = new Vector2(horizontalPadding.x, top ? -margin - height : margin);
+            rect.offsetMax = new Vector2(-horizontalPadding.x, top ? -margin : margin + height);
+            go.GetComponent<Image>().color = ContentSlot;
+            go.GetComponent<Image>().raycastTarget = false;
+            return rect;
+        }
+
+        static RectTransform AddStretchPanel(RectTransform parent, string name, float top, float bottom, Vector2 horizontalPadding, Color color)
+        {
+            var go = new GameObject(name, typeof(RectTransform), typeof(Image));
+            go.transform.SetParent(parent, false);
+            var rect = go.GetComponent<RectTransform>();
+            rect.anchorMin = Vector2.zero;
+            rect.anchorMax = Vector2.one;
+            rect.offsetMin = new Vector2(horizontalPadding.x, bottom);
+            rect.offsetMax = new Vector2(-horizontalPadding.x, -top);
             var image = go.GetComponent<Image>();
             image.color = color;
             image.raycastTarget = false;
             return rect;
+        }
+
+        static RectTransform AddChildPanel(RectTransform parent, string name, Color color)
+        {
+            var go = new GameObject(name, typeof(RectTransform), typeof(Image));
+            go.transform.SetParent(parent, false);
+            var rect = go.GetComponent<RectTransform>();
+            Stretch(rect);
+            var image = go.GetComponent<Image>();
+            image.color = color;
+            image.raycastTarget = false;
+            return rect;
+        }
+
+        static RectTransform AddFlexibleSlot(RectTransform parent, string name, float preferredWidth, float preferredHeight)
+        {
+            var slot = AddLayoutImage(parent, name, preferredWidth, preferredHeight, ContentSlot);
+            var layout = slot.gameObject.AddComponent<LayoutElement>();
+            layout.flexibleWidth = 1f;
+            layout.preferredWidth = preferredWidth;
+            layout.preferredHeight = preferredHeight;
+            return slot;
+        }
+
+        static Button AddLayoutButton(RectTransform parent, string name, float preferredWidth, float preferredHeight, bool flexible = false)
+        {
+            var rect = AddLayoutImage(parent, name, preferredWidth, preferredHeight, flexible ? AccentButtonSlot : ButtonSlot);
+            var image = rect.GetComponent<Image>();
+            image.raycastTarget = true;
+            var layout = rect.gameObject.AddComponent<LayoutElement>();
+            layout.preferredWidth = preferredWidth;
+            layout.preferredHeight = preferredHeight;
+            layout.flexibleWidth = flexible ? 1f : 0f;
+            layout.flexibleHeight = 1f;
+            var button = rect.gameObject.AddComponent<Button>();
+            button.targetGraphic = image;
+            button.transition = Selectable.Transition.ColorTint;
+            return button;
+        }
+
+        static RectTransform AddLayoutImage(RectTransform parent, string name, float preferredWidth, float preferredHeight, Color color)
+        {
+            var go = new GameObject(name, typeof(RectTransform), typeof(Image));
+            go.transform.SetParent(parent, false);
+            var rect = go.GetComponent<RectTransform>();
+            rect.sizeDelta = new Vector2(preferredWidth, preferredHeight);
+            var image = go.GetComponent<Image>();
+            image.color = color;
+            image.raycastTarget = false;
+            return rect;
+        }
+
+        static ScrollRect AddScrollView(RectTransform parent, string name, float top, float bottom, int itemCount, string itemPrefix)
+        {
+            var root = AddStretchPanel(parent, name, top, bottom, new Vector2(32f, 0f), ScrollSlot);
+            var scroll = root.gameObject.AddComponent<ScrollRect>();
+            scroll.horizontal = false;
+
+            var viewport = new GameObject("Viewport", typeof(RectTransform), typeof(Image), typeof(Mask));
+            viewport.transform.SetParent(root, false);
+            var viewportRect = viewport.GetComponent<RectTransform>();
+            Stretch(viewportRect);
+            viewport.GetComponent<Image>().color = new Color(0f, 0f, 0f, 0.12f);
+            viewport.GetComponent<Mask>().showMaskGraphic = true;
+
+            var content = new GameObject("Content", typeof(RectTransform), typeof(VerticalLayoutGroup), typeof(ContentSizeFitter));
+            content.transform.SetParent(viewport.transform, false);
+            var contentRect = content.GetComponent<RectTransform>();
+            contentRect.anchorMin = new Vector2(0f, 1f);
+            contentRect.anchorMax = Vector2.one;
+            contentRect.pivot = new Vector2(0.5f, 1f);
+            contentRect.offsetMin = Vector2.zero;
+            contentRect.offsetMax = Vector2.zero;
+
+            var layout = content.GetComponent<VerticalLayoutGroup>();
+            layout.padding = new RectOffset(20, 20, 20, 20);
+            layout.spacing = 16f;
+            layout.childControlWidth = true;
+            layout.childControlHeight = true;
+            layout.childForceExpandWidth = true;
+            layout.childForceExpandHeight = false;
+
+            var fitter = content.GetComponent<ContentSizeFitter>();
+            fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+            for (int i = 0; i < itemCount; i++)
+            {
+                var item = AddLayoutImage(contentRect, $"{itemPrefix}_{i + 1:00}", 0f, 120f, ContentSlot);
+                var element = item.gameObject.AddComponent<LayoutElement>();
+                element.preferredHeight = 120f;
+                element.flexibleWidth = 1f;
+            }
+
+            scroll.viewport = viewportRect;
+            scroll.content = contentRect;
+            scroll.movementType = ScrollRect.MovementType.Clamped;
+            return scroll;
+        }
+
+        static void CreateWireframePopupPrefab<T>(string prefabName, IReadOnlyList<RectSpec> imageSlots, IReadOnlyList<RectSpec> buttons) where T : PopupBase
+        {
+            var root = new GameObject(prefabName, typeof(RectTransform), typeof(T));
+            Stretch(root.GetComponent<RectTransform>());
+
+            foreach (var slot in imageSlots)
+                AddImageSlot(root.GetComponent<RectTransform>(), slot.Name, slot.Position, slot.Size);
+
+            foreach (var button in buttons)
+                AddWireButton(root.GetComponent<RectTransform>(), button.Name, button.Position, button.Size);
+
+            AssignPopupReferences(root);
+            PrefabUtility.SaveAsPrefabAsset(root, $"{PopupPrefabRoot}/{prefabName}.prefab");
+            Object.DestroyImmediate(root);
+        }
+
+        static void AssignPopupReferences(GameObject root)
+        {
+            if (root.TryGetComponent(out SettingPopup settingPopup))
+            {
+                AssignObject(settingPopup, "closeButton", FindButton(root, "CloseButton"));
+                AssignObject(settingPopup, "closeIconButton", FindButton(root, "CloseIconButton"));
+                AssignObject(settingPopup, "saveButton", FindButton(root, "SaveButton"));
+            }
+
+            if (root.TryGetComponent(out BuyItemPopup buyItemPopup))
+            {
+                AssignObject(buyItemPopup, "closeButton", FindButton(root, "CloseButton"));
+                AssignObject(buyItemPopup, "closeIconButton", FindButton(root, "CloseIconButton"));
+                AssignObject(buyItemPopup, "buyButton", FindButton(root, "BuyButton"));
+            }
+
+            if (root.TryGetComponent(out EnergyPopup energyPopup))
+            {
+                AssignObject(energyPopup, "closeButton", FindButton(root, "CloseButton"));
+                AssignObject(energyPopup, "closeIconButton", FindButton(root, "CloseIconButton"));
+                AssignObject(energyPopup, "watchAdButton", FindButton(root, "WatchAdButton"));
+                AssignObject(energyPopup, "refillButton", FindButton(root, "RefillButton"));
+            }
+
+            if (root.TryGetComponent(out ReturnTitlePopup returnTitlePopup))
+            {
+                AssignObject(returnTitlePopup, "closeIconButton", FindButton(root, "CloseIconButton"));
+                AssignObject(returnTitlePopup, "cancelButton", FindButton(root, "CancelButton"));
+                AssignObject(returnTitlePopup, "confirmButton", FindButton(root, "ConfirmButton"));
+            }
+
+            if (root.TryGetComponent(out ExitGamePopup exitGamePopup))
+            {
+                AssignObject(exitGamePopup, "closeIconButton", FindButton(root, "CloseIconButton"));
+                AssignObject(exitGamePopup, "cancelButton", FindButton(root, "CancelButton"));
+                AssignObject(exitGamePopup, "confirmButton", FindButton(root, "ConfirmButton"));
+            }
+        }
+
+        static Button FindButton(GameObject root, string buttonName)
+        {
+            foreach (var button in root.GetComponentsInChildren<Button>(true))
+            {
+                if (button.name == buttonName)
+                    return button;
+            }
+
+            return null;
+        }
+
+        static void AssignObject(Object target, string propertyName, Object value)
+        {
+            var so = new SerializedObject(target);
+            var property = so.FindProperty(propertyName);
+            if (property == null) return;
+
+            property.objectReferenceValue = value;
+            so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        static void ConfigureSpriteSheet(string path, int columns, int rows, string prefix)
+        {
+            if (AssetImporter.GetAtPath(path) is not TextureImporter importer) return;
+
+            importer.textureType = TextureImporterType.Sprite;
+            importer.spriteImportMode = SpriteImportMode.Multiple;
+            importer.alphaIsTransparency = true;
+            importer.mipmapEnabled = false;
+            importer.SaveAndReimport();
+
+            var texture = AssetDatabase.LoadAssetAtPath<Texture2D>(path);
+            if (texture == null) return;
+
+            var factory = new SpriteDataProviderFactories();
+            factory.Init();
+            var dataProvider = factory.GetSpriteEditorDataProviderFromObject(importer);
+            if (dataProvider == null) return;
+
+            dataProvider.InitSpriteEditorDataProvider();
+
+            int cellW = texture.width / columns;
+            int cellH = texture.height / rows;
+            var rects = new SpriteRect[columns * rows];
+            var pairs = new List<SpriteNameFileIdPair>(rects.Length);
+            int index = 0;
+
+            for (int row = 0; row < rows; row++)
+            {
+                for (int col = 0; col < columns; col++)
+                {
+                    var spriteId = GUID.Generate();
+                    string spriteName = $"{prefix}_{index:00}";
+                    rects[index] = new SpriteRect
+                    {
+                        name = spriteName,
+                        spriteID = spriteId,
+                        rect = new Rect(col * cellW, texture.height - (row + 1) * cellH, cellW, cellH),
+                        alignment = SpriteAlignment.Center,
+                        pivot = new Vector2(0.5f, 0.5f)
+                    };
+                    pairs.Add(new SpriteNameFileIdPair(spriteName, spriteId));
+                    index++;
+                }
+            }
+
+            dataProvider.SetSpriteRects(rects);
+            var nameProvider = dataProvider.GetDataProvider<ISpriteNameFileIdDataProvider>();
+            nameProvider?.SetNameFileIdPairs(pairs);
+            dataProvider.Apply();
+            importer.SaveAndReimport();
         }
 
         static void ConfigureEscapeHandler(GameObject root, string sceneName, RuntimeNavigationButtons router)
@@ -468,6 +654,17 @@ namespace ProjectLink.EditorTools
             so.ApplyModifiedPropertiesWithoutUndo();
         }
 
+        static void EnsureFolder(string path)
+        {
+            if (AssetDatabase.IsValidFolder(path)) return;
+
+            string parent = System.IO.Path.GetDirectoryName(path)?.Replace('\\', '/');
+            string leaf = System.IO.Path.GetFileName(path);
+            if (!string.IsNullOrEmpty(parent) && !AssetDatabase.IsValidFolder(parent))
+                EnsureFolder(parent);
+            AssetDatabase.CreateFolder(parent, leaf);
+        }
+
         static void Stretch(RectTransform rect)
         {
             rect.anchorMin = Vector2.zero;
@@ -476,25 +673,13 @@ namespace ProjectLink.EditorTools
             rect.offsetMax = Vector2.zero;
         }
 
-        static void SetTop(RectTransform rect)
+        static void Center(RectTransform rect, Vector2 position, Vector2 size)
         {
-            rect.anchorMin = new Vector2(0.5f, 1f);
-            rect.anchorMax = new Vector2(0.5f, 1f);
-            rect.pivot = new Vector2(0.5f, 1f);
-        }
-
-        static void SetBottom(RectTransform rect)
-        {
-            rect.anchorMin = new Vector2(0.5f, 0f);
-            rect.anchorMax = new Vector2(0.5f, 0f);
-            rect.pivot = new Vector2(0.5f, 0f);
-        }
-
-        static void SetLeft(RectTransform rect)
-        {
-            rect.anchorMin = new Vector2(0f, 0.5f);
-            rect.anchorMax = new Vector2(0f, 0.5f);
-            rect.pivot = new Vector2(0f, 0.5f);
+            rect.anchorMin = new Vector2(0.5f, 0.5f);
+            rect.anchorMax = new Vector2(0.5f, 0.5f);
+            rect.pivot = new Vector2(0.5f, 0.5f);
+            rect.anchoredPosition = position;
+            rect.sizeDelta = size;
         }
     }
 }

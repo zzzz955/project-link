@@ -12,4 +12,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 33125e53c71ae404e98ae705ec0ad082, type: 3}
   m_Name: FontRegistry
   m_EditorClassIdentifier: Assembly-CSharp::ProjectLink.Core.FontRegistry
-  entries: []
+  entries:
+  - language: 0
+    regular: {fileID: 0}
+    bold: {fileID: 0}
+  - language: 1
+    regular: {fileID: 11400000, guid: e2316cdcb56675043b6e93e2600f0e45, type: 2}
+    bold: {fileID: 11400000, guid: 2fd28808cd78d5242ad5002bd272c0cb, type: 2}
+  - language: 2
+    regular: {fileID: 11400000, guid: c97bf6cddc8792243b0cf749cfab693a, type: 2}
+    bold: {fileID: 11400000, guid: 9c4bdfa1fb2f0c947894fb7067815cd5, type: 2}
+  - language: 3
+    regular: {fileID: 11400000, guid: 4f50c5c28cb9b5d459871743ef6654ee, type: 2}
+    bold: {fileID: 11400000, guid: 1621245a533054246a5014dd413787d8, type: 2}
+  - language: 4
+    regular: {fileID: 11400000, guid: f430b9f1db96abf469bd308b8c47aa64, type: 2}
+    bold: {fileID: 11400000, guid: 54e2fc6fa57a9864181494791e731f61, type: 2}

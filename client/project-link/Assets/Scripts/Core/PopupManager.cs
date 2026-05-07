@@ -4,6 +4,27 @@ using UnityEngine.InputSystem;
 
 namespace ProjectLink.Core
 {
+    public enum PopupId
+    {
+        ReturnTitle,
+        ExitGame,
+        Settings,
+        BuyItem,
+        Energy
+    }
+
+    public readonly struct PopupRequest
+    {
+        public PopupRequest(PopupId id, object payload)
+        {
+            Id = id;
+            Payload = payload;
+        }
+
+        public PopupId Id { get; }
+        public object Payload { get; }
+    }
+
     public abstract class PopupBase : MonoBehaviour
     {
         public virtual void OnBackPressed() => PopupManager.Instance.CloseTop();
@@ -11,6 +32,7 @@ namespace ProjectLink.Core
 
     public class PopupManager : MonoBehaviour
     {
+        public static event System.Action<PopupRequest> Requested;
         public static PopupManager Instance { get; private set; }
 
         private readonly Stack<PopupBase> _stack = new();
@@ -26,10 +48,27 @@ namespace ProjectLink.Core
             DontDestroyOnLoad(gameObject);
         }
 
+        void OnEnable()
+        {
+            if (Instance == this)
+                Requested += HandleRequest;
+        }
+
+        void OnDisable()
+        {
+            if (Instance == this)
+                Requested -= HandleRequest;
+        }
+
         void Update()
         {
             if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame && HasPopup && Time.frameCount > _lastPushFrame)
                 CloseTop();
+        }
+
+        public static void Request(PopupId id, object payload = null)
+        {
+            Requested?.Invoke(new PopupRequest(id, payload));
         }
 
         public void Push(PopupBase popup)
@@ -67,6 +106,50 @@ namespace ProjectLink.Core
             rect.offsetMin = Vector2.zero;
             rect.offsetMax = Vector2.zero;
             var popup = go.AddComponent<T>();
+            Push(popup);
+            return popup;
+        }
+
+        void HandleRequest(PopupRequest request)
+        {
+            switch (request.Id)
+            {
+                case PopupId.ReturnTitle:
+                    OpenPrefab<ProjectLink.OutGame.UI.ReturnTitlePopup>("Prefabs/UI/ReturnTitlePopup")?.Init();
+                    break;
+                case PopupId.ExitGame:
+                    OpenPrefab<ProjectLink.OutGame.UI.ExitGamePopup>("Prefabs/UI/ExitGamePopup")?.Init(request.Payload as ProjectLink.OutGame.UI.RuntimeNavigationButtons);
+                    break;
+                case PopupId.Settings:
+                    OpenPrefab<ProjectLink.OutGame.UI.SettingPopup>("Prefabs/UI/SettingPopup")?.Init();
+                    break;
+                case PopupId.BuyItem:
+                    OpenPrefab<ProjectLink.OutGame.UI.BuyItemPopup>("Prefabs/UI/BuyItemPopup")?.Init();
+                    break;
+                case PopupId.Energy:
+                    OpenPrefab<ProjectLink.OutGame.UI.EnergyPopup>("Prefabs/UI/EnergyPopup")?.Init();
+                    break;
+            }
+        }
+
+        T OpenPrefab<T>(string resourcePath) where T : PopupBase
+        {
+            var prefab = Resources.Load<T>(resourcePath);
+            if (prefab == null)
+            {
+                Debug.LogError($"Popup prefab not found: Resources/{resourcePath}");
+                return null;
+            }
+
+            var popup = Instantiate(prefab, UIManager.Instance.GetLayer(UILayer.Popup), false);
+            var rect = popup.GetComponent<RectTransform>();
+            if (rect == null)
+                rect = popup.gameObject.AddComponent<RectTransform>();
+
+            rect.anchorMin = Vector2.zero;
+            rect.anchorMax = Vector2.one;
+            rect.offsetMin = Vector2.zero;
+            rect.offsetMax = Vector2.zero;
             Push(popup);
             return popup;
         }

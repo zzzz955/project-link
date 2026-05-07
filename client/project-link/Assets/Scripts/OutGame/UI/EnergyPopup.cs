@@ -4,11 +4,12 @@ using UnityEngine.UI;
 
 namespace ProjectLink.OutGame.UI
 {
-    public sealed class ReturnTitlePopup : PopupBase
+    public sealed class EnergyPopup : PopupBase
     {
+        [SerializeField] Button closeButton;
         [SerializeField] Button closeIconButton;
-        [SerializeField] Button cancelButton;
-        [SerializeField] Button confirmButton;
+        [SerializeField] Button watchAdButton;
+        [SerializeField] Button refillButton;
 
         bool _initialized;
 
@@ -18,28 +19,24 @@ namespace ProjectLink.OutGame.UI
             _initialized = true;
 
             ResolveMissingReferences();
+            BindClose(closeButton);
             BindClose(closeIconButton);
-            BindClose(cancelButton);
-            BindConfirm(confirmButton);
+            BindClose(watchAdButton);
+            BindClose(refillButton);
         }
 
         void ResolveMissingReferences()
         {
+            closeButton ??= FindButton("CloseButton");
             closeIconButton ??= FindButton("CloseIconButton");
-            cancelButton ??= FindButton("CancelButton");
-            confirmButton ??= FindButton("ConfirmButton");
+            watchAdButton ??= FindButton("WatchAdButton");
+            refillButton ??= FindButton("RefillButton");
         }
 
         void BindClose(Button button)
         {
             if (button != null)
                 button.onClick.AddListener(CloseTop);
-        }
-
-        void BindConfirm(Button button)
-        {
-            if (button != null)
-                button.onClick.AddListener(ReturnToTitle);
         }
 
         Button FindButton(string buttonName)
@@ -57,15 +54,6 @@ namespace ProjectLink.OutGame.UI
         {
             if (PopupManager.Instance != null)
                 PopupManager.Instance.CloseTop();
-        }
-
-        static void ReturnToTitle()
-        {
-            PopupManager.Instance?.CloseAll();
-            if (SceneLoader.Instance != null)
-                SceneLoader.Instance.LoadScene("Title");
-            else
-                UnityEngine.SceneManagement.SceneManager.LoadScene("Title");
         }
     }
 }

@@ -48,3 +48,34 @@ country_kr,KR,KR,KR,KR,KR
 country_cn,CN,CN,CN,CN,CN
 country_tw,TW,TW,TW,TW,TW
 country_th,TH,TH,TH,TH,TH
+ui_color,Color,Color,Color,Color,Color
+ui_paths,Paths,Paths,Paths,Paths,Paths
+ui_start,Start,Start,Start,Start,Start
+ui_play,Play,Play,Play,Play,Play
+ui_buy,Buy,Buy,Buy,Buy,Buy
+ui_close,Close,Close,Close,Close,Close
+ui_save,Save,Save,Save,Save,Save
+bootstrap_loading,Loading...,Loading...,Loading...,Loading...,Loading...
+settings_bgm,BGM,BGM,BGM,BGM,BGM
+settings_sfx,SFX,SFX,SFX,SFX,SFX
+settings_haptics,Haptics,Haptics,Haptics,Haptics,Haptics
+settings_notifications,Notifications,Notifications,Notifications,Notifications,Notifications
+settings_language,Language,Language,Language,Language,Language
+settings_account,Account,Account,Account,Account,Account
+settings_not_linked,Not linked,Not linked,Not linked,Not linked,Not linked
+settings_link,Link,Link,Link,Link,Link
+popup_buy_item_title,Buy Item,Buy Item,Buy Item,Buy Item,Buy Item
+popup_buy_item_hint_desc,Reveal a path when stuck!,Reveal a path when stuck!,Reveal a path when stuck!,Reveal a path when stuck!,Reveal a path when stuck!
+popup_refill,Refill,Refill,Refill,Refill,Refill
+popup_energy_empty,You're out of energy! Refill to keep playing.,You're out of energy! Refill to keep playing.,You're out of energy! Refill to keep playing.,You're out of energy! Refill to keep playing.,You're out of energy! Refill to keep playing.
+popup_watch_ad,Watch Ad,Watch Ad,Watch Ad,Watch Ad,Watch Ad
+lobby_daily_challenge,Daily Challenge,Daily Challenge,Daily Challenge,Daily Challenge,Daily Challenge
+lobby_color_cup,Color Cup,Color Cup,Color Cup,Color Cup,Color Cup
+lobby_current_stage,Current Stage,Current Stage,Current Stage,Current Stage,Current Stage
+nav_ranking,Ranking,Ranking,Ranking,Ranking,Ranking
+game_level,Level,Level,Level,Level,Level
+game_hint,Hint,Hint,Hint,Hint,Hint
+game_undo,Undo,Undo,Undo,Undo,Undo
+item_paint,Paint,Paint,Paint,Paint,Paint
+item_shuffle,Shuffle,Shuffle,Shuffle,Shuffle,Shuffle
+item_hammer,Hammer,Hammer,Hammer,Hammer,Hammer

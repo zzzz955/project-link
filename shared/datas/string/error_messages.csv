@@ -1,0 +1,16 @@
+errorCode,ko,en
+C,C,C
+string(64),string(256),string(256)
+PK,NN,NN
+INSUFFICIENT_STAMINA,스태미나가 부족합니다.,Insufficient stamina.
+INSUFFICIENT_FUNDS,재화가 부족합니다.,Insufficient currency.
+INSUFFICIENT_INVENTORY,아이템 보유 수량이 부족합니다.,Insufficient item quantity.
+STAGE_SESSION_NOT_FOUND,진행 중인 스테이지를 찾을 수 없습니다.,No active stage session found.
+STAGE_ALREADY_ACTIVE,이미 진행 중인 스테이지가 있습니다.,A stage is already in progress.
+STAGE_ALREADY_LOCKED,스테이지 준비가 이미 완료되었습니다.,Stage setup is already locked.
+STAGE_NOT_IN_SETUP_PHASE,아이템 사용 가능 단계가 지났습니다.,Stage setup phase has ended.
+STAGE_NOT_FOUND,스테이지 정보를 찾을 수 없습니다.,Stage not found.
+AD_TOKEN_ALREADY_USED,이미 사용된 광고 보상입니다.,Ad reward already claimed.
+INVALID_STAGE_RESULT,올바르지 않은 스테이지 결과입니다.,Invalid stage result value.
+RATE_LIMITED,요청이 너무 많습니다. 잠시 후 다시 시도해 주세요.,Too many requests. Please try again later.
+INTERNAL_ERROR,서버 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.,An internal server error occurred.

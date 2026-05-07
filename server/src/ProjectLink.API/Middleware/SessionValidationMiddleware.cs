@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using ProjectLink.Application.Session;
+using ProjectLink.Application.UserProfile;
 
 namespace ProjectLink.API.Middleware;
 
@@ -9,7 +10,7 @@ public class SessionValidationMiddleware
 
     public SessionValidationMiddleware(RequestDelegate next) => _next = next;
 
-    public async Task InvokeAsync(HttpContext ctx, SessionService sessionService)
+    public async Task InvokeAsync(HttpContext ctx, SessionService sessionService, UserProfileService userProfileService)
     {
         if (ctx.User.Identity?.IsAuthenticated != true)
         {
@@ -27,6 +28,10 @@ public class SessionValidationMiddleware
             await ctx.Response.WriteAsJsonAsync(new { reason = "session_invalidated" });
             return;
         }
+
+        // Upsert user_profiles on every authenticated request (Redis-cached after first insert)
+        var displayName = ctx.User.FindFirstValue("name") ?? "";
+        await userProfileService.EnsureProfileAsync(userId, displayName, ctx.RequestAborted);
 
         await _next(ctx);
     }

@@ -1,0 +1,194 @@
+using ProjectLink.Contracts.Ranking;
+using ProjectLink.Domain.Interfaces;
+using StackExchange.Redis;
+
+namespace ProjectLink.Application.Ranking;
+
+public class RankingService
+{
+    private readonly IRankingRepository   _repo;
+    private readonly IUserProfileRepository _profiles;
+    private readonly IDatabase            _redis;
+    private readonly IConfiguration       _config;
+
+    private const long MaxUnixTs = 9_999_999_999L;
+
+    public RankingService(IRankingRepository repo, IUserProfileRepository profiles, IConnectionMultiplexer redis, IConfiguration config)
+    {
+        _repo     = repo;
+        _profiles = profiles;
+        _redis    = redis.GetDatabase();
+        _config   = config;
+    }
+
+    private int NetworkToleranceMs => _config.GetValue<int>("Ranking:NetworkToleranceMs", 2000);
+
+    public static int ComputeScore(int timeLimit, long adjustedElapsedMs)
+    {
+        var elapsedCs = (int)(adjustedElapsedMs / 10);
+        return Math.Max(0, timeLimit * 100 - elapsedCs);
+    }
+
+    public static long AdjustElapsedMs(long clientElapsedMs, long serverElapsedMs, int toleranceMs)
+        => Math.Max(clientElapsedMs, serverElapsedMs - toleranceMs);
+
+    // Encodes score for descending ranking (higher is better)
+    private static double EncodeDescending(long primaryValue, long accountCreatedAtUnix)
+        => primaryValue * 1e10 + (MaxUnixTs - accountCreatedAtUnix);
+
+    // Encodes elapsed_cs for ascending ranking (lower is better)
+    private static double EncodeAscending(long elapsedCs, long accountCreatedAtUnix)
+        => elapsedCs * 1e10 + accountCreatedAtUnix;
+
+    public async Task OnStageClearAsync(string userId, int stageId, long clientElapsedMs, long serverElapsedMs, int timeLimit, CancellationToken ct)
+    {
+        var adjustedMs = AdjustElapsedMs(clientElapsedMs, serverElapsedMs, NetworkToleranceMs);
+        var score      = ComputeScore(timeLimit, adjustedMs);
+        var elapsedCs  = adjustedMs / 10;
+
+        var existing = await _repo.GetBestRecordAsync(userId, stageId, ct);
+        if (existing != null && existing.BestClearTimeMs <= adjustedMs)
+            return; // not a new best
+
+        await _repo.UpsertBestRecordAsync(userId, stageId, adjustedMs, score, ct);
+
+        // Recompute aggregate from all records (fetch all for user)
+        var allRecords = await _repo.GetUserBestRecordsAsync(userId, ct);
+        var totalScore     = (long)allRecords.Sum(r => (long)r.BestScore);
+        var stagesCleared  = allRecords.Count;
+
+        await _repo.UpsertRankingCacheAsync(userId, totalScore, stagesCleared, ct);
+
+        var profile = await _profiles.GetByIdAsync(userId, ct);
+        var accountCreatedUnix = profile?.AccountCreatedAt.ToUnixTimeSeconds() ?? 0L;
+
+        // ZADD Redis
+        var stageKey    = $"ranking:stage:{stageId}:time";
+        var stagesKey   = "ranking:global:stages";
+        var scoreKey    = "ranking:global:score";
+
+        await _redis.SortedSetAddAsync(stageKey,  userId, EncodeAscending(elapsedCs, accountCreatedUnix));
+        await _redis.SortedSetAddAsync(stagesKey, userId, EncodeDescending(stagesCleared, accountCreatedUnix));
+        await _redis.SortedSetAddAsync(scoreKey,  userId, EncodeDescending(totalScore, accountCreatedUnix));
+    }
+
+    public async Task<RankingListResponse> GetStageRankingAsync(int stageId, int top, string? callerId, CancellationToken ct)
+    {
+        var key     = $"ranking:stage:{stageId}:time";
+        var entries = await _redis.SortedSetRangeByRankWithScoresAsync(key, 0, top - 1);
+        var result  = await BuildListResponseAsync(entries, isAscending: true, callerId, key, ct);
+        return result;
+    }
+
+    public async Task<RankingListResponse> GetGlobalStagesRankingAsync(int top, string? callerId, CancellationToken ct)
+    {
+        var key     = "ranking:global:stages";
+        var entries = await _redis.SortedSetRangeByRankWithScoresAsync(key, 0, top - 1, Order.Descending);
+        return await BuildListResponseAsync(entries, isAscending: false, callerId, key, ct);
+    }
+
+    public async Task<RankingListResponse> GetGlobalScoreRankingAsync(int top, string? callerId, CancellationToken ct)
+    {
+        var key     = "ranking:global:score";
+        var entries = await _redis.SortedSetRangeByRankWithScoresAsync(key, 0, top - 1, Order.Descending);
+        return await BuildListResponseAsync(entries, isAscending: false, callerId, key, ct);
+    }
+
+    private async Task<RankingListResponse> BuildListResponseAsync(SortedSetEntry[] entries, bool isAscending, string? callerId, string key, CancellationToken ct)
+    {
+        var rankEntries = new List<RankingEntry>();
+        for (var i = 0; i < entries.Length; i++)
+        {
+            var userId  = (string)entries[i].Element!;
+            var profile = await _profiles.GetByIdAsync(userId, ct);
+            var value   = DecodeValue(entries[i].Score, isAscending);
+            rankEntries.Add(new RankingEntry
+            {
+                Rank        = i + 1,
+                UserId      = userId,
+                DisplayName = profile?.DisplayName ?? "",
+                Value       = value
+            });
+        }
+
+        RankingEntry? myRank = null;
+        if (callerId != null)
+        {
+            var rank = isAscending
+                ? await _redis.SortedSetRankAsync(key, callerId)
+                : await _redis.SortedSetRankAsync(key, callerId, Order.Descending);
+
+            if (rank.HasValue)
+            {
+                var score   = await _redis.SortedSetScoreAsync(key, callerId);
+                var profile = await _profiles.GetByIdAsync(callerId, ct);
+                myRank = new RankingEntry
+                {
+                    Rank        = (int)rank.Value + 1,
+                    UserId      = callerId,
+                    DisplayName = profile?.DisplayName ?? "",
+                    Value       = DecodeValue(score!.Value, isAscending)
+                };
+            }
+        }
+
+        return new RankingListResponse { Entries = rankEntries, MyRank = myRank };
+    }
+
+    private static long DecodeValue(double encodedScore, bool isAscending)
+    {
+        // Strip the tie-break portion (last 10 decimal digits worth)
+        if (isAscending)
+            return (long)(encodedScore / 1e10);
+        // For descending: primary = floor(encoded / 1e10)
+        return (long)(encodedScore / 1e10);
+    }
+
+    public async Task<MyRankResponse> GetMyRankAsync(string userId, CancellationToken ct)
+    {
+        MyRankEntry? stagesEntry = null;
+        MyRankEntry? scoreEntry  = null;
+
+        var stagesRank = await _redis.SortedSetRankAsync("ranking:global:stages", userId, Order.Descending);
+        if (stagesRank.HasValue)
+        {
+            var score  = await _redis.SortedSetScoreAsync("ranking:global:stages", userId);
+            stagesEntry = new MyRankEntry { Rank = (int)stagesRank.Value + 1, Value = DecodeValue(score!.Value, false) };
+        }
+
+        var scoreRank = await _redis.SortedSetRankAsync("ranking:global:score", userId, Order.Descending);
+        if (scoreRank.HasValue)
+        {
+            var score = await _redis.SortedSetScoreAsync("ranking:global:score", userId);
+            scoreEntry = new MyRankEntry { Rank = (int)scoreRank.Value + 1, Value = DecodeValue(score!.Value, false) };
+        }
+
+        return new MyRankResponse { StagesCleared = stagesEntry, TotalScore = scoreEntry };
+    }
+
+    public async Task RebuildFromDbAsync(CancellationToken ct)
+    {
+        var records  = await _repo.GetAllBestRecordsAsync(ct);
+        var caches   = await _repo.GetAllRankingCachesAsync(ct);
+        var cacheMap = caches.ToDictionary(c => c.UserId);
+
+        // Per-stage time rankings
+        foreach (var record in records)
+        {
+            var profile           = await _profiles.GetByIdAsync(record.UserId, ct);
+            var accountCreatedUnix = profile?.AccountCreatedAt.ToUnixTimeSeconds() ?? 0L;
+            var elapsedCs         = record.BestClearTimeMs / 10;
+            var stageKey          = $"ranking:stage:{record.StageId}:time";
+            await _redis.SortedSetAddAsync(stageKey, record.UserId, EncodeAscending(elapsedCs, accountCreatedUnix));
+        }
+
+        // Global rankings
+        foreach (var cache in caches)
+        {
+            var profile           = await _profiles.GetByIdAsync(cache.UserId, ct);
+            var accountCreatedUnix = profile?.AccountCreatedAt.ToUnixTimeSeconds() ?? 0L;
+            await _redis.SortedSetAddAsync("ranking:global:stages", cache.UserId, EncodeDescending(cache.StagesCleared, accountCreatedUnix));
+            await _redis.SortedSetAddAsync("ranking:global:score",  cache.UserId, EncodeDescending(cache.TotalScore, accountCreatedUnix));
+        }
+    }
+}

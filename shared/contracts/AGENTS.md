@@ -32,9 +32,41 @@ shared/contracts/
 ## Files
 | file | namespace | role |
 |------|-----------|------|
-| _(none yet)_ | — | — |
+| `Common/ErrorResponse.cs` | `ProjectLink.Contracts.Common` | Unified error response — `ErrorCode` string maps to `error_messages.csv` |
+| `Stage/StageRequests.cs` | `ProjectLink.Contracts.Stage` | Stage start/end request bodies |
+| `Stage/StageResponses.cs` | `ProjectLink.Contracts.Stage` | Stage start/end response shapes |
+| `Stamina/StaminaRequests.cs` | `ProjectLink.Contracts.Stamina` | Ad-reward and extend request bodies |
+| `Stamina/StaminaResponses.cs` | `ProjectLink.Contracts.Stamina` | Stamina state and reward responses |
+| `Currency/CurrencyRequests.cs` | `ProjectLink.Contracts.Currency` | Ad-reward request body |
+| `Currency/CurrencyResponses.cs` | `ProjectLink.Contracts.Currency` | Balance and reward responses |
+| `Item/ItemRequests.cs` | `ProjectLink.Contracts.Item` | Purchase and use request bodies |
+| `Item/ItemResponses.cs` | `ProjectLink.Contracts.Item` | Inventory and purchase responses |
+| `Ranking/RankingResponses.cs` | `ProjectLink.Contracts.Ranking` | Ranking list and my-rank responses |
 
 ## Symbols
 | symbol | kind | note |
 |--------|------|------|
-| _(none yet)_ | — | — |
+| `ErrorResponse` | class | `ErrorCode` (string) — client maps code to localized message via error_messages.csv |
+| `StageStartRequest` | class | empty body — stageId in route |
+| `StageStartResponse` | class | `SessionToken`, `ServerStartAt` (ISO 8601) |
+| `StageEndRequest` | class | `Result` ("success"\|"fail"), `ClientElapsedMs` |
+| `StageEndResponse` | class | `Score`, `Stars`, `AdjustedElapsedMs`, `IsBestRecord`, `SoftBalanceAfter` |
+| `StaminaAdRewardRequest` | class | `AdToken` — platform-issued, idempotency key |
+| `StaminaExtendRequest` | class | empty — server reads cost from config |
+| `StaminaResponse` | class | `Current`, `Max`, `NextRechargeAt?` (ISO 8601) |
+| `StaminaAdRewardResponse` | class | `Current`, `Added`, `NextRechargeAt?` |
+| `StaminaExtendResponse` | class | `StaminaCurrent`, `SoftBalanceAfter` |
+| `CurrencyAdRewardRequest` | class | `AdToken` — idempotency key |
+| `CurrencyResponse` | class | `SoftAmount` |
+| `CurrencyAdRewardResponse` | class | `SoftAmountAfter`, `Added` |
+| `ItemPurchaseRequest` | class | `ItemId`, `Quantity` |
+| `ItemUseEntry` | class | single item in a use batch: `ItemId`, `Quantity` |
+| `ItemUseRequest` | class | `StageSessionToken`, `Items` (List\<ItemUseEntry\>) |
+| `InventorySlot` | class | `ItemId`, `Quantity` — shared by inventory and use responses |
+| `InventoryResponse` | class | `Items` (List\<InventorySlot\>) — quantity > 0 only |
+| `ItemPurchaseResponse` | class | `ItemId`, `QuantityAfter`, `SoftBalanceAfter` |
+| `ItemUseResponse` | class | `UpdatedSlots` (List\<InventorySlot\>) — changed entries only |
+| `RankingEntry` | class | `Rank`, `UserId`, `DisplayName`, `Value` |
+| `RankingListResponse` | class | `Entries`, `MyRank?` — used for all 3 list endpoints |
+| `MyRankEntry` | class | `Rank`, `Value` — one category |
+| `MyRankResponse` | class | `StagesCleared?`, `TotalScore?` — `/api/ranking/me` |

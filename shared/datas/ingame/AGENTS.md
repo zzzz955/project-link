@@ -5,6 +5,7 @@
 |------|------|-----|
 | `ingame_stage.csv` | One row per stage | `stageId` (PK) |
 | `ingame_node_colors.csv` | One row per node group color | `nodeGroupId` (PK) |
+| `ingame_item.csv` | One row per item type | `id` (PK) |
 | `ingame_stage_info.csv` | Legacy one row per stage | `stageId` (PK) |
 | `ingame_stage_nodes.csv` | Legacy node endpoint rows | `stageId + colorId + nodeIndex` |
 
@@ -25,6 +26,13 @@
 - `nodeGroupId` int32 PK - node group id used by `nodeMap`
 - `hexColor` string(16) NN - canonical color rendered by client and stage tool
 - `displayName` string(32) NN - authoring label
+
+**ingame_item**
+- `id` int32 PK
+- `name` string(64) NN — display name
+- `type` string(32) NN — `OBSTACLE_REMOVE` | `NODE_PAIR_REMOVE`
+- `cost_soft` int32 NN — soft currency purchase price
+- `description` string(256) NN — UI tooltip text
 
 **ingame_stage_info**
 - Legacy table kept until client loader migration is complete.

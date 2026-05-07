@@ -3,7 +3,7 @@
 ## Nav
 | path | role |
 |------|------|
-| `shared/` | Packet definitions, shared types, game meta data | -> `shared/AGENTS.md` |
+| `shared/` | Shared C# contracts, shared types, game meta data | -> `shared/AGENTS.md` |
 | `tools/` | Automation pipeline (gen-data, gen-packets, gen-orm) | -> `tools/AGENTS.md` |
 | `client/` | Client app - stack defined by user | -> `client/AGENTS.md` |
 | `server/` | Server app + DB schema - stack defined by user | -> `server/AGENTS.md` |
@@ -11,11 +11,11 @@
 
 ## Pipeline
 ```
-shared/datas/**/*.csv        -> gen:data    -> {client,server}/generated/data/**/*.csv
-shared/packets/*.packet.json -> gen:packets -> {client,server}/generated/packets/*
-server/db/schema.json        -> gen:orm     -> DB CREATE/ALTER TABLE (+ migration SQL)
+shared/datas/**/*.csv  -> gen:data -> {client,server}/generated/data/**/*.csv
+server/db/schema.json  -> gen:orm  -> DB CREATE/ALTER TABLE (+ migration SQL)
+shared/contracts/*.cs  -> manual   -> server ProjectReference + Unity Assets/Scripts/Generated/Contracts/
 ```
-CMD: `tools/gen-all.bat` | `tools/gen-data.bat` | `tools/gen-packets.bat` | `tools/gen-orm.bat` | `npm run gen:all`
+CMD: `tools/gen-all.bat` | `tools/gen-data.bat` | `tools/gen-orm.bat` | `npm run gen:all`
 
 ## Rules
 - NEVER edit `*/generated/*` — edit source, re-run gen
@@ -47,10 +47,11 @@ This convention is enforced by AI agents; violations should be fixed before comm
 - `CLAUDE.md` must remain a Claude Code compatibility wrapper: contents = `@AGENTS.md`
 
 ## Formats
-FILE (data):   `[domain]_[table].csv`          e.g. `characters_base.csv`
-FILE (packet): `[domain].packet.json`           e.g. `player.packet.json`
-FILE (db):     `schema.json` (single file)
-FILE (gen):    auto-named from source filename
+FILE (data):      `[domain]_[table].csv`         e.g. `characters_base.csv`
+FILE (contracts): `[Domain]Requests.cs`          e.g. `StageRequests.cs`
+FILE (contracts): `[Domain]Responses.cs`         e.g. `StageResponses.cs`
+FILE (db):        `schema.json` (single file)
+FILE (gen):       auto-named from source filename
 
 ## Output
 - No narration before tool calls - execute immediately, no "Let me read X" preamble

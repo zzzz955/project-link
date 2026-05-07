@@ -9,7 +9,7 @@
 | `GameStateMachine.cs` | `GameStateMachine` | Pure FSM with validated transitions + change event |
 | `InGameController.cs` | `InGameController` | Singleton; orchestrates board/input/paths/HUD/timer |
 | `UIManager.cs` | `UIManager` | Canvas layer resolver (Background/HUD/Popup/System) |
-| `PopupManager.cs` | `PopupManager` | Stack-based popup lifecycle; back-press aware |
+| `PopupManager.cs` | `PopupManager` | Event-driven popup request router + stack lifecycle; back-press aware |
 | `SceneLoader.cs` | `SceneLoader` | Faded async scene transitions |
 | `DataManager.cs` | `DataManager` | PlayerPrefs persistence: progress, settings |
 | `SoundManager.cs` | `SoundManager` | BGM + SFX AudioSource management |
@@ -35,7 +35,10 @@
 | `InGameController.RefreshGroupViews(int)` | method | refreshes all PathViews for a given groupId |
 | `InGameController.GetConnectedCount()` | method | counts groups where all nodes are endpoints of complete paths (uses PathValidator.IsGroupConnected) |
 | `UIManager.GetLayer(UILayer)` | method | returns canvas Transform for named layer |
-| `PopupManager.Open<T>()` | method | instantiates T on Popup layer, pushes stack |
+| `PopupId` | enum | popup request ids: ReturnTitle, ExitGame, Settings, BuyItem, Energy |
+| `PopupRequest` | struct | event payload: PopupId + optional object payload |
+| `PopupManager.Request(PopupId,object)` | method | static event-driven popup request entry point |
+| `PopupManager.Open<T>()` | method | code-instantiates legacy in-game popup T on Popup layer, pushes stack |
 | `PopupManager.CloseTop()` | method | destroys top popup, re-shows previous |
 | `PopupManager.HasPopup` | prop | true if any popup on stack |
 | `SceneLoader.LoadScene(string)` | method | fade-out → load → fade-in |
@@ -56,6 +59,7 @@
 ## Rules
 - All singletons pattern: `if (Instance != null) { Destroy(gameObject); return; }` in Awake
 - Popup T must extend `PopupBase`; use `UILayer.Popup` for all overlays
+- New UI popups should be requested through `PopupManager.Request(PopupId, payload)` and loaded from `Resources/Prefabs/UI`.
 - FSM valid transitions only: Idle↔Drawing, Drawing→Completed
 - `InGameController` calls `ColorPalette.Init(stageData.NodeColors)` and `BoardCameraController.Init` in Start()
 - `InGameController` wires OnTimeUp → HandleTimeUp (cancels drawing, shows TimeoutPopup)

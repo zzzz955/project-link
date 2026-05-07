@@ -7,6 +7,7 @@ Client-facing localized UI string tables.
 | file | role |
 |------|------|
 | `clientstring.csv` | Client UI text — one row per stringId, one column per language |
+| `error_messages.csv` | Server error code → localized message mapping — one row per errorCode |
 
 ## CSV Format (wide — one row per string)
 ```

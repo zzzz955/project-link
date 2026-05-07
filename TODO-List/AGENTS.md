@@ -17,8 +17,11 @@ Navigation and progress tracker for all remaining work before release.
 | [08_sound_vfx.md](08_sound_vfx.md) | Sound & VFX Polish | TODO |
 | [09_platform_build.md](09_platform_build.md) | Platform Build (Android) | TODO |
 | [10_server.md](10_server.md) | Server (ASP.NET) | IN_PROGRESS |
-| [11_packet_protocol.md](11_packet_protocol.md) | Packet Protocol (gen-packets rewrite) | TODO |
 | [12_client_rule_refactor.md](12_client_rule_refactor.md) | Client Rule Refactor | TODO |
+| [13_stamina.md](13_stamina.md) | Stamina System | DONE |
+| [14_currency.md](14_currency.md) | Currency System | IN_PROGRESS |
+| [15_items.md](15_items.md) | Item System | IN_PROGRESS |
+| [16_ranking.md](16_ranking.md) | Ranking System | DONE |
 
 ## Progress Summary
 

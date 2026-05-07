@@ -6,6 +6,7 @@ public class IngameStageData
     public int    Width         { get; set; }
     public int    Height        { get; set; }
     public int    TimeLimit     { get; set; }
+    public int    MoveLimit     { get; set; }   // 0 = unlimited
     public int    Difficulty    { get; set; }
     public string BoardEncoding { get; set; } = "";
     public string NodeMap       { get; set; } = "";

@@ -4,3 +4,8 @@ int32,string(64),string(32),int32,string(256)
 PK,NN,NN,NN,NN
 1,Obstacle Remover,OBSTACLE_REMOVE,30,Remove one obstacle cell from the board before the stage starts.
 2,Node Pair Eraser,NODE_PAIR_REMOVE,50,Remove one node pair from the board before the stage starts.
+3,Hint,POWER_UP,50,Reveals one valid connection path on the board.
+4,Undo,POWER_UP,20,Reverts the last move made on the board.
+5,Paint,POWER_UP,80,Changes the color of any one node on the board.
+6,Hammer,POWER_UP,100,Removes one obstacle or gimmick cell instantly during play.
+7,Shuffle,POWER_UP,60,Reshuffles all unconnected nodes on the board.

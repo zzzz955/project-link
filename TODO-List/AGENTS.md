@@ -22,6 +22,7 @@ Navigation and progress tracker for all remaining work before release.
 | [14_currency.md](14_currency.md) | Currency System | IN_PROGRESS |
 | [15_items.md](15_items.md) | Item System | IN_PROGRESS |
 | [16_ranking.md](16_ranking.md) | Ranking System | DONE |
+| [17_ui_wireframe_server_contracts.md](17_ui_wireframe_server_contracts.md) | UI Wireframe Server Contracts | IN_PROGRESS |
 
 ## Progress Summary
 
@@ -29,7 +30,7 @@ Client core loop playable (scene transitions, InGame HUD/popups, GameContext).
 Client-first boundary gates server wiring: UI/scene code should depend on mock/local service interfaces before HTTP adapters.
 Server scaffold complete (4-layer structure, middleware stack, Docker Compose), but gameplay integration waits until client contracts stabilize.
 Stage Editor: TypeScript local web tool implemented for CSV CRUD, validation, solver checks, and generated stage drafts.
-Remaining: Client service boundaries, Client Rule Refactor, OutGame UI, Auth/Ad systems, Sound/VFX, Platform build, server sync wiring.
+Remaining: Client service boundaries, Client Rule Refactor, OutGame UI, UI wireframe server contracts, Auth/Ad systems, Sound/VFX, Platform build, server sync wiring.
 
 Suggested execution order:
 1. `00` - service boundaries and mock/local adapters
@@ -40,9 +41,10 @@ Suggested execution order:
 6. `12` - client runtime support for nodeMap/cellMap rules
 7. `05` - auth client mock first, then shared auth server
 8. `10` - game server wiring after client contracts stabilize
-9. `04` - monetization
-10. `08` - polish
-11. `09` - release build
+9. `17` - UI wireframe DTO/API contract gate before new UI HTTP binding
+10. `04` - monetization
+11. `08` - polish
+12. `09` - release build
 
 ## Convention
 
@@ -53,3 +55,4 @@ Suggested execution order:
 
 <!-- changed: added client rule refactor tracker after Stage Editor data model changes -->
 <!-- changed: marked Stage Editor DONE after CRUD, solver validation, generator, and CI validation command landed -->
+<!-- changed: added UI wireframe server contract tracker for Color Paths PDF UI refresh -->

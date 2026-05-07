@@ -15,6 +15,7 @@
 - `width` int32 NN - grid columns
 - `height` int32 NN - grid rows
 - `timeLimit` int32 NN - per-stage countdown in seconds; 0 = no limit
+- `moveLimit` int32 NN - maximum moves allowed; 0 = unlimited; validated server-side in StageService.EndAsync
 - `difficulty` int32 NN - stage difficulty for generator/client display
 - `boardEncoding` string(32) NN - board codec id; current value `b36w2-rm-v1`
 - `nodeMap` string NN - row-major base36 fixed-width 2-char node group layer; `00` empty, `01..0K` node groups
@@ -45,6 +46,9 @@
 - Consumed by: server `Infrastructure.StaticDataService` (loads ingame CSVs at startup)
 - Consumed by: server `Domain.IngameStageData`, `Domain.IngameItemData` (POCO source)
 - Consumed by: client `Data.StageLoader` (decodes nodeMap/cellMap), client `Data.Generated` classes
+
+## Column Order (generated CSV)
+`stageId[0], width[1], height[2], timeLimit[3], moveLimit[4], difficulty[5], boardEncoding[6], nodeMap[7], cellMap[8], soft_reward[9], stageMeta[10..^1], generatorSeed[^1]`
 
 ## Rules
 - Stage IDs must remain contiguous. Add only `maxStageId + 1`; delete only `maxStageId`; update only existing stages.

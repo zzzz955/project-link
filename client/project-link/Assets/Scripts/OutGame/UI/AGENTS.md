@@ -6,6 +6,7 @@
 | `LocalizedText.cs` | `LocalizedText` | MonoBehaviour; auto-refreshes TMP text on LanguageChanged |
 | `LanguageSelector.cs` | `LanguageSelector` | TMP_Dropdown wired to LocalizationManager |
 | `RuntimeNavigationButtons.cs` | `RuntimeNavigationButtons` | Scene navigation + popup trigger entry points |
+| `LobbyTabController.cs` | `LobbyTabController` | Lobby Shop/Home/Ranking tab switcher with Inspector-assignable refs |
 | `SceneEscapeHandler.cs` | `SceneEscapeHandler` | Escape key EscapeAction (None/ReturnToTitle/ExitGame) |
 | `SafeAreaFitter.cs` | `SafeAreaFitter` | Adjusts RectTransform anchors to device safe area in Awake |
 | `ModernUI.cs` | `ModernUI` | Shared code-created glossy UI helper methods/colors |
@@ -27,6 +28,13 @@
 | `RuntimeNavigationButtons.OpenSettingsPopup()` | method | requests `PopupId.Settings` via PopupManager event |
 | `RuntimeNavigationButtons.OpenBuyItemPopup()` | method | requests `PopupId.BuyItem` via PopupManager event |
 | `RuntimeNavigationButtons.OpenEnergyPopup()` | method | requests `PopupId.Energy` via PopupManager event |
+| `LobbyTabController.Configure(...)` | method | assigns tab buttons and tab panels from generated UI builder |
+| `LobbyTabController.shopTabButton` | field | `[SerializeField]` Shop tab button, Inspector-assignable |
+| `LobbyTabController.homeTabButton` | field | `[SerializeField]` Home tab button, Inspector-assignable |
+| `LobbyTabController.rankingTabButton` | field | `[SerializeField]` Ranking tab button, Inspector-assignable |
+| `LobbyTabController.shopPanel` | field | `[SerializeField]` Shop tab panel; includes ScrollView |
+| `LobbyTabController.homePanel` | field | `[SerializeField]` Home tab panel |
+| `LobbyTabController.rankingPanel` | field | `[SerializeField]` Ranking tab panel; includes ScrollView |
 | `ModernUI.AddPanel(...)` | method | creates themed Image panel with optional shadow |
 | `ModernUI.AddLocalizedLabel(...)` | method | creates TMP label bound to `LocalizedText` |
 | `ModernUI.AddLocalizedButton(...)` | method | creates themed Button with localized TMP label |
@@ -36,16 +44,17 @@
 | `LobbyStageMapView.Build()` | method | instantiates/pools all stage node buttons |
 | `LobbyStageMapView.NextPage()` / `PreviousPage()` | methods | pagination control |
 | `SceneEscapeHandler.action` | field | `[SerializeField]` EscapeAction enum |
-| `ReturnTitlePopup.Init()` | method | binds prefab buttons: CloseIconButton, CancelButton, ConfirmButton |
-| `ExitGamePopup.Init(RuntimeNavigationButtons)` | method | binds prefab buttons: CloseIconButton, CancelButton, ConfirmButton |
-| `SettingPopup.Init()` | method | binds prefab buttons: CloseIconButton, CloseButton, SaveButton |
-| `BuyItemPopup.Init()` | method | binds prefab buttons: CloseIconButton, CloseButton, BuyButton |
-| `EnergyPopup.Init()` | method | binds prefab buttons: CloseIconButton, CloseButton, WatchAdButton, RefillButton |
+| `ReturnTitlePopup.Init()` | method | binds Inspector refs or fallback buttons: CloseIconButton, CancelButton, ConfirmButton |
+| `ExitGamePopup.Init(RuntimeNavigationButtons)` | method | binds Inspector refs or fallback buttons: CloseIconButton, CancelButton, ConfirmButton |
+| `SettingPopup.Init()` | method | binds Inspector refs or fallback buttons: CloseIconButton, CloseButton, SaveButton |
+| `BuyItemPopup.Init()` | method | binds Inspector refs or fallback buttons: CloseIconButton, CloseButton, BuyButton |
+| `EnergyPopup.Init()` | method | binds Inspector refs or fallback buttons: CloseIconButton, CloseButton, WatchAdButton, RefillButton |
 
 ## Rules
 - Namespace: `ProjectLink.OutGame.UI`
 - Scene navigation uses `SceneLoader.LoadScene`; shared state uses `GameContext`
 - Repeated runtime UI (stage nodes) uses `PoolManager`
 - `SafeAreaFitter` attach to root canvas panel; handles notch/home-bar insets automatically
-- New popup prefabs are generated as wireframe image slots plus transparent hotspots under `Assets/Resources/Prefabs/UI`.
+- New popup prefabs are generated as visible wireframe image slots plus Button hotspots under `Assets/Resources/Prefabs/UI`.
+- Popup and lobby controllers expose serialized refs for Inspector assignment and also fallback-find by child name.
 - Visible runtime-created strings must use `LocalizedText` and client string IDs unless they are numeric state or icon glyphs.

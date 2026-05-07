@@ -311,8 +311,7 @@ namespace ProjectLink.EditorTools
             var homeTab = AddLayoutButton(tabs, "HomeTabButton", 0f, 140f, true);
             var rankingTab = AddLayoutButton(tabs, "RankingTabButton", 0f, 140f, true);
 
-            var tabController = safe.gameObject.AddComponent<LobbyTabController>();
-            tabController.Configure(shopTab, homeTab, rankingTab, shopPanel.gameObject, homePanel.gameObject, rankingPanel.gameObject);
+            AddLobbyTabController(safe.gameObject, shopTab, homeTab, rankingTab, shopPanel.gameObject, homePanel.gameObject, rankingPanel.gameObject);
         }
 
         static void BuildLobbyShopPanel(RectTransform panel)
@@ -562,6 +561,24 @@ namespace ProjectLink.EditorTools
                 AssignObject(exitGamePopup, "cancelButton", FindButton(root, "CancelButton"));
                 AssignObject(exitGamePopup, "confirmButton", FindButton(root, "ConfirmButton"));
             }
+        }
+
+        static void AddLobbyTabController(GameObject root, Button shopTab, Button homeTab, Button rankingTab, GameObject shopPanel, GameObject homePanel, GameObject rankingPanel)
+        {
+            var controllerType = System.Type.GetType("ProjectLink.OutGame.UI.LobbyTabController, Assembly-CSharp");
+            if (controllerType == null)
+            {
+                Debug.LogWarning("LobbyTabController type not found. Regenerate Unity project files or let Unity compile scripts before rebuilding Lobby UI.");
+                return;
+            }
+
+            var controller = root.AddComponent(controllerType);
+            AssignObject(controller, "shopTabButton", shopTab);
+            AssignObject(controller, "homeTabButton", homeTab);
+            AssignObject(controller, "rankingTabButton", rankingTab);
+            AssignObject(controller, "shopPanel", shopPanel);
+            AssignObject(controller, "homePanel", homePanel);
+            AssignObject(controller, "rankingPanel", rankingPanel);
         }
 
         static Button FindButton(GameObject root, string buttonName)

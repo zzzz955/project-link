@@ -1,0 +1,6 @@
+id,name,type,cost_soft,description
+CS,CS,CS,CS,CS
+int32,string(64),string(32),int32,string(256)
+PK,NN,NN,NN,NN
+1,Obstacle Remover,OBSTACLE_REMOVE,30,Remove one obstacle cell from the board before the stage starts.
+2,Node Pair Eraser,NODE_PAIR_REMOVE,50,Remove one node pair from the board before the stage starts.

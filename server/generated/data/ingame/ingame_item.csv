@@ -1,0 +1,3 @@
+id,name,type,cost_soft,description
+1,Obstacle Remover,OBSTACLE_REMOVE,30,Remove one obstacle cell from the board before the stage starts.
+2,Node Pair Eraser,NODE_PAIR_REMOVE,50,Remove one node pair from the board before the stage starts.

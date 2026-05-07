@@ -1,0 +1,11 @@
+streakDay,rewardType,rewardId,amount
+CS,CS,CS,CS
+int32,string(32),int32,int32
+PK,NN,NN,NN
+1,SOFT_CURRENCY,0,30
+2,SOFT_CURRENCY,0,30
+3,ITEM,3,1
+4,SOFT_CURRENCY,0,50
+5,ITEM,4,2
+6,SOFT_CURRENCY,0,80
+7,ITEM,5,1

@@ -1,0 +1,5 @@
+configId,maxStamina,rechargeSeconds,refillCostSoft,adRewardAmount
+CS,CS,CS,S,CS
+int32,int32,int32,int32,int32
+PK,NN,NN,NN,NN
+1,5,300,80,2

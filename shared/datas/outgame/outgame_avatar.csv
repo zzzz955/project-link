@@ -1,0 +1,14 @@
+id,name,iconPath,unlockCondition
+CS,CS,CS,CS
+int32,string(64),string(128),string(64)
+PK,NN,NN,NN
+1,Pathfinder,avatars/avatar_01,default
+2,Explorer,avatars/avatar_02,default
+3,Seeker,avatars/avatar_03,default
+4,Navigator,avatars/avatar_04,default
+5,Connector,avatars/avatar_05,default
+6,Weaver,avatars/avatar_06,default
+7,Flow Master,avatars/avatar_07,default
+8,Color Sage,avatars/avatar_08,default
+9,Trail Blazer,avatars/avatar_09,default
+10,Nexus,avatars/avatar_10,default

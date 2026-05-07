@@ -25,10 +25,10 @@ public class StageController : ControllerBase
     }
 
     [HttpPost("lock")]
-    public async Task<IActionResult> Lock(int stageId, CancellationToken ct)
+    public async Task<IActionResult> Lock(int stageId, [FromBody] StageEndRequest req, CancellationToken ct)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-        await _stage.LockAsync(userId, stageId, ct);
+        await _stage.LockAsync(userId, stageId, req.SessionToken, ct);
         return NoContent();
     }
 
@@ -37,14 +37,15 @@ public class StageController : ControllerBase
     {
         var userId        = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
         var correlationId = HttpContext.Items["CorrelationId"] as string ?? HttpContext.TraceIdentifier;
-        return Ok(await _stage.EndAsync(userId, stageId, req.Result, req.ClientElapsedMs, correlationId, ct));
+        return Ok(await _stage.EndAsync(
+            userId, stageId, req.SessionToken, req.Result, req.ClientElapsedMs, req.MovesUsed, correlationId, ct));
     }
 
     [HttpPost("extend")]
-    public async Task<IActionResult> Extend(int stageId, CancellationToken ct)
+    public async Task<IActionResult> Extend(int stageId, [FromBody] StageEndRequest req, CancellationToken ct)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-        await _stage.ExtendAsync(userId, stageId, ct);
+        await _stage.ExtendAsync(userId, stageId, req.SessionToken, ct);
         return NoContent();
     }
 }

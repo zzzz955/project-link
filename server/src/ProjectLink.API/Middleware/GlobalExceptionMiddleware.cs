@@ -1,3 +1,4 @@
+using Npgsql;
 using ProjectLink.Contracts.Common;
 using ProjectLink.Domain.Exceptions;
 
@@ -26,14 +27,23 @@ public class GlobalExceptionMiddleware
             {
                 InsufficientFundsException
                     or InsufficientStaminaException
-                    or InsufficientInventoryException    => 422,
+                    or InsufficientInventoryException
+                    or DailyChallengeNotCompletableException
+                    or StaminaAlreadyFullException           => 422,
                 StageSessionNotFoundException
-                    or StageNotFoundException            => 404,
-                InvalidStageResultException              => 400,
-                _                                       => 409,
+                    or StageNotFoundException
+                    or ShopItemNotFoundException             => 404,
+                InvalidStageResultException                  => 400,
+                _                                           => 409,
             };
             ctx.Response.ContentType = "application/json";
             await ctx.Response.WriteAsJsonAsync(new ErrorResponse { ErrorCode = ex.ErrorCode });
+        }
+        catch (NpgsqlException ex) when (ex.SqlState == "55P03")
+        {
+            ctx.Response.StatusCode  = 409;
+            ctx.Response.ContentType = "application/json";
+            await ctx.Response.WriteAsJsonAsync(new ErrorResponse { ErrorCode = "CONCURRENT_MODIFICATION" });
         }
         catch (Exception ex)
         {

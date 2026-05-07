@@ -8,49 +8,39 @@ namespace ProjectLink.Application.Stage;
 
 public class StageService
 {
-    private readonly IStageSessionCache  _sessionCache;
-    private readonly IStaminaRepository  _stamina;
-    private readonly ICurrencyRepository _currency;
-    private readonly IRankingRepository  _ranking;
-    private readonly IProgressRepository _progress;
-    private readonly IStaticDataService  _staticData;
-    private readonly RankingService      _rankingService;
-    private readonly IConfiguration      _config;
+    private readonly IStageSessionCache    _sessionCache;
+    private readonly IStaminaRepository    _stamina;
+    private readonly IInventoryRepository  _inventory;
+    private readonly IStaticDataService    _staticData;
+    private readonly RankingService        _rankingService;
+    private readonly IStageEndTransaction  _stageEndTx;
 
     public StageService(
-        IStageSessionCache  sessionCache,
-        IStaminaRepository  stamina,
-        ICurrencyRepository currency,
-        IRankingRepository  ranking,
-        IProgressRepository progress,
-        IStaticDataService  staticData,
-        RankingService      rankingService,
-        IConfiguration      config)
+        IStageSessionCache   sessionCache,
+        IStaminaRepository   stamina,
+        IInventoryRepository inventory,
+        IStaticDataService   staticData,
+        RankingService       rankingService,
+        IStageEndTransaction stageEndTx)
     {
         _sessionCache   = sessionCache;
         _stamina        = stamina;
-        _currency       = currency;
-        _ranking        = ranking;
-        _progress       = progress;
+        _inventory      = inventory;
         _staticData     = staticData;
         _rankingService = rankingService;
-        _config         = config;
+        _stageEndTx     = stageEndTx;
     }
-
-    private int MaxStamina          => _config.GetValue<int>("Stamina:Max", 5);
-    private int RechargeIntervalMin => _config.GetValue<int>("Stamina:RechargeIntervalMinutes", 30);
 
     public async Task<StageStartResponse> StartAsync(string userId, int stageId, CancellationToken ct)
     {
         var stageData = _staticData.GetStage(stageId)
             ?? throw new StageNotFoundException(stageId);
 
-        var existing = await _sessionCache.GetAsync(userId, ct);
-        if (existing != null)
+        if (await _sessionCache.GetAsync(userId, ct) != null)
             throw new StageAlreadyActiveException();
 
-        // Deduct 1 stamina
-        await _stamina.DeductAsync(userId, MaxStamina, RechargeIntervalMin, ct);
+        var config = _staticData.GetStaminaConfig();
+        var stateAfter = await _stamina.DeductAsync(userId, config.MaxStamina, config.RechargeSeconds / 60, ct);
 
         var now = DateTimeOffset.UtcNow;
         var session = new StageSession
@@ -63,42 +53,57 @@ public class StageService
             IsExtended   = false
         };
 
-        var ttl = TimeSpan.FromSeconds(stageData.TimeLimit + 300); // timeLimit + 5min buffer
-        await _sessionCache.SetAsync(userId, session, ttl, ct);
+        var buffer = stageData.TimeLimit > 0 ? stageData.TimeLimit + 300 : 3600;
+        await _sessionCache.SetAsync(userId, session, TimeSpan.FromSeconds(buffer), ct);
+
+        var allItems = await _inventory.GetAllAsync(userId, ct);
+        var powerUpIds = _staticData.GetAllItems()
+            .Where(i => i.Type == "POWER_UP")
+            .Select(i => i.ItemId)
+            .ToHashSet();
+        var itemCounts = allItems
+            .Where(i => powerUpIds.Contains(i.ItemId) && i.Quantity > 0)
+            .ToDictionary(i => i.ItemId, i => i.Quantity);
 
         return new StageStartResponse
         {
-            SessionToken = session.Token,
-            ServerStartAt = now.ToString("O")
+            SessionToken     = session.Token,
+            ServerStartAt    = now.ToString("O"),
+            MoveLimit        = stageData.MoveLimit,
+            TimeLimitSeconds = stageData.TimeLimit,
+            ItemCounts       = itemCounts,
+            StaminaCurrent   = stateAfter.Current,
         };
     }
 
-    public async Task LockAsync(string userId, int stageId, CancellationToken ct)
+    public async Task LockAsync(string userId, int stageId, string sessionToken, CancellationToken ct)
     {
         var session = await _sessionCache.GetAsync(userId, ct)
             ?? throw new StageSessionNotFoundException();
 
-        if (session.StageId != stageId)
+        if (session.StageId != stageId || session.Token != sessionToken)
             throw new StageSessionNotFoundException();
 
         if (!session.IsSetupPhase)
             throw new StageAlreadyLockedException();
 
         session.IsSetupPhase = false;
-        // Reset timer to NOW so server_elapsed_ms is measured from lock (in-game start)
-        session.StartAtMs = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        session.StartAtMs    = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
         var stageData = _staticData.GetStage(stageId)!;
-        var ttl = TimeSpan.FromSeconds(stageData.TimeLimit + 60);
-        await _sessionCache.SetAsync(userId, session, ttl, ct);
+        var ttl = stageData.TimeLimit > 0 ? stageData.TimeLimit + 60 : 3600;
+        await _sessionCache.SetAsync(userId, session, TimeSpan.FromSeconds(ttl), ct);
     }
 
-    public async Task<StageEndResponse> EndAsync(string userId, int stageId, string result, long clientElapsedMs, string correlationId, CancellationToken ct)
+    public async Task<StageEndResponse> EndAsync(
+        string userId, int stageId, string sessionToken,
+        string result, long clientElapsedMs, int movesUsed,
+        string correlationId, CancellationToken ct)
     {
         var session = await _sessionCache.GetAsync(userId, ct)
             ?? throw new StageSessionNotFoundException();
 
-        if (session.StageId != stageId)
+        if (session.StageId != stageId || session.Token != sessionToken)
             throw new StageSessionNotFoundException();
 
         if (result != "success" && result != "fail")
@@ -106,48 +111,77 @@ public class StageService
 
         await _sessionCache.DeleteAsync(userId, ct);
 
+        var stageData = _staticData.GetStage(stageId)!;
+
         if (result == "fail")
         {
-            var balance = await _currency.GetBalanceAsync(userId, ct);
-            return new StageEndResponse { Score = 0, Stars = 0, AdjustedElapsedMs = 0, IsBestRecord = false, SoftBalanceAfter = balance };
+            return new StageEndResponse
+            {
+                Score      = 0,
+                Stars      = 0,
+                MovesUsed  = movesUsed,
+                MoveLimit  = stageData.MoveLimit,
+                NextStageId = null,
+                NextStageUnlocked = false,
+            };
         }
 
-        var stageData = _staticData.GetStage(stageId)!;
+        // Validate move limit
+        if (stageData.MoveLimit > 0 && movesUsed > stageData.MoveLimit)
+            throw new InvalidStageResultException();
+
         var serverElapsedMs = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - session.StartAtMs;
-        var adjustedMs      = RankingService.AdjustElapsedMs(clientElapsedMs, serverElapsedMs, _config.GetValue<int>("Ranking:NetworkToleranceMs", 2000));
+        var config          = _staticData.GetStaminaConfig();
+        var toleranceMs     = 2000; // fixed 2s tolerance
+        var adjustedMs      = RankingService.AdjustElapsedMs(clientElapsedMs, serverElapsedMs, toleranceMs);
         var score           = RankingService.ComputeScore(stageData.TimeLimit, adjustedMs);
         var maxScore        = stageData.TimeLimit * 100;
         var stars           = score >= maxScore * 3 / 4 ? 3 : score >= maxScore / 2 ? 2 : 1;
 
-        await _progress.UpsertClearAsync(userId, stageId, stars, ct);
+        var allStages  = _staticData.GetAllStages();
+        var maxStageId = allStages.Count > 0 ? allStages.Max(s => s.StageId) : stageId;
 
-        var existing   = await _ranking.GetBestRecordAsync(userId, stageId, ct);
-        var isBestRecord = existing == null || adjustedMs < existing.BestClearTimeMs;
+        var dbResult = await _stageEndTx.ExecuteAsync(new StageEndDbCommand
+        {
+            UserId        = userId,
+            StageId       = stageId,
+            Stars         = stars,
+            Score         = score,
+            AdjustedMs    = adjustedMs,
+            SoftReward    = stageData.SoftReward,
+            MovesUsed     = movesUsed,
+            MaxStages     = maxStageId,
+            CorrelationId = correlationId,
+            ChallengeDate = DateOnly.FromDateTime(DateTime.UtcNow),
+        }, ct);
 
-        await _rankingService.OnStageClearAsync(userId, stageId, clientElapsedMs, serverElapsedMs, stageData.TimeLimit, ct);
+        // Update Redis ranking best-effort (non-transactional, recoverable from DB)
+        if (dbResult.IsBestRecord)
+            await _rankingService.OnStageEndAsync(userId, stageId, adjustedMs, score, dbResult.TotalScore, dbResult.StagesCleared, ct);
 
-        long softBalance;
-        if (stageData.SoftReward > 0)
-            softBalance = await _currency.GrantAsync(userId, stageData.SoftReward, "stage_clear", Guid.NewGuid().ToString(), correlationId, ct);
-        else
-            softBalance = await _currency.GetBalanceAsync(userId, ct);
+        var nextStageId = stageId < maxStageId ? stageId + 1 : (int?)null;
 
         return new StageEndResponse
         {
             Score             = score,
             Stars             = stars,
             AdjustedElapsedMs = adjustedMs,
-            IsBestRecord      = isBestRecord,
-            SoftBalanceAfter  = softBalance
+            IsBestRecord      = dbResult.IsBestRecord,
+            SoftBalanceAfter  = dbResult.SoftBalanceAfter,
+            SoftReward        = stageData.SoftReward,
+            MovesUsed         = movesUsed,
+            MoveLimit         = stageData.MoveLimit,
+            NextStageId       = nextStageId,
+            NextStageUnlocked = dbResult.NextStageUnlocked,
         };
     }
 
-    public async Task ExtendAsync(string userId, int stageId, CancellationToken ct)
+    public async Task ExtendAsync(string userId, int stageId, string sessionToken, CancellationToken ct)
     {
         var session = await _sessionCache.GetAsync(userId, ct)
             ?? throw new StageSessionNotFoundException();
 
-        if (session.StageId != stageId)
+        if (session.StageId != stageId || session.Token != sessionToken)
             throw new StageSessionNotFoundException();
 
         if (session.IsSetupPhase)
@@ -156,24 +190,23 @@ public class StageService
         if (session.IsExtended)
             throw new StageAlreadyLockedException();
 
-        // Deduct 1 extra stamina to extend
-        await _stamina.DeductAsync(userId, MaxStamina, RechargeIntervalMin, ct);
+        var config = _staticData.GetStaminaConfig();
+        await _stamina.DeductAsync(userId, config.MaxStamina, config.RechargeSeconds / 60, ct);
 
         session.IsExtended = true;
 
-        var stageData = _staticData.GetStage(stageId)!;
-        // Extend TTL by the extra time
+        var stageData   = _staticData.GetStage(stageId)!;
         var remainingMs = (session.StartAtMs + stageData.TimeLimit * 1000L) - DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
         var newTtl      = TimeSpan.FromMilliseconds(Math.Max(0, remainingMs)) + TimeSpan.FromSeconds(stageData.TimeLimit + 60);
         await _sessionCache.SetAsync(userId, session, newTtl, ct);
     }
 
-    public async Task RecordItemUseAsync(string userId, int stageId, List<ItemUsedEntry> items, CancellationToken ct)
+    public async Task RecordItemUseAsync(string userId, int stageId, string sessionToken, List<ItemUsedEntry> items, CancellationToken ct)
     {
         var session = await _sessionCache.GetAsync(userId, ct)
             ?? throw new StageSessionNotFoundException();
 
-        if (session.StageId != stageId)
+        if (session.StageId != stageId || session.Token != sessionToken)
             throw new StageSessionNotFoundException();
 
         if (!session.IsSetupPhase)
@@ -182,7 +215,7 @@ public class StageService
         session.ItemsUsed.AddRange(items);
 
         var stageData = _staticData.GetStage(stageId)!;
-        var ttl = TimeSpan.FromSeconds(stageData.TimeLimit + 300);
-        await _sessionCache.SetAsync(userId, session, ttl, ct);
+        var buffer = stageData.TimeLimit > 0 ? stageData.TimeLimit + 300 : 3600;
+        await _sessionCache.SetAsync(userId, session, TimeSpan.FromSeconds(buffer), ct);
     }
 }

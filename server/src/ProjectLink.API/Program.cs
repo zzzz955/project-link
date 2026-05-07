@@ -3,11 +3,16 @@ using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using ProjectLink.Application.Bootstrap;
 using ProjectLink.Application.Currency;
+using ProjectLink.Application.DailyChallenge;
 using ProjectLink.Application.Inventory;
+using ProjectLink.Application.Lobby;
 using ProjectLink.Application.Progress;
 using ProjectLink.Application.Ranking;
 using ProjectLink.Application.Session;
+using ProjectLink.Application.Settings;
+using ProjectLink.Application.Shop;
 using ProjectLink.Application.Stamina;
 using ProjectLink.Application.Stage;
 using ProjectLink.Application.UserProfile;
@@ -36,16 +41,24 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(
 // 3. Static data — singleton loaded once at startup
 builder.Services.AddSingleton<IStaticDataService, StaticDataService>();
 
-// 4. Repositories + services + Application handlers
-builder.Services.AddScoped<IProgressRepository,    ProgressRepository>();
-builder.Services.AddScoped<ISessionRepository,     SessionRepository>();
-builder.Services.AddScoped<ISessionCache,          RedisSessionCache>();
-builder.Services.AddScoped<IUserProfileRepository, UserProfileRepository>();
-builder.Services.AddScoped<ICurrencyRepository,    CurrencyRepository>();
-builder.Services.AddScoped<IStaminaRepository,     StaminaRepository>();
-builder.Services.AddScoped<IInventoryRepository,   InventoryRepository>();
-builder.Services.AddScoped<IRankingRepository,     RankingRepository>();
-builder.Services.AddScoped<IStageSessionCache,     StageSessionCache>();
+// 4. Repositories
+builder.Services.AddScoped<IProgressRepository,             ProgressRepository>();
+builder.Services.AddScoped<ISessionRepository,              SessionRepository>();
+builder.Services.AddScoped<ISessionCache,                   RedisSessionCache>();
+builder.Services.AddScoped<IUserProfileRepository,          UserProfileRepository>();
+builder.Services.AddScoped<ICurrencyRepository,             CurrencyRepository>();
+builder.Services.AddScoped<IStaminaRepository,              StaminaRepository>();
+builder.Services.AddScoped<IInventoryRepository,            InventoryRepository>();
+builder.Services.AddScoped<IRankingRepository,              RankingRepository>();
+builder.Services.AddScoped<IStageSessionCache,              StageSessionCache>();
+builder.Services.AddScoped<IDailyChallengeRepository,       DailyChallengeRepository>();
+builder.Services.AddScoped<IPlayerSettingsRepository,       PlayerSettingsRepository>();
+builder.Services.AddScoped<IStageEndTransaction,            StageEndTransactionRepository>();
+builder.Services.AddScoped<IStaminaRefillTransaction,       StaminaRefillTransactionRepository>();
+builder.Services.AddScoped<IDailyChallengeCompleteTransaction, DailyChallengeCompleteTransactionRepository>();
+builder.Services.AddScoped<IShopPurchaseTransaction,        ShopPurchaseTransactionRepository>();
+
+// 5. Application services
 builder.Services.AddScoped<SessionService>();
 builder.Services.AddScoped<UserProfileService>();
 builder.Services.AddScoped<CurrencyService>();
@@ -54,15 +67,19 @@ builder.Services.AddScoped<InventoryService>();
 builder.Services.AddScoped<RankingService>();
 builder.Services.AddScoped<StageService>();
 builder.Services.AddScoped<GetProgressQueryHandler>();
-builder.Services.AddScoped<UpsertProgressCommandHandler>();
+builder.Services.AddScoped<BootstrapService>();
+builder.Services.AddScoped<LobbyService>();
+builder.Services.AddScoped<DailyChallengeService>();
+builder.Services.AddScoped<ShopService>();
+builder.Services.AddScoped<PlayerSettingsService>();
 
-// 5. JwtPublicKeyCache + Ranking rebuild as hosted services
+// 6. JwtPublicKeyCache + Ranking rebuild as hosted services
 builder.Services.AddHttpClient<JwtPublicKeyCache>();
 builder.Services.AddSingleton<JwtPublicKeyCache>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<JwtPublicKeyCache>());
 builder.Services.AddHostedService<RankingRebuildHostedService>();
 
-// 6. JWT Bearer auth
+// 7. JWT Bearer auth
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer();
 
@@ -93,7 +110,7 @@ builder.Services.AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationSc
 
 builder.Services.AddAuthorization();
 
-// 7. Rate limiting
+// 8. Rate limiting
 builder.Services.AddRateLimiter(opts =>
 {
     // Global IP-based DDoS protection: 500 req/min per IP
@@ -142,20 +159,20 @@ builder.Services.AddRateLimiter(opts =>
     };
 });
 
-// 8. Scalar / OpenAPI
+// 9. Scalar / OpenAPI
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 
 var app = builder.Build();
 
-// 9. Middleware pipeline
+// 10. Middleware pipeline
 app.UseMiddleware<CorrelationIdMiddleware>();
-app.UseMiddleware<GlobalExceptionMiddleware>();  // after correlation ID — logs with trace context
+app.UseMiddleware<GlobalExceptionMiddleware>();
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseRateLimiter();                            // after auth — per-user policies use JWT userId
+app.UseRateLimiter();
 app.UseMiddleware<VersionCheckMiddleware>();
 app.UseMiddleware<MetaHashMiddleware>();
 app.UseMiddleware<SessionValidationMiddleware>();
@@ -169,7 +186,7 @@ app.MapScalarApiReference(options =>
     options.WithOpenApiRoutePattern("/openapi/{documentName}.json");
 });
 
-// 10. Controllers
+// 11. Controllers
 app.MapControllers();
 
 app.Run();

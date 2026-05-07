@@ -13,6 +13,7 @@ namespace ProjectLink.Data.Generated
         public int width;
         public int height;
         public int timeLimit;
+        public int moveLimit;
         public int difficulty;
         public string boardEncoding;
         public string nodeMap;

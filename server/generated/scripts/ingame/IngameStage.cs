@@ -9,6 +9,7 @@ namespace ProjectLink.Generated.Data
     public int width { get; set; }
     public int height { get; set; }
     public int timeLimit { get; set; }
+    public int moveLimit { get; set; }
     public int difficulty { get; set; }
     public string boardEncoding { get; set; }
     public string nodeMap { get; set; }

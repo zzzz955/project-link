@@ -15,7 +15,7 @@
     },
     {
       "name": "stage_progress",
-      "comment": "PK is composite (user_id, stage_id)",
+      "comment": "PK is composite (user_id, stage_id) — best stars per stage",
       "columns": [
         { "name": "user_id",    "type": "string(36)", "constraints": ["PK","NN"] },
         { "name": "stage_id",   "type": "int32",      "constraints": ["PK","NN"] },
@@ -48,6 +48,79 @@
         { "name": "created_at",     "type": "datetime",   "constraints": ["NN"] }
       ],
       "indexes": [{ "name": "idx_currency_logs_user_id", "columns": ["user_id"] }]
+    },
+    {
+      "name": "stamina_state",
+      "comment": "Lazy-evaluated stamina — current value at time of last write",
+      "columns": [
+        { "name": "user_id",           "type": "string(36)", "constraints": ["PK","NN"] },
+        { "name": "current",           "type": "int8",       "constraints": ["NN"] },
+        { "name": "last_recharged_at", "type": "datetime",   "constraints": ["NN"] }
+      ]
+    },
+    {
+      "name": "user_currency",
+      "comment": "Current soft currency balance per user",
+      "columns": [
+        { "name": "user_id",     "type": "string(36)", "constraints": ["PK","NN"] },
+        { "name": "soft_amount", "type": "int64",      "constraints": ["NN"], "default": "0" }
+      ]
+    },
+    {
+      "name": "inventory",
+      "comment": "PK is composite (user_id, item_id)",
+      "columns": [
+        { "name": "user_id",  "type": "string(36)", "constraints": ["PK","NN"] },
+        { "name": "item_id",  "type": "int32",      "constraints": ["PK","NN"] },
+        { "name": "quantity", "type": "int32",      "constraints": ["NN"], "default": "0" }
+      ]
+    },
+    {
+      "name": "stage_best_records",
+      "comment": "PK is composite (user_id, stage_id) — best clear time + score per stage for ranking",
+      "columns": [
+        { "name": "user_id",          "type": "string(36)", "constraints": ["PK","NN"] },
+        { "name": "stage_id",         "type": "int32",      "constraints": ["PK","NN"] },
+        { "name": "best_clear_time_ms", "type": "int64",    "constraints": ["NN"] },
+        { "name": "best_score",       "type": "int32",      "constraints": ["NN"] },
+        { "name": "cleared_at",       "type": "datetime",   "constraints": ["NN"] }
+      ]
+    },
+    {
+      "name": "user_ranking_cache",
+      "comment": "Aggregate ranking snapshot — rebuilt from stage_best_records on Redis cold start",
+      "columns": [
+        { "name": "user_id",        "type": "string(36)", "constraints": ["PK","NN"] },
+        { "name": "total_score",    "type": "int64",      "constraints": ["NN"], "default": "0" },
+        { "name": "stages_cleared", "type": "int32",      "constraints": ["NN"], "default": "0" },
+        { "name": "updated_at",     "type": "datetime",   "constraints": ["NN"] }
+      ]
+    },
+    {
+      "name": "user_profiles",
+      "comment": "Game server user cache — populated on first login from JWT claims",
+      "columns": [
+        { "name": "user_id",            "type": "string(36)", "constraints": ["PK","NN"] },
+        { "name": "display_name",       "type": "string(64)", "constraints": ["NN"] },
+        { "name": "account_created_at", "type": "datetime",   "constraints": ["NN"] },
+        { "name": "last_login_at",      "type": "datetime",   "constraints": ["NN"] }
+      ]
+    },
+    {
+      "name": "action_logs",
+      "comment": "Append-only general action audit log — never UPDATE or DELETE",
+      "columns": [
+        { "name": "id",             "type": "int64",      "constraints": ["PK","AUTO","NN"] },
+        { "name": "user_id",        "type": "string(36)", "constraints": ["NN"] },
+        { "name": "action_type",    "type": "string(64)", "constraints": ["NN"] },
+        { "name": "payload",        "type": "json" },
+        { "name": "correlation_id", "type": "string(36)", "constraints": ["NN"] },
+        { "name": "created_at",     "type": "datetime",   "constraints": ["NN"] }
+      ],
+      "indexes": [
+        { "name": "idx_action_logs_user_id",    "columns": ["user_id"] },
+        { "name": "idx_action_logs_action_type","columns": ["action_type"] }
+      ]
     }
   ]
 }

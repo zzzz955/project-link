@@ -11,6 +11,7 @@
 | `gen-data.bat` | Runs gen-data only |
 | `gen-packets.bat` | Runs gen-packets only |
 | `gen-orm.bat` | Runs gen-orm only |
+| `start-stage-editor.bat` | Starts stage editor dev server (UI + API) with CRUD console logs |
 | `stage-tool/` | Local TypeScript web tool for stage CRUD, validation, and visualization |
 
 ## Rules

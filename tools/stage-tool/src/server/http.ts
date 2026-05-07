@@ -3,16 +3,17 @@ import { createReadStream, existsSync } from "fs";
 import path from "path";
 import { GenerateStageInput, generateStagePayload, StagePayload, ValidationError } from "../shared";
 import { StageRepository } from "./stageRepository";
+import { EditorDefaults } from "./paths";
 
 interface JsonResponse {
   status: number;
   body?: unknown;
 }
 
-export function createServer(repository: StageRepository): http.Server {
+export function createServer(repository: StageRepository, defaults: EditorDefaults): http.Server {
   return http.createServer(async (request, response) => {
     try {
-      const result = await route(repository, request, response);
+      const result = await route(repository, defaults, request, response);
       if (result.status === 0) {
         return;
       }
@@ -23,7 +24,7 @@ export function createServer(repository: StageRepository): http.Server {
   });
 }
 
-async function route(repository: StageRepository, request: IncomingMessage, response: ServerResponse): Promise<JsonResponse> {
+async function route(repository: StageRepository, defaults: EditorDefaults, request: IncomingMessage, response: ServerResponse): Promise<JsonResponse> {
   const method = request.method ?? "GET";
   const url = new URL(request.url ?? "/", "http://localhost");
   const pathname = url.pathname;
@@ -34,6 +35,10 @@ async function route(repository: StageRepository, request: IncomingMessage, resp
 
   if ((method === "GET" || method === "HEAD") && !pathname.startsWith("/api/")) {
     return serveStatic(request, response, pathname);
+  }
+
+  if (method === "GET" && pathname === "/api/defaults") {
+    return { status: 200, body: defaults };
   }
 
   if (method === "GET" && pathname === "/api/stages") {
@@ -65,14 +70,19 @@ async function route(repository: StageRepository, request: IncomingMessage, resp
     }
     if (method === "POST") {
       const payload = await readJsonBody<StagePayload>(request);
-      return { status: 201, body: await repository.createStage(stageId, payload) };
+      const result = await repository.createStage(stageId, payload);
+      process.stdout.write(`[CRUD] CREATE stage ${stageId}\n`);
+      return { status: 201, body: result };
     }
     if (method === "PUT") {
       const payload = await readJsonBody<StagePayload>(request);
-      return { status: 200, body: await repository.updateStage(stageId, payload) };
+      const result = await repository.updateStage(stageId, payload);
+      process.stdout.write(`[CRUD] UPDATE stage ${stageId}\n`);
+      return { status: 200, body: result };
     }
     if (method === "DELETE") {
       await repository.deleteStage(stageId);
+      process.stdout.write(`[CRUD] DELETE stage ${stageId}\n`);
       return { status: 204 };
     }
   }

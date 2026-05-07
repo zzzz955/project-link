@@ -69,7 +69,16 @@ type GeneratedStageResponse = Partial<StageRecord> & {
 
 const DEFAULT_WIDTH = 8;
 const DEFAULT_HEIGHT = 8;
+const DEFAULT_TIME_LIMIT = 120;
+const DEFAULT_DIFFICULTY = 1;
 const MAX_BOARD_EDGE = 40;
+
+type EditorDefaults = {
+  width: number;
+  height: number;
+  timeLimit: number;
+  difficulty: number;
+};
 const MAX_NODE_GROUPS = 20;
 const CELL_CODES: Array<{ code: CellCode; label: string; value: string }> = [
   { code: "empty", label: "Empty", value: "0" },
@@ -409,6 +418,12 @@ function normalizeGeneratedStage(raw: unknown, fallbackStageId: string): { stage
 }
 
 function App() {
+  const [editorDefaults, setEditorDefaults] = useState<EditorDefaults>({
+    width: DEFAULT_WIDTH,
+    height: DEFAULT_HEIGHT,
+    timeLimit: DEFAULT_TIME_LIMIT,
+    difficulty: DEFAULT_DIFFICULTY,
+  });
   const [stages, setStages] = useState<StageSummary[]>([]);
   const [stage, setStage] = useState<StageRecord>(() => createStage());
   const [selectedStageId, setSelectedStageId] = useState("");
@@ -464,6 +479,9 @@ function App() {
   }, []);
 
   useEffect(() => {
+    requestJson<EditorDefaults>("/api/defaults")
+      .then((data) => setEditorDefaults(data))
+      .catch(() => {});
     requestJson<unknown>("/api/node-colors")
       .then((payload) => setNodeColors(normalizeColors(payload)))
       .catch(() => setNodeColors(FALLBACK_NODE_COLORS));
@@ -577,9 +595,16 @@ function App() {
   };
 
   const newStage = () => {
-    const nextId =
-      stages.reduce((max, item) => Math.max(max, Number(item.stageId) || 0), 0) + 1;
-    const next = createStage(draftStageId || String(nextId));
+    const nextId = stages.reduce((max, item) => Math.max(max, Number(item.stageId) || 0), 0) + 1;
+    const { width, height, timeLimit, difficulty } = editorDefaults;
+    const next: StageRecord = {
+      stageId: String(nextId),
+      boardSize: { width, height },
+      timeLimit,
+      difficulty,
+      nodeMap: emptyGrid(width, height, 0),
+      cellMap: emptyGrid(width, height, "0"),
+    };
     setStage(next);
     setSelectedStageId("");
     setDraftStageId(next.stageId);
@@ -727,7 +752,7 @@ function App() {
           </button>
         </div>
         <div className="list-scroll">
-          {stages.map((item) => (
+          {[...stages].sort((a, b) => Number(b.stageId) - Number(a.stageId)).map((item) => (
             <button
               type="button"
               key={item.stageId}
@@ -878,6 +903,7 @@ function App() {
           </div>
         </div>
 
+        <div className="editor-scroll">
         {validationErrors.length > 0 && (
           <div className="errors" role="alert">
             {validationErrors.map((error, index) => (
@@ -984,6 +1010,7 @@ function App() {
               }),
             )}
           </div>
+        </div>
         </div>
       </section>
     </main>

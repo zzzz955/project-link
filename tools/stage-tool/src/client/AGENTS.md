@@ -17,6 +17,8 @@
 | `clampDifficulty` | function | Constrains editor/generator difficulty to 1..5 |
 | `clampNodeCount` | function | Constrains generator node group count to `1..20` |
 | `appendDragCells` | function | Builds row/column drag preview and erase paths between pointer-entered cells |
+| `App.editorDefaults` | state | Defaults fetched from `/api/defaults`; used by Add button to initialize new stage fields |
+| `App.newStage` | method | Creates new stage with stageId = maxId+1 and values from `editorDefaults` |
 
 ## Rules
 - Keep API calls under `/api`; Vite proxies them to the local server in development.

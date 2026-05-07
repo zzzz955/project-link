@@ -1,11 +1,12 @@
 import { createServer } from "./http";
-import { resolveDataPaths } from "./paths";
+import { resolveDataPaths, resolveEditorDefaults } from "./paths";
 import { StageRepository } from "./stageRepository";
 
 const port = parsePort(process.env.PORT);
 const paths = resolveDataPaths();
+const defaults = resolveEditorDefaults(paths.projectRoot);
 const repository = new StageRepository(paths.stageCsv, paths.nodeColorsCsv);
-const server = createServer(repository);
+const server = createServer(repository, defaults);
 
 server.listen(port, () => {
   process.stdout.write(`stage-tool server listening on http://localhost:${port}\n`);

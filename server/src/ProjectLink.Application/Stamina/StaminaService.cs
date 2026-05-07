@@ -7,50 +7,69 @@ namespace ProjectLink.Application.Stamina;
 
 public class StaminaService
 {
-    private readonly IStaminaRepository  _repo;
-    private readonly ICurrencyRepository _currency;
-    private readonly IDatabase           _redis;
-    private readonly IConfiguration      _config;
+    private readonly IStaminaRepository          _repo;
+    private readonly IStaticDataService          _staticData;
+    private readonly IStaminaRefillTransaction   _refillTx;
+    private readonly IDatabase                   _redis;
 
     private static readonly TimeSpan AdTokenTtl = TimeSpan.FromHours(24);
 
-    public StaminaService(IStaminaRepository repo, ICurrencyRepository currency, IConnectionMultiplexer redis, IConfiguration config)
+    public StaminaService(
+        IStaminaRepository        repo,
+        IStaticDataService        staticData,
+        IStaminaRefillTransaction refillTx,
+        IConnectionMultiplexer    redis)
     {
-        _repo     = repo;
-        _currency = currency;
-        _redis    = redis.GetDatabase();
-        _config   = config;
+        _repo       = repo;
+        _staticData = staticData;
+        _refillTx   = refillTx;
+        _redis      = redis.GetDatabase();
     }
-
-    private int  MaxStamina          => _config.GetValue<int>("Stamina:Max", 5);
-    private int  RechargeIntervalMin => _config.GetValue<int>("Stamina:RechargeIntervalMinutes", 30);
-    private int  AdRewardAmount      => _config.GetValue<int>("Stamina:AdRewardAmount", 1);
-    private long ExtendCostSoft      => _config.GetValue<long>("Stamina:ExtendCostSoft", 30);
 
     private StaminaResponse ToResponse(Domain.Entities.StaminaState state)
     {
-        var nextRecharge = state.Current < MaxStamina
-            ? state.LastRechargedAt.AddMinutes(RechargeIntervalMin)
+        var config       = _staticData.GetStaminaConfig();
+        var nextRecharge = state.Current < config.MaxStamina
+            ? state.LastRechargedAt.AddSeconds(config.RechargeSeconds)
             : (DateTimeOffset?)null;
 
         return new StaminaResponse
         {
             Current        = state.Current,
-            Max            = MaxStamina,
-            NextRechargeAt = nextRecharge?.ToString("O")
+            Max            = config.MaxStamina,
+            NextRechargeAt = nextRecharge?.ToString("O"),
         };
     }
 
     public async Task<StaminaResponse> GetAsync(string userId, CancellationToken ct)
     {
-        var state = await _repo.GetComputedAsync(userId, MaxStamina, RechargeIntervalMin, ct);
+        var config = _staticData.GetStaminaConfig();
+        var state  = await _repo.GetComputedAsync(userId, config.MaxStamina, config.RechargeSeconds / 60, ct);
         return ToResponse(state);
     }
 
     public async Task<StaminaResponse> DeductAsync(string userId, CancellationToken ct)
     {
-        var state = await _repo.DeductAsync(userId, MaxStamina, RechargeIntervalMin, ct);
+        var config = _staticData.GetStaminaConfig();
+        var state  = await _repo.DeductAsync(userId, config.MaxStamina, config.RechargeSeconds / 60, ct);
         return ToResponse(state);
+    }
+
+    public async Task<StaminaRefillResponse> RefillAsync(string userId, string correlationId, CancellationToken ct)
+    {
+        var config = _staticData.GetStaminaConfig();
+        var result = await _refillTx.ExecuteAsync(
+            userId, config.MaxStamina, config.RechargeSeconds, config.RefillCostSoft, correlationId, ct);
+
+        return new StaminaRefillResponse
+        {
+            Current          = result.CurrentAfter,
+            Max              = config.MaxStamina,
+            Added            = result.Added,
+            SoftCost         = config.RefillCostSoft,
+            SoftBalanceAfter = result.SoftBalanceAfter,
+            NextRechargeAt   = result.NextRechargeAt?.ToString("O"),
+        };
     }
 
     public async Task<StaminaAdRewardResponse> AdRewardAsync(string userId, string adToken, CancellationToken ct)
@@ -59,31 +78,19 @@ public class StaminaService
         if (!await _redis.StringSetAsync(key, userId, AdTokenTtl, When.NotExists))
             throw new AdTokenAlreadyUsedException();
 
-        var (state, added) = await _repo.AddAsync(userId, MaxStamina, RechargeIntervalMin, AdRewardAmount, ct);
+        var config      = _staticData.GetStaminaConfig();
+        var (state, added) = await _repo.AddAsync(userId, config.MaxStamina, config.RechargeSeconds / 60, config.AdRewardAmount, ct);
 
-        var nextRecharge = state.Current < MaxStamina
-            ? state.LastRechargedAt.AddMinutes(RechargeIntervalMin)
+        var nextRecharge = state.Current < config.MaxStamina
+            ? state.LastRechargedAt.AddSeconds(config.RechargeSeconds)
             : (DateTimeOffset?)null;
 
         return new StaminaAdRewardResponse
         {
             Current        = state.Current,
             Added          = added,
-            NextRechargeAt = nextRecharge?.ToString("O")
+            NextRechargeAt = nextRecharge?.ToString("O"),
         };
     }
 
-    public async Task<StaminaExtendResponse> ExtendAsync(string userId, string correlationId, CancellationToken ct)
-    {
-        var balanceAfter = await _currency.DeductAsync(
-            userId, ExtendCostSoft, "stamina_extend", Guid.NewGuid().ToString(), correlationId, ct);
-
-        var (state, _) = await _repo.AddAsync(userId, MaxStamina, RechargeIntervalMin, 1, ct);
-
-        return new StaminaExtendResponse
-        {
-            StaminaCurrent   = state.Current,
-            SoftBalanceAfter = balanceAfter
-        };
-    }
 }

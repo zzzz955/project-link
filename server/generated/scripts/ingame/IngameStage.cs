@@ -13,6 +13,7 @@ namespace ProjectLink.Generated.Data
     public string boardEncoding { get; set; }
     public string nodeMap { get; set; }
     public string cellMap { get; set; }
+    public int soft_reward { get; set; }
     public string stageMeta { get; set; }
     public uint generatorSeed { get; set; }
     }

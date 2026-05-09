@@ -1,37 +1,49 @@
-Commit staged changes using the project's commit message convention.
+Commit changes from the current `git diff` by grouping them into logical work units.
 
-Arguments: $ARGUMENTS — format: `{도메인}#{이슈번호}` e.g. `서버#87`, `클라#12`
+Arguments: $ARGUMENTS — optional guidance for work type, issue number, or commit scope.
 
-## Prerequisites
-Read `.env` and verify the following are set. If any are missing, STOP and notify the user:
-- `GITHUB_TOKEN`
-- `GITHUB_REPO_URL`
-- `GITHUB_DEFAULT_ASSIGNEE` — used as the committer name in message
+## Repository Source
+1. Read `.env`.
+2. Use `GITHUB_REPO_URL` as the target GitHub repository.
+3. If `GITHUB_REPO_URL` is missing, STOP and return an exception to the user.
+4. Use the issue list from `GITHUB_REPO_URL` to choose matching issue numbers.
 
 ## Commit Message Convention
-```
-[{도메인}/{작업자}] #{이슈번호} {작업 내용 요약}
-```
-- `{도메인}`: from $ARGUMENTS (e.g. 서버, 클라, 공통)
-- `{작업자}`: value of `GITHUB_DEFAULT_ASSIGNEE` from `.env`
-- `{이슈번호}`: from $ARGUMENTS (e.g. #87)
-- `{작업 내용 요약}`: concise Korean summary of what changed
+Use one of the following formats:
 
-Example result: `[서버/전상혁] #87 플레이어 이동 패킷 핸들러 추가`
+```
+{작업 성질}#{이슈번호}: {커밋 메시지}
+{작업 성질}: {커밋 메시지}
+```
+
+- `{작업 성질}`: concise work type such as `feat`, `fix`, `refactor`, `docs`, `test`, `chore`, `build`, or `ci`.
+- `{이슈번호}`: matching GitHub issue number from the repository issue list.
+- `{커밋 메시지}`: concise Korean summary; avoid verbose explanations.
+
+Examples:
+- `refactor#5: git관련 커맨드 리팩토링`
+- `feat#99: 결제 시스템 초기 로직 작성`
+- `docs: 커밋 규칙 문서 정리`
 
 ## Git Command Rule
 Never use `cd {path} && git ...`. Always use `git -C {repo_path} <subcommand>` to avoid permission prompts.
 
 ## Steps
-1. Read `GITHUB_DEFAULT_ASSIGNEE` from `.env`.
-2. Parse `{도메인}` and `{이슈번호}` from $ARGUMENTS.
-   If either is missing or malformed, ask the user to clarify.
-3. Run `git status` and `git diff` to inspect all changes.
-4. Group changes by logical work unit (e.g. packet changes vs. data changes vs. server logic).
-   If multiple distinct work units exist, plan separate commits for each.
-5. For each commit:
-   a. Stage only the files belonging to that work unit.
-      Never stage `.env` or files matching `.gitignore`.
-   b. Draft the commit message following the convention above.
-   c. Run `git commit -m "[message]"` immediately — no confirmation needed.
+1. Read `.env` and verify `GITHUB_REPO_URL` exists.
+2. Run `git status` and inspect the current `git diff`.
+3. Fetch or inspect the issue list for `GITHUB_REPO_URL`.
+4. Group changed files and hunks by work nature.
+   If multiple distinct work units exist, create separate commits.
+5. For each work unit:
+   a. Match the work unit to an existing issue when appropriate.
+   b. If no suitable issue exists and the work is large enough to need issue tracking, share the list of issues that should be created with the user before committing.
+   c. If the work is small enough that issue tracking is unnecessary, omit the issue number and use `{작업 성질}: {커밋 메시지}`.
+   d. Stage only files or hunks belonging to that work unit.
+      Never stage `.env` or files ignored by `.gitignore`.
+   e. Commit immediately with the selected message format.
 6. Report each commit hash and message after completion.
+
+## Exceptions
+- Missing `GITHUB_REPO_URL`: return an exception and stop.
+- No suitable issue for issue-worthy work: report the issue creation list to the user before committing.
+- Small work that does not require an issue: commit without an issue number.

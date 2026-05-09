@@ -9,6 +9,7 @@
 | `gen-all.bat` / `gen-all.sh` | Runs all gen steps in order |
 | `gen-data.bat` | Runs gen-data only |
 | `gen-orm.bat` | Runs gen-orm only |
+| `run-gen-step.ps1` | Streams gen batch step output to console + `tools/logs/*.log` |
 | `start-stage-editor.bat` | Starts stage editor dev server (UI + API) with CRUD console logs |
 | `stage-tool/` | Local TypeScript web tool for stage CRUD, validation, and visualization |
 
@@ -18,6 +19,7 @@
 - Errors report as: `[tool] ERROR: <file>\n  <location>: <message>`
 - On any error - print all errors, then `process.exit(1)`
 - gen-orm default: `dry_run=true` (SQL file only) - set `false` in `template.ini` to execute
+- gen-orm auto-installs the DB driver package when physical DB sync needs it and it is missing
 
 ## Serena
 FIND: config values - `config-loader.js` exports

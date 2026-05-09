@@ -23,6 +23,7 @@ Navigation and progress tracker for all remaining work before release.
 | [15_items.md](15_items.md) | Item System | IN_PROGRESS |
 | [16_ranking.md](16_ranking.md) | Ranking System | DONE |
 | [17_ui_wireframe_server_contracts.md](17_ui_wireframe_server_contracts.md) | UI Wireframe Server Contracts | IN_PROGRESS |
+| [18_infrastructure.md](18_infrastructure.md) | Infrastructure | IN_PROGRESS |
 
 ## Progress Summary
 
@@ -30,7 +31,7 @@ Client core loop playable (scene transitions, InGame HUD/popups, GameContext).
 Client-first boundary gates server wiring: UI/scene code should depend on mock/local service interfaces before HTTP adapters.
 Server scaffold complete (4-layer structure, middleware stack, Docker Compose), but gameplay integration waits until client contracts stabilize.
 Stage Editor: TypeScript local web tool implemented for CSV CRUD, validation, solver checks, and generated stage drafts.
-Remaining: Client service boundaries, Client Rule Refactor, OutGame UI, UI wireframe server contracts, Auth/Ad systems, Sound/VFX, Platform build, server sync wiring.
+Remaining: Client service boundaries, Client Rule Refactor, OutGame UI, UI wireframe server contracts, Infrastructure, Auth/Ad systems, Sound/VFX, Platform build, server sync wiring.
 
 Suggested execution order:
 1. `00` - service boundaries and mock/local adapters
@@ -42,9 +43,10 @@ Suggested execution order:
 7. `05` - auth client mock first, then shared auth server
 8. `10` - game server wiring after client contracts stabilize
 9. `17` - UI wireframe DTO/API contract gate before new UI HTTP binding
-10. `04` - monetization
-11. `08` - polish
-12. `09` - release build
+10. `18` - dev/prod infrastructure, port exposure, SSH-only DB/Redis access
+11. `04` - monetization
+12. `08` - polish
+13. `09` - release build
 
 ## Convention
 
@@ -56,3 +58,4 @@ Suggested execution order:
 <!-- changed: added client rule refactor tracker after Stage Editor data model changes -->
 <!-- changed: marked Stage Editor DONE after CRUD, solver validation, generator, and CI validation command landed -->
 <!-- changed: added UI wireframe server contract tracker for Color Paths PDF UI refresh -->
+<!-- changed: added infrastructure tracker for Docker dev/prod exposure and port allocation -->

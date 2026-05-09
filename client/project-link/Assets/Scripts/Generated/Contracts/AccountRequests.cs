@@ -1,4 +1,7 @@
-namespace ProjectLink.Contracts.Account;
+#nullable enable
+
+namespace ProjectLink.Contracts.Account
+{
 
 public class GuestLoginRequest { }
 
@@ -17,4 +20,5 @@ public class LinkAccountRequest
 {
     public string Provider { get; set; } = "";
     public string IdToken  { get; set; } = "";
+}
 }

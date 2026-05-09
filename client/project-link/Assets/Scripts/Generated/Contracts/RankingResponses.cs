@@ -1,4 +1,8 @@
-namespace ProjectLink.Contracts.Ranking;
+#nullable enable
+
+using System.Collections.Generic;
+namespace ProjectLink.Contracts.Ranking
+{
 
 public class RankingEntry
 {
@@ -29,4 +33,5 @@ public class MyRankResponse
 {
     public MyRankEntry? StagesCleared { get; set; }
     public MyRankEntry? TotalScore { get; set; }
+}
 }

@@ -1,4 +1,8 @@
-namespace ProjectLink.Contracts.Daily;
+#nullable enable
+
+using System.Collections.Generic;
+namespace ProjectLink.Contracts.Daily
+{
 
 public class DailyChallengeStreakTile
 {
@@ -17,6 +21,7 @@ public class DailyChallengeRewardPreview
 
 public class DailyChallengeResponse
 {
+    public List<int> TodayStageIds  { get; set; } = new();  // date-seeded random selection
     public bool   CompletedToday  { get; set; }
     public bool   CanComplete     { get; set; }
     public int    PlayCountToday  { get; set; }
@@ -46,4 +51,5 @@ public class DailyInventoryUpdate
 {
     public int ItemId        { get; set; }
     public int QuantityAfter { get; set; }
+}
 }

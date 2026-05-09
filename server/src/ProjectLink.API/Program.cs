@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using System.Threading.RateLimiting;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -10,6 +11,7 @@ using ProjectLink.Application.Inventory;
 using ProjectLink.Application.Lobby;
 using ProjectLink.Application.Progress;
 using ProjectLink.Application.Ranking;
+using ProjectLink.Application.Reward;
 using ProjectLink.Application.Session;
 using ProjectLink.Application.Settings;
 using ProjectLink.Application.Shop;
@@ -26,6 +28,7 @@ using ProjectLink.Infrastructure.Security;
 using Scalar.AspNetCore;
 using StackExchange.Redis;
 using ProjectLink.API.Middleware;
+using ProjectLink.API;
 
 var builder = WebApplication.CreateBuilder(args);
 var config  = builder.Configuration;
@@ -72,6 +75,7 @@ builder.Services.AddScoped<LobbyService>();
 builder.Services.AddScoped<DailyChallengeService>();
 builder.Services.AddScoped<ShopService>();
 builder.Services.AddScoped<PlayerSettingsService>();
+builder.Services.AddScoped<RewardService>();
 
 // 6. JwtPublicKeyCache + Ranking rebuild as hosted services
 builder.Services.AddHttpClient<JwtPublicKeyCache>();
@@ -79,34 +83,43 @@ builder.Services.AddSingleton<JwtPublicKeyCache>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<JwtPublicKeyCache>());
 builder.Services.AddHostedService<RankingRebuildHostedService>();
 
-// 7. JWT Bearer auth
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer();
+// 7. Auth
+var useMockAuth = config.GetValue<bool?>("Auth:UseMock") ?? string.IsNullOrWhiteSpace(config["Jwt:Authority"]);
+if (useMockAuth)
+{
+    builder.Services.AddAuthentication(MockAuthenticationHandler.SchemeName)
+        .AddScheme<AuthenticationSchemeOptions, MockAuthenticationHandler>(MockAuthenticationHandler.SchemeName, _ => { });
+}
+else
+{
+    builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+        .AddJwtBearer();
 
-builder.Services.AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme)
-    .Configure<JwtPublicKeyCache, IConfiguration>((opts, keyCache, cfg) =>
-    {
-        opts.TokenValidationParameters = new TokenValidationParameters
+    builder.Services.AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme)
+        .Configure<JwtPublicKeyCache, IConfiguration>((opts, keyCache, cfg) =>
         {
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKeyResolver = (_, _, _, _) => keyCache.GetKeys(),
-            ValidateIssuer           = false,
-            ValidateAudience         = true,
-            ValidAudience            = cfg["Jwt:Audience"],
-        };
-
-        opts.Events = new JwtBearerEvents
-        {
-            OnTokenValidated = ctx =>
+            opts.TokenValidationParameters = new TokenValidationParameters
             {
-                var clientId = cfg["App:ClientId"];
-                var appClaim = ctx.Principal?.FindFirst("app")?.Value;
-                if (appClaim != clientId)
-                    ctx.Fail("Invalid app claim");
-                return Task.CompletedTask;
-            },
-        };
-    });
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKeyResolver = (_, _, _, _) => keyCache.GetKeys(),
+                ValidateIssuer           = false,
+                ValidateAudience         = true,
+                ValidAudience            = cfg["Jwt:Audience"],
+            };
+
+            opts.Events = new JwtBearerEvents
+            {
+                OnTokenValidated = ctx =>
+                {
+                    var clientId = cfg["App:ClientId"];
+                    var appClaim = ctx.Principal?.FindFirst("app")?.Value;
+                    if (appClaim != clientId)
+                        ctx.Fail("Invalid app claim");
+                    return Task.CompletedTask;
+                },
+            };
+        });
+}
 
 builder.Services.AddAuthorization();
 

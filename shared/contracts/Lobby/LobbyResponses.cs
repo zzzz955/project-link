@@ -1,4 +1,7 @@
-namespace ProjectLink.Contracts.Lobby;
+#nullable enable
+
+namespace ProjectLink.Contracts.Lobby
+{
 
 public class LobbyStateResponse
 {
@@ -51,4 +54,5 @@ public class LobbySeasonEvent
     public string Name     { get; set; } = "";
     public string EndAt    { get; set; } = "";
     public bool   IsActive { get; set; }
+}
 }

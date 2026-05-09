@@ -1,4 +1,7 @@
-namespace ProjectLink.Contracts.Stamina;
+#nullable enable
+
+namespace ProjectLink.Contracts.Stamina
+{
 
 public class StaminaAdRewardRequest
 {
@@ -8,3 +11,4 @@ public class StaminaAdRewardRequest
 public class StaminaExtendRequest { }
 
 public class StaminaRefillRequest { }
+}

@@ -17,6 +17,8 @@ shared/contracts/
 
 ## Rules
 - Target `netstandard2.1` — no net8.0-only APIs
+- Keep syntax compatible with Unity C# 9.0: no file-scoped namespaces, global usings, or C# 10+ features.
+- Put `#nullable enable` in each contract file because Unity assembly nullable context is not project-wide.
 - Only POCOs: public properties, no logic, no dependencies
 - Nullable enabled — use `Type?` for optional fields
 - Namespace: `ProjectLink.Contracts.[Domain]`
@@ -76,7 +78,7 @@ shared/contracts/
 | `StaminaAdRewardRequest` | class | `AdToken` — platform-issued, idempotency key |
 | `StaminaRefillRequest` | class | empty — server reads cost from static data |
 | `StaminaResponse` | class | `Current`, `Max`, `NextRechargeAt?` (ISO 8601) |
-| `StaminaAdRewardResponse` | class | `Current`, `Added`, `NextRechargeAt?` |
+| `StaminaAdRewardResponse` | class | `Current`, `Max`, `Added`, `NextRechargeAt?` |
 | `StaminaRefillResponse` | class | `Current`, `Max`, `Added`, `SoftCost`, `SoftBalanceAfter`, `NextRechargeAt?` |
 | `CurrencyAdRewardRequest` | class | `AdToken` — idempotency key |
 | `CurrencyResponse` | class | `SoftAmount` |
@@ -103,7 +105,7 @@ shared/contracts/
 | `StageProgressEntry` | class | `StageId`, `Stars`, `IsUnlocked`, `ClearedAt?` |
 | `ProgressResponse` | class | `Stages` (List\<StageProgressEntry\>) |
 | `DailyChallengeCompleteRequest` | class | empty body |
-| `DailyChallengeResponse` | class | `CompletedToday`, `CanComplete`, `PlayCountToday`, `PlayCountTarget`, `StreakDays`, `ResetAt`, `Tiles`, `TodayRewards` |
+| `DailyChallengeResponse` | class | `TodayStageIds` (List\<int\>, date-seeded), `CompletedToday`, `CanComplete`, `PlayCountToday`, `PlayCountTarget`, `StreakDays`, `ResetAt`, `Tiles`, `TodayRewards` |
 | `DailyChallengeStreakTile` | class | `Day`, `IsDone`, `IsToday`, `IsLocked` |
 | `DailyChallengeRewardPreview` | class | `RewardType`, `RewardId`, `Amount` — preview before completion |
 | `DailyChallengeCompleteResponse` | class | `RewardsGranted`, `StreakDays`, `SoftBalanceAfter`, `InventoryUpdates` |

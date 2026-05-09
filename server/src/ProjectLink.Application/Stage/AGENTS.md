@@ -10,11 +10,11 @@
 |--------|------|------|
 | `StageService.StartAsync` | method | Deducts stamina, creates session, returns `StageStartResponse` with item counts from static data |
 | `StageService.LockAsync` | method | Validates `sessionToken`, transitions session to locked state; must be called before EndAsync |
-| `StageService.EndAsync` | method | Validates sessionToken + move limit; delegates to `IStageEndTransaction`; calls `RankingService.OnStageEndAsync` only on best record |
+| `StageService.EndAsync` | method | Validates sessionToken + move limit; checks `DailyChallengeStageSelector` to set `IsDailyChallengeStage`; delegates to `IStageEndTransaction`; calls `RankingService.OnStageEndAsync` only on best record |
 | `StageService.ExtendAsync` | method | Refunds stamina on stage-fail; validates sessionToken; cost from `IStaticDataService.GetStaminaConfig()` |
 
 ## Cross-refs
-- Depends on: `ISessionCache`, `IStaminaRepository`, `IInventoryRepository`, `IStageEndTransaction`, `IStaticDataService`, `RankingService`
+- Depends on: `ISessionCache`, `IStaminaRepository`, `IInventoryRepository`, `IStageEndTransaction`, `IStaticDataService`, `RankingService`, `DailyChallengeStageSelector` (internal static)
 - Consumed by: `API.Controllers.StageController` → `POST /api/stage/{id}/start`, `POST /api/stage/{id}/lock`, `POST /api/stage/{id}/end`, `POST /api/stage/{id}/extend`
 
 ## Rules

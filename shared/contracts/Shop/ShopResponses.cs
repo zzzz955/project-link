@@ -1,4 +1,8 @@
-namespace ProjectLink.Contracts.Shop;
+#nullable enable
+
+using System.Collections.Generic;
+namespace ProjectLink.Contracts.Shop
+{
 
 public class ShopProductEntry
 {
@@ -29,4 +33,5 @@ public class ShopPurchaseResponse
     public int                               ProductId        { get; set; }
     public long                              SoftBalanceAfter { get; set; }
     public List<ShopPurchaseInventoryUpdate> InventoryUpdates { get; set; } = new();
+}
 }

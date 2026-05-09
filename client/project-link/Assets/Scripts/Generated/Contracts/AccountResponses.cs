@@ -1,4 +1,8 @@
-namespace ProjectLink.Contracts.Account;
+#nullable enable
+
+using System.Collections.Generic;
+namespace ProjectLink.Contracts.Account
+{
 
 public class AccountMeResponse
 {
@@ -16,4 +20,5 @@ public class AuthResponse
     public string            RefreshToken { get; set; } = "";
     public string            ExpiresAt    { get; set; } = "";
     public AccountMeResponse Profile      { get; set; } = new();
+}
 }

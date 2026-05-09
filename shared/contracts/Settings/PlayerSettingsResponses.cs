@@ -1,4 +1,7 @@
-namespace ProjectLink.Contracts.Settings;
+#nullable enable
+
+namespace ProjectLink.Contracts.Settings
+{
 
 public class PlayerSettingsResponse
 {
@@ -7,4 +10,5 @@ public class PlayerSettingsResponse
     public bool   HapticsEnabled       { get; set; } = true;
     public bool   NotificationsEnabled { get; set; } = true;
     public string Language             { get; set; } = "EN";
+}
 }

@@ -1,4 +1,7 @@
-namespace ProjectLink.Contracts.Bootstrap;
+#nullable enable
+
+namespace ProjectLink.Contracts.Bootstrap
+{
 
 public class BootstrapConfigResponse
 {
@@ -9,4 +12,5 @@ public class BootstrapConfigResponse
     public string  ServerTimeUtc         { get; set; } = "";
     public bool    Maintenance           { get; set; }
     public string? MaintenanceMessage    { get; set; }
+}
 }

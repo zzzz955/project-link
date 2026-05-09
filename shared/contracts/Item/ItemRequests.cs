@@ -1,4 +1,8 @@
-namespace ProjectLink.Contracts.Item;
+#nullable enable
+
+using System.Collections.Generic;
+namespace ProjectLink.Contracts.Item
+{
 
 public class ItemPurchaseRequest
 {
@@ -16,4 +20,5 @@ public class ItemUseRequest
 {
     public string StageSessionToken { get; set; } = "";
     public List<ItemUseEntry> Items { get; set; } = new List<ItemUseEntry>();
+}
 }

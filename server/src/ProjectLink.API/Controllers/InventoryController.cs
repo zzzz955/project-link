@@ -56,7 +56,7 @@ public class InventoryController : ControllerBase
         var result = await _inventory.UseAsync(userId, req.Items, ct);
 
         // Record items used in the stage session
-        await _stage.RecordItemUseAsync(userId, session.StageId,
+        await _stage.RecordItemUseAsync(userId, session.StageId, req.StageSessionToken,
             req.Items.Select(i => new ItemUsedEntry { ItemId = i.ItemId, Quantity = i.Quantity }).ToList(), ct);
 
         return Ok(result);

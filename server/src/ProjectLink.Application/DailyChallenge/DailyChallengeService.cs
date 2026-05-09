@@ -36,6 +36,8 @@ public class DailyChallengeService
         var today  = DateOnly.FromDateTime(DateTime.UtcNow);
         var row    = await _repo.GetForDateAsync(userId, today, ct);
 
+        var todayStageIds = DailyChallengeStageSelector.GetTodayStageIds(config.StagePickCount, _staticData.GetAllStages());
+
         var playCountToday = row?.PlayCount ?? 0;
         var completed      = row?.Completed ?? false;
 
@@ -80,6 +82,7 @@ public class DailyChallengeService
 
         return new DailyChallengeResponse
         {
+            TodayStageIds   = todayStageIds,
             CompletedToday  = completed,
             CanComplete     = !completed && playCountToday >= config.PlayCountTarget,
             PlayCountToday  = playCountToday,

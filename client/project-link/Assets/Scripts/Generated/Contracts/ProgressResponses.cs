@@ -1,4 +1,8 @@
-namespace ProjectLink.Contracts.Progress;
+#nullable enable
+
+using System.Collections.Generic;
+namespace ProjectLink.Contracts.Progress
+{
 
 public class StageProgressEntry
 {
@@ -11,4 +15,5 @@ public class StageProgressEntry
 public class ProgressResponse
 {
     public List<StageProgressEntry> Stages { get; set; } = new();
+}
 }

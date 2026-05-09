@@ -1,4 +1,8 @@
-namespace ProjectLink.Contracts.Event;
+#nullable enable
+
+using System.Collections.Generic;
+namespace ProjectLink.Contracts.Event
+{
 
 public class SeasonEventEntry
 {
@@ -15,4 +19,5 @@ public class SeasonEventEntry
 public class ActiveEventsResponse
 {
     public List<SeasonEventEntry> Events { get; set; } = new();
+}
 }

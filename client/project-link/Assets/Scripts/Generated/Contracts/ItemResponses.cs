@@ -1,4 +1,8 @@
-namespace ProjectLink.Contracts.Item;
+#nullable enable
+
+using System.Collections.Generic;
+namespace ProjectLink.Contracts.Item
+{
 
 public class InventorySlot
 {
@@ -21,4 +25,5 @@ public class ItemPurchaseResponse
 public class ItemUseResponse
 {
     public List<InventorySlot> UpdatedSlots { get; set; } = new List<InventorySlot>();
+}
 }

@@ -1,3 +1,7 @@
-namespace ProjectLink.Contracts.Daily;
+#nullable enable
+
+namespace ProjectLink.Contracts.Daily
+{
 
 public class DailyChallengeCompleteRequest { }
+}

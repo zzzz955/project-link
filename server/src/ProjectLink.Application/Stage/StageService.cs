@@ -1,3 +1,4 @@
+using ProjectLink.Application.DailyChallenge;
 using ProjectLink.Application.Ranking;
 using ProjectLink.Contracts.Stage;
 using ProjectLink.Domain.Exceptions;
@@ -141,18 +142,22 @@ public class StageService
         var allStages  = _staticData.GetAllStages();
         var maxStageId = allStages.Count > 0 ? allStages.Max(s => s.StageId) : stageId;
 
+        var dailyConfig      = _staticData.GetDailyChallengeConfig();
+        var todayDailyStages = DailyChallengeStageSelector.GetTodayStageIds(dailyConfig.StagePickCount, allStages);
+
         var dbResult = await _stageEndTx.ExecuteAsync(new StageEndDbCommand
         {
-            UserId        = userId,
-            StageId       = stageId,
-            Stars         = stars,
-            Score         = score,
-            AdjustedMs    = adjustedMs,
-            SoftReward    = stageData.SoftReward,
-            MovesUsed     = movesUsed,
-            MaxStages     = maxStageId,
-            CorrelationId = correlationId,
-            ChallengeDate = DateOnly.FromDateTime(DateTime.UtcNow),
+            UserId               = userId,
+            StageId              = stageId,
+            Stars                = stars,
+            Score                = score,
+            AdjustedMs           = adjustedMs,
+            SoftReward           = stageData.SoftReward,
+            MovesUsed            = movesUsed,
+            MaxStages            = maxStageId,
+            CorrelationId        = correlationId,
+            ChallengeDate        = DateOnly.FromDateTime(DateTime.UtcNow),
+            IsDailyChallengeStage = todayDailyStages.Contains(stageId),
         }, ct);
 
         // Update Redis ranking best-effort (non-transactional, recoverable from DB)

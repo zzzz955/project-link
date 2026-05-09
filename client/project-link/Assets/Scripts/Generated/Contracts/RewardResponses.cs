@@ -1,4 +1,8 @@
-namespace ProjectLink.Contracts.Reward;
+#nullable enable
+
+using System.Collections.Generic;
+namespace ProjectLink.Contracts.Reward
+{
 
 public class RewardGrantEntry
 {
@@ -18,4 +22,5 @@ public class RewardClaimResponse
     public List<RewardGrantEntry>      RewardsGranted   { get; set; } = new();
     public long                        SoftBalanceAfter { get; set; }
     public List<RewardInventoryUpdate> InventoryUpdates { get; set; } = new();
+}
 }

@@ -1,4 +1,8 @@
-namespace ProjectLink.Contracts.Stage;
+#nullable enable
+
+using System.Collections.Generic;
+namespace ProjectLink.Contracts.Stage
+{
 
 public class StageStartResponse
 {
@@ -22,4 +26,5 @@ public class StageEndResponse
     public int   MoveLimit         { get; set; }
     public int?  NextStageId       { get; set; }
     public bool  NextStageUnlocked { get; set; }
+}
 }

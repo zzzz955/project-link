@@ -10,8 +10,9 @@ public class StageEndDbCommand
     public int     SoftReward      { get; set; }
     public int     MovesUsed       { get; set; }
     public int     MaxStages       { get; set; }
-    public string  CorrelationId   { get; set; } = default!;
-    public DateOnly ChallengeDate  { get; set; }
+    public string  CorrelationId        { get; set; } = default!;
+    public DateOnly ChallengeDate       { get; set; }
+    public bool    IsDailyChallengeStage { get; set; }
 }
 
 public class StageEndDbResult

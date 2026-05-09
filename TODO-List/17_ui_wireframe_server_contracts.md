@@ -12,10 +12,10 @@ Reference:
 
 ## Direction
 
-- [ ] Treat the PDF as the UI source of truth for generated scene/popup hierarchy.
-- [ ] Keep UI work mock/local-service driven until DTO/API shapes below are available.
-- [ ] Server agents should define DTOs in `shared/contracts/` first, then implement controllers.
-- [ ] UI agents should bind only to service interfaces and mock data until routes and DTOs are stable.
+- [x] Treat the PDF as the UI source of truth for generated scene/popup hierarchy.
+- [x] Keep UI work service-interface driven; real labels/states must come from server DTOs or generated CSV metadata.
+- [x] Server agents should define DTOs in `shared/contracts/` first, then implement controllers.
+- [x] UI agents should bind only to service interfaces, generated CSV metadata, and stable server DTOs.
 - [ ] Detailed server business rules are delegated to the server implementation agent.
 
 ---
@@ -24,11 +24,11 @@ Reference:
 
 The new UI can be generated visually before this gate, but real server binding starts only after:
 
-- [ ] `Auth`, `Player/Lobby`, `Progress`, `Stage`, `Stamina`, `Currency`, `Item`, `Ranking`, `Daily`, `Reward`, `Settings` DTOs needed below are present or explicitly deferred.
-- [ ] Controller routes are named and stable.
-- [ ] Each response contains enough data for PDF labels, counters, disabled states, badges, timers, and popups.
-- [ ] Error responses remain unified through `Common/ErrorResponse`.
-- [ ] Unity-side mock adapters can construct every response shape without a running server.
+- [x] `Auth`, `Player/Lobby`, `Progress`, `Stage`, `Stamina`, `Currency`, `Item`, `Ranking`, `Daily`, `Reward`, `Settings` DTOs needed below are present or explicitly deferred.
+- [x] Controller routes are named and stable.
+- [x] Each response contains enough data for PDF labels, counters, disabled states, badges, timers, and popups.
+- [x] Error responses remain unified through `Common/ErrorResponse`.
+- [x] Unity-side HTTP adapters use mock guest auth and stable DTOs; local test fallback remains explicit.
 
 ---
 
@@ -38,7 +38,7 @@ The new UI can be generated visually before this gate, but real server binding s
 |---|---|---|
 | Stamina | `GET /api/stamina`, `POST /api/stamina/ad-reward`, `POST /api/stamina/extend` | Refill popup needs explicit reward/cost/max/current data aligned to UI |
 | Currency | `GET /api/currency`, `POST /api/currency/ad-reward` | Lobby/reward popup needs grant result DTO consistency |
-| Inventory/Items | `GET /api/inventory`, `POST /api/items/purchase`, `POST /api/items/use` | Shop catalog is TODO; BuyItem popup still needs item display data from static CSV/mock |
+| Inventory/Items/Shop | `GET /api/inventory`, `POST /api/items/purchase`, `POST /api/items/use`, `GET /api/shop/catalog`, `POST /api/shop/purchase` | BuyItem/Shop UI should prefer server catalog and merge generated CSV item metadata |
 | Stage | `POST /api/stage/{id}/start|lock|end|extend` | UI needs session token on mutating calls, moves/time/reward/next-stage result fields |
 | Ranking | global/stage/me endpoints exist | UI needs category/segment support, my pinned row, display metadata |
 | Progress | `GET /api/progress`, `POST /api/progress/batch` | Must stop exposing Domain entity directly; add shared DTOs |
@@ -71,8 +71,8 @@ UI data:
 - app version
 
 Server contract:
-- [ ] `GET /api/account/me`
-- [ ] account link/login endpoints listed under Account
+- [x] `GET /api/account/me`
+- [ ] Auth guest/login/refresh/link: delegated to auth-server agent; dev environment uses mock/JWT stub
 
 ### Lobby - Stage Tab
 
@@ -113,9 +113,9 @@ UI data:
 - player soft currency amount
 
 Server contract:
-- [ ] Shop Catalog: TODO
+- [x] Shop Catalog: `GET /api/shop/catalog` + `shared/datas/outgame/outgame_shop_catalog.csv`
 - [ ] IAP receipt verification: TODO
-- [ ] For now, UI should use static CSV/mock product data and existing item purchase route only.
+- [x] UI should use server catalog as source of truth and generated CSV only for local display metadata.
 
 ### Lobby - Ranking Tab
 
@@ -179,10 +179,10 @@ UI data:
 - player soft balance
 
 Server contract:
-- [ ] Shop Catalog: TODO
-- [ ] Existing `POST /api/items/purchase`
-  - Response should include `itemId`, `quantityAfter`, `softBalanceAfter`
-- [ ] Item display metadata can come from `shared/datas/ingame/ingame_item.csv` until Shop Catalog is implemented.
+- [x] Shop Catalog: `GET /api/shop/catalog`
+- [x] Existing `POST /api/shop/purchase`
+  - Response includes `productId`, `softBalanceAfter`, `inventoryUpdates`
+- [x] Item display metadata can come from `shared/datas/ingame/ingame_item.csv` and generated outgame shop catalog.
 
 ### Energy Popup
 
@@ -195,11 +195,11 @@ UI data:
 - soft balance
 
 Server contract:
-- [ ] `GET /api/stamina`
-  - Ensure response includes `current`, `max`, `nextRechargeAt`
-- [ ] `POST /api/stamina/ad-reward`
-  - Response: `current`, `max`, `added`, `nextRechargeAt`
-- [ ] `POST /api/stamina/refill`
+- [x] `GET /api/stamina`
+  - Response includes `current`, `max`, `nextRechargeAt`
+- [x] `POST /api/stamina/ad-reward`
+  - Response: `current`, `max`, `added`, `nextRechargeAt` — `Max` field added to `StaminaAdRewardResponse`
+- [x] `POST /api/stamina/refill`
   - Response: `current`, `max`, `added`, `softCost`, `softBalanceAfter`, `nextRechargeAt`
 
 ### Settings Popup
@@ -221,19 +221,29 @@ Server contract:
 ### Daily Challenge Popup
 
 UI data:
-- today's challenge id/name/stage id
+- today's N stage IDs (date-seeded random selection from all stages)
+- play count progress (playCountToday / playCountTarget)
 - reset time/countdown
 - 7-day streak tiles: done/today/locked
 - reward preview: soft currency, item rewards
 - play enabled state
 
+Design decision:
+- N stages selected each day via date-seeded RNG (N = static config, e.g. `outgame_daily_challenge` CSV)
+- No dedicated start route — use existing `POST /api/stage/{stageId}/start` for any of `todayStageIds`
+- `StageService.End` detects if played stage is in today's set and increments `playCount`
+
 Server contract:
-- [ ] `GET /api/daily-challenge`
-  - Response: `challengeId`, `stageId`, `name`, `resetAt`, `streakDays`, `tiles`, `rewards`, `canPlay`, `completedToday`
-- [ ] `POST /api/daily-challenge/{challengeId}/start`
-  - Response: `stageId`, `sessionToken`, `serverStartAt`
-- [ ] `POST /api/daily-challenge/{challengeId}/complete`
+- [x] `GET /api/daily-challenge`
+  - Response: `todayStageIds` (List\<int\>), `playCountToday`, `playCountTarget`, `completedToday`, `canComplete`, `streakDays`, `resetAt`, `tiles`, `todayRewards`
+  - `TodayStageIds` added to `DailyChallengeResponse` DTO
+- ~~`POST /api/daily-challenge/{challengeId}/start`~~ — dropped; use existing stage start
+- [x] `POST /api/daily-challenge/complete`
   - Response: `rewardsGranted`, `streakDays`, `softBalanceAfter`, `inventoryUpdates`
+
+Outstanding server impl:
+- [x] `DailyChallengeService.GetAsync` — date-seeded stage selection implemented via `DailyChallengeStageSelector`; `TodayStageIds` populated
+- [x] `StageService.End` — sets `IsDailyChallengeStage` flag; `StageEndTransactionRepository` gates play_count increment on this flag
 
 ### Account Popup
 
@@ -244,12 +254,12 @@ UI data:
 - account id or masked email
 
 Server contract:
-- [ ] `GET /api/account/me`
+- [x] `GET /api/account/me`
   - Response: `userId`, `displayName`, `isGuest`, `linkedProviders`, `avatarId`, `createdAt`
-- [ ] `POST /api/auth/guest`
-- [ ] `POST /api/auth/login`
-- [ ] `POST /api/auth/refresh`
-- [ ] `POST /api/account/link`
+- [ ] `POST /api/auth/guest` — delegated to auth-server agent; dev uses mock/JWT stub
+- [ ] `POST /api/auth/login` — delegated to auth-server agent
+- [ ] `POST /api/auth/refresh` — delegated to auth-server agent
+- [ ] `POST /api/account/link` — delegated to auth-server agent
 - [ ] Social provider details remain delegated to auth-server agent.
 
 ### Pause / Quit Popup
@@ -282,20 +292,22 @@ Server contract:
 
 ## Shared DTO Work Items
 
-- [ ] Add `Bootstrap/BootstrapResponses.cs`
-- [ ] Add `Account/AccountRequests.cs`, `Account/AccountResponses.cs`
-- [ ] Add `Lobby/LobbyResponses.cs`
-- [ ] Add `Progress/ProgressRequests.cs`, `Progress/ProgressResponses.cs`
-- [ ] Extend `Stage/StageRequests.cs`, `Stage/StageResponses.cs`
-- [ ] Extend `Stamina/StaminaRequests.cs`, `Stamina/StaminaResponses.cs`
-- [ ] Extend `Currency/CurrencyResponses.cs` only if reward grant shape is reused
-- [ ] Extend `Item/ItemResponses.cs` for display/quantity updates if needed
-- [ ] Extend `Ranking/RankingResponses.cs`
-- [ ] Add `Daily/DailyChallengeRequests.cs`, `Daily/DailyChallengeResponses.cs`
-- [ ] Add `Reward/RewardRequests.cs`, `Reward/RewardResponses.cs`
-- [ ] Add `Settings/PlayerSettingsRequests.cs`, `Settings/PlayerSettingsResponses.cs` only if settings sync is implemented
-- [ ] Update `shared/contracts/AGENTS.md` after DTO files change
-- [ ] Copy/sync updated contracts to Unity generated contracts after DTOs stabilize
+- [x] Add `Bootstrap/BootstrapResponses.cs`
+- [x] Add `Account/AccountRequests.cs`, `Account/AccountResponses.cs`
+- [x] Add `Lobby/LobbyResponses.cs`
+- [x] Add `Progress/ProgressRequests.cs`, `Progress/ProgressResponses.cs`
+- [x] Extend `Stage/StageRequests.cs`, `Stage/StageResponses.cs`
+- [x] Extend `Stamina/StaminaRequests.cs`, `Stamina/StaminaResponses.cs`
+  - [x] `StaminaAdRewardResponse.Max` added
+- [x] Extend `Currency/CurrencyResponses.cs`
+- [x] Extend `Item/ItemResponses.cs`
+- [x] Extend `Ranking/RankingResponses.cs` — `avatarId`, `isMe`, `category`, `metricLabel`, `nextCursor` added
+- [x] Add `Daily/DailyChallengeRequests.cs`, `Daily/DailyChallengeResponses.cs`
+  - [x] `DailyChallengeResponse.TodayStageIds: List<int>` added
+- [x] Add `Reward/RewardRequests.cs`, `Reward/RewardResponses.cs`
+- [x] Add `Settings/PlayerSettingsRequests.cs`, `Settings/PlayerSettingsResponses.cs`
+- [x] Update `shared/contracts/AGENTS.md` after DTO files change
+- [x] Copy/sync updated contracts to Unity `Assets/Scripts/Generated/Contracts/`
 
 ---
 
@@ -317,9 +329,29 @@ This TODO intentionally specifies only UI-required data and DTO/API surfaces.
 
 UI implementation agent owns:
 - updating `ProjectLinkUIBuilder` generated hierarchy to match PDF screens
-- using mock DTO data for all labels/counters/states before HTTP binding
+- using server DTO data and generated CSV metadata for labels/counters/states; explicit debug adapters only for local tests
 - keeping scene/popup controllers behind service interfaces
 - avoiding direct controller/server class dependencies
 - documenting changed UI builder symbols in `client/project-link/Assets/Scripts/Editor/AGENTS.md`
 
+---
+
+## Client Binding Prerequisites
+
+Before replacing generated UI hierarchy:
+
+- [x] Run `npm run gen:data` so outgame planning tables are available under Unity `Resources/Data/outgame`.
+- [x] Sync `shared/contracts/*.cs` into Unity `Assets/Scripts/Generated/Contracts/`.
+- [x] Make shared contract DTOs Unity-compatible without implicit SDK usings.
+- [x] Add a real planning-table loader for outgame UI data.
+- [x] Add client service interfaces and API route constants that UI controllers can depend on.
+- [x] Implement HTTP adapters behind `IUiDataService`.
+- [x] Add ViewModel/mapper layer that merges server DTOs with generated CSV metadata.
+- [x] Add/confirm account controller route before Account popup binding.
+- [x] Auth guest route uses dev mock token; login/refresh/link routes remain delegated to auth-server agent.
+- [x] Add/confirm reward claim controller route before Reward/Video Ad popup binding.
+- [x] Update `ProjectLinkUIBuilder` to generate bindable refs only, not hardcoded visible values.
+
 <!-- changed: added UI wireframe server-contract tracker from Color Paths PDF -->
+<!-- changed: added client data-binding prerequisites before visual UI rebuild -->
+<!-- changed: ProjectLinkUIBuilder now emits PDF-aligned bindable labels/buttons and lobby/popup controllers bind via IUiDataService/static catalog. -->

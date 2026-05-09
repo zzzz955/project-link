@@ -46,6 +46,30 @@ namespace ProjectLink.OutGame.UI
             PopupManager.Request(PopupId.Settings);
         }
 
+        public void OpenAccountPopup()
+        {
+            if (PopupManager.Instance == null)
+                return;
+
+            PopupManager.Request(PopupId.Account);
+        }
+
+        public void OpenDailyChallengePopup()
+        {
+            if (PopupManager.Instance == null)
+                return;
+
+            PopupManager.Request(PopupId.DailyChallenge);
+        }
+
+        public void OpenRewardPopup()
+        {
+            if (PopupManager.Instance == null)
+                return;
+
+            PopupManager.Request(PopupId.Reward);
+        }
+
         public void OpenBuyItemPopup()
         {
             if (PopupManager.Instance == null)

@@ -16,6 +16,8 @@ Unity 6000.4.5f1 | URP 2D (17.4.0) | C# | New Input System (1.19.0)
 | `project-link/Assets/Scripts/OutGame/` | Non-gameplay scenes (Title, Lobby) -> `OutGame/AGENTS.md` |
 | `project-link/Assets/Scripts/OutGame/UI/` | Title/Lobby UI helpers, outgame popups -> `OutGame/UI/AGENTS.md` |
 | `project-link/Assets/Scripts/Editor/` | Unity Editor automation tools -> `Editor/AGENTS.md` |
+| `project-link/Assets/Scripts/Generated/` | Unity-synced shared contracts -> `Generated/AGENTS.md` |
+| `project-link/Assets/Scripts/Services/` | Client service boundaries for server/static UI data -> `Services/AGENTS.md` |
 | `project-link/Assets/Scripts/Data/` | Hand-written data models and loaders -> `Data/AGENTS.md` |
 | `project-link/Assets/Scripts/Data/Generated/` | Auto-generated C# models; do not edit -> `Data/Generated/AGENTS.md` |
 | `project-link/Assets/Scripts/Utils/` | Stateless helpers: CsvLoader, GridUtils, ColorPalette -> `Utils/AGENTS.md` |

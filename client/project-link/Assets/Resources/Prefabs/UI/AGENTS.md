@@ -6,6 +6,7 @@
 | `SettingPopup.prefab` | `SettingPopup` | Generated prefab with `UI/SettingPopup` image and button hotspots |
 | `BuyItemPopup.prefab` | `BuyItemPopup` | Generated prefab with `UI/BuyItemPopup` image and button hotspots |
 | `EnergyPopup.prefab` | `EnergyPopup` | Generated prefab with `UI/EnergyPopup` image and button hotspots |
+| `ClearPopup.prefab` | `ClearPopup` | Generated prefab with stage-clear result labels and Next/Retry/Lobby hotspots |
 
 ## Symbols
 | symbol | kind | note |
@@ -13,6 +14,7 @@
 | `Prefabs/UI/SettingPopup` | Resources path | loaded by `PopupManager` for `PopupId.Settings` |
 | `Prefabs/UI/BuyItemPopup` | Resources path | loaded by `PopupManager` for `PopupId.BuyItem` |
 | `Prefabs/UI/EnergyPopup` | Resources path | loaded by `PopupManager` for `PopupId.Energy` |
+| `Prefabs/UI/ClearPopup` | Resources path | loaded by `PopupManager` for `PopupId.StageClear` |
 
 ## Rules
 - Regenerate via `Tools/Project Link/UI Build/Build Popup Prefabs`.

@@ -11,10 +11,14 @@
 | `ProjectLinkUIBuilder.BuildCurrentSceneUI()` | method | [MenuItem] rebuilds active scene runtime UI |
 | `ProjectLinkUIBuilder.BuildAllSceneUI()` | method | [MenuItem] rebuilds wireframe UI hierarchy for all game scenes and popup prefabs |
 | `ProjectLinkUIBuilder.BuildAllSceneUIBatch()` | method | CI/batch variant; no dialogs |
-| `ProjectLinkUIBuilder.BuildPopupPrefabs()` | method | [MenuItem] creates `Assets/Resources/Prefabs/UI/*.prefab` with visible image slots, buttons, and serialized controller refs |
+| `ProjectLinkUIBuilder.BuildPopupPrefabs()` | method | [MenuItem] creates `Assets/Resources/Prefabs/UI/*.prefab` including ClearPopup with visible image slots, buttons, and serialized controller refs |
 | `ProjectLinkUIBuilder.ConfigureUiTextureImports()` | method | configures AssetResource sheets as Multiple sprites via SpriteDataProvider |
+| `ProjectLinkUIBuilder.DecoratePopup(...)` | method | adds PDF text slots and bindable labels to generated popup prefabs |
 | `ProjectLinkUIBuilder.AddScrollView(...)` | method | creates visible ScrollRect placeholder with Viewport/Content/items |
 | `ProjectLinkUIBuilder.AddLobbyTabController(...)` | method | attaches LobbyTabController by type name and assigns serialized refs |
+| `ProjectLinkUIBuilder.BuildBootstrap(...)` | method | attaches BootstrapWireframeController and assigns serialized refs |
+| `ProjectLinkUIBuilder.BuildTitle(...)` | method | attaches TitleWireframeController and assigns serialized refs |
+| `ProjectLinkUIBuilder.BuildGameShell(...)` | method | attaches GameWireframeController and assigns serialized refs |
 
 ## Cross-refs
 - Consumed by: Unity Editor only (not included in player builds)

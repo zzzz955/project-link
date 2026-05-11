@@ -24,7 +24,7 @@
 | symbol | kind | note |
 |--------|------|------|
 | `BootstrapController.GetConfig` | method | `GET /api/bootstrap/config`; no auth; returns `BootstrapConfigResponse` |
-| `AuthController.Guest` | method | `POST /api/auth/guest`; returns mock `AuthResponse` token for dev client-server calls |
+| `AuthController.Guest` | method | `POST /api/auth/guest`; mock mode: returns `mock:guest` token; real mode (`Auth:UseMock=false`): proxies to `{Jwt:Authority}/auth/guest` |
 | `AccountController.Me` | method | `GET /api/account/me`; returns authenticated `AccountMeResponse` |
 | `StageController.Start` | method | `POST /api/stage/{stageId}/start` |
 | `StageController.Lock` | method | `POST /api/stage/{stageId}/lock`; body includes `sessionToken` |

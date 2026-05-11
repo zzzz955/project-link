@@ -4,6 +4,7 @@
 | file | class | role |
 |------|-------|------|
 | `platform-auth.md` | PlatformAuthRefs | Project Link's dependency index for platform auth. |
+| `platform-infra.md` | PlatformInfraRefs | Infra design (dev/prod split, port policy, network topology). |
 | `AGENTS.md` | Docs | Directory instructions. |
 | `CLAUDE.md` | Docs | Claude wrapper. |
 
@@ -11,6 +12,7 @@
 | symbol | kind | note |
 |--------|------|------|
 | PlatformAuthRefs | doc | First lookup target for platform auth usage in Project Link. |
+| PlatformInfraRefs | doc | First lookup target for platform infra (env files, compose overlays, ports). |
 
 ## Rules
 - Keep refs short and consumer-focused.

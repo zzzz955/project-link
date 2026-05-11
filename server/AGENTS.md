@@ -13,13 +13,14 @@ ASP.NET Core 8 Web API | C# | Entity Framework Core 8 (ORM only, no migrations) 
 | `src/ProjectLink.Infrastructure/` | EF Core DbContext, repositories, Redis cache, JWT key cache |
 | `src/ProjectLink.API/` | Startup, controllers, middleware, Dockerfile |
 | `generated/` | Auto-generated — DO NOT edit | → see Rules |
-| `../.env.example` | Root environment variable template |
+| `../.env.dev.example` | Dev environment variable template |
+| `../.env.prod.example` | Prod environment variable template |
 
 ## Rules
 - NEVER edit `*/generated/*` — source is in `shared/`
 - EF Core is used as ORM ONLY — never run `dotnet ef migrations` or `dotnet ef database update`
 - DB schema is managed by `npm run gen:orm` (reads `server/db/schema.json`)
-- NEVER commit `.env` — use root `.env.example`
+- NEVER commit `.env.dev` or `.env.prod` — use `.env.dev.example` / `.env.prod.example`
 - NEW_DIR: create `AGENTS.md` for it + update Nav above
 
 ## DB Schema
@@ -35,10 +36,11 @@ API → Infrastructure
 ## Cross-refs
 | type | refs |
 |------|------|
-| Depends on | `project-link:docs/refs/platform-auth.md` |
-| Platform source | `platform:docs/refs/auth.md` |
+| Depends on | `project-link:docs/refs/platform-auth.md`, `project-link:docs/refs/platform-infra.md` |
+| Platform source | `platform:docs/refs/auth.md` (`../platform/docs/refs/auth.md`) |
 | External API | `platform-auth:GET /.well-known/jwks.json`, `platform-auth:POST /auth/refresh` |
 | Local responsibility | Validate platform JWTs offline; do not own account identity or refresh-token family state. |
+| Auth mode | `AUTH_USE_MOCK=true` → `MockAuthenticationHandler`; `false` → `JwtPublicKeyCache` + JWKS |
 
 ## Serena
 FIND: `[Domain][Type].cs` → `find_symbol('[Domain][Type]')`

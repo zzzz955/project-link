@@ -19,6 +19,7 @@
 | surface | ref |
 |---------|-----|
 | Login | `platform-auth:POST /auth/login` |
+| Google native ID token login | `platform-auth:POST /auth/google` |
 | Refresh | `platform-auth:POST /auth/refresh` |
 | Logout | `platform-auth:POST /auth/logout` |
 | Current account | `platform-auth:GET /users/me` |
@@ -28,12 +29,17 @@
 ## Local Rules
 - Project Link must not implement account identity, social identity linking, refresh-token family state, key rotation, lockout, recovery, or audit source-of-truth logic.
 - Project Link server validates access tokens offline and treats refresh/re-login as platform auth responsibilities.
-- Project Link client may initiate guest, Google, Apple, and Facebook login flows, then hand provider results to platform auth.
+- Project Link client may initiate guest and Google native account selection flows, then send provider ID tokens/results to platform auth over HTTPS.
+- Project Link mobile login must not require web redirect for Google in the MVP path.
 - If platform auth behavior is unclear, update `platform:docs/refs/auth.md` or the platform contract first.
 
 ## Agent Lookup Order
 1. Read this file.
-2. Read `platform:docs/refs/auth.md`.
-3. Read local server/client `AGENTS.md` for consumer responsibilities.
-4. Read platform contracts or architecture docs only when needed.
-5. Inspect implementation files only after refs and contracts are insufficient.
+2. Read `platform:docs/refs/auth.md` (`../platform/docs/refs/auth.md`).
+3. Read `platform:docs/architecture/auth-security.md` for security behavior.
+4. Read local server/client `AGENTS.md` for consumer responsibilities.
+5. Read platform contracts or architecture docs only when needed.
+6. Inspect implementation files only after refs and contracts are insufficient.
+
+## See Also
+- `project-link:docs/refs/platform-infra.md` — infra topology and env var conventions (AUTH_USE_MOCK, JWT_AUTHORITY)

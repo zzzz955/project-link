@@ -11,12 +11,14 @@ namespace ProjectLink.Core
     {
         public static NetworkManager Instance { get; private set; }
 
-        [SerializeField] string baseUrl = "https://localhost:5001";
+        [SerializeField] AppEnvironment environment = AppEnvironment.Dev;
         [SerializeField] string clientVersion = "1.0.0";
         [SerializeField] string protocolVersion = "1";
         [SerializeField] string metaHash = "";
         [SerializeField] bool autoGuestLogin = true;
         [SerializeField] string guestLoginEndpoint = "/api/auth/guest";
+
+        string baseUrl;
 
         public string BaseUrl
         {
@@ -32,6 +34,7 @@ namespace ProjectLink.Core
             if (Instance != null) { Destroy(gameObject); return; }
             Instance = this;
             DontDestroyOnLoad(gameObject);
+            baseUrl = environment == AppEnvironment.Prod ? AppConfig.ProdGameServerUrl : AppConfig.DevGameServerUrl;
         }
 
         public void SetAuthToken(string accessToken)

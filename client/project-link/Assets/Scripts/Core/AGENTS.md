@@ -14,7 +14,8 @@
 | `DataManager.cs` | `DataManager` | PlayerPrefs persistence: progress, settings |
 | `SoundManager.cs` | `SoundManager` | BGM + SFX AudioSource management |
 | `HapticManager.cs` | `HapticManager` | Platform haptic feedback (static helpers) |
-| `NetworkManager.cs` | `NetworkManager` | HTTP GET/POST/PATCH coroutines with client/protocol/auth headers |
+| `AppEnvironment.cs` | `AppEnvironment`, `AppConfig` | Env enum (Dev/Prod) + URL constants; prod URLs are placeholders until deployment |
+| `NetworkManager.cs` | `NetworkManager` | HTTP GET/POST/PATCH coroutines with client/protocol/auth headers; baseUrl selected by AppEnvironment |
 | `PoolManager.cs` | `PoolManager` | Keyed GameObject pool |
 | `LocalizationManager.cs` | `LocalizationManager` | String table + language switching; fires LanguageChanged |
 | `FontRegistry.cs` | `FontRegistry` | ScriptableObject: LanguageCode → TMP_FontAsset pair |
@@ -43,6 +44,11 @@
 | `PopupManager.Open<T>()` | method | code-instantiates legacy in-game popup T on Popup layer, pushes stack |
 | `PopupManager.CloseTop()` | method | destroys top popup, re-shows previous |
 | `PopupManager.HasPopup` | prop | true if any popup on stack |
+| `AppEnvironment` | enum | `Dev` \| `Prod` |
+| `AppConfig.DevGameServerUrl` | const | `http://localhost:20101` |
+| `AppConfig.ProdGameServerUrl` | const | placeholder — update when prod server is deployed |
+| `AppConfig.DevPlatformAuthUrl` | const | `http://localhost:20001` |
+| `AppConfig.ProdPlatformAuthUrl` | const | placeholder — update when prod auth is deployed |
 | `NetworkManager.SetAuthToken(string)` | method | sets Bearer token for authenticated API calls |
 | `NetworkManager.EnsureGuestAuth(Action<bool,string>)` | method | obtains `/api/auth/guest` mock token before authenticated UI calls |
 | `NetworkManager.ClearAuthToken()` | method | clears Bearer token |

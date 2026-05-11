@@ -3,7 +3,8 @@
 .agents/cache/
 
 # Secrets
-.env
+.env.dev
+.env.prod
 
 # Generated files (committed — needed at runtime, no secrets)
 # Regenerate with: npm run gen:data | gen:packets | gen:orm

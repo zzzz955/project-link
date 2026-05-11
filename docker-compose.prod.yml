@@ -1,0 +1,20 @@
+services:
+  api:
+    ports:
+      - "127.0.0.1:${API_HOST_PORT:-20101}:${API_CONTAINER_PORT:-8080}"
+    restart: unless-stopped
+    networks:
+      - default
+      - madalang-net
+
+  db:
+    ports:
+      - "127.0.0.1:${POSTGRES_HOST_PORT:-20132}:${POSTGRES_CONTAINER_PORT:-5432}"
+    restart: unless-stopped
+
+  redis:
+    restart: unless-stopped
+
+networks:
+  madalang-net:
+    external: true

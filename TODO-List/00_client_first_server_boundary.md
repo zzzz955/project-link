@@ -27,11 +27,11 @@ Goal: finish client core/UI flow with mock/local services first, then replace ad
 
 ## Phase 2 - Mock Failure States
 
-- [ ] Mock auth success/failure/session-expired scenarios
+- [x] Mock auth success/failure/session-expired scenarios (`MockAuthScenario` enum)
 - [ ] Mock progress fetch delay/error/offline queue scenarios
 - [ ] UI loading state for login, lobby progress load, stage clear save
 - [ ] UI error state for auth failed, sync failed, retry available
-- [ ] Session expired popup flow: return to Title or retry refresh
+- [x] Session expired popup flow: `HttpUiDataService` → `PopupManager.Request(SessionExpired)` → `SessionExpiredPopup` → return to Title
 
 ---
 

@@ -38,10 +38,10 @@ Ref: `00_client_first_server_boundary.md`, `05_auth_system.md (Part 0)`
 - [x] Implement `MockAuthService` — Success / Failure / SessionExpired scenarios
 - [x] Auth service defaults to `MockAuthService` on `NetworkManager.Awake`; injectable via `AuthService` property
 - [x] `BootstrapEntry` injects `MockAuthService` into `NetworkManager` at startup
-- [ ] Title → Lobby → InGame scene flow wired through `IAuthService` only
-- [ ] Session-expired UI path works without real auth server
+- [x] Title → Lobby → InGame scene flow wired through `IAuthService` only (via IUiDataService → NetworkManager → IAuthService chain)
+- [x] Session-expired UI path works without real auth server (`MockAuthScenario.SessionExpired` → `PopupId.SessionExpired` → `SessionExpiredPopup`)
 
-**Gate:** all items checked before P3 starts.
+**Gate:** P1 complete. ✓ P3 can begin.
 
 ---
 

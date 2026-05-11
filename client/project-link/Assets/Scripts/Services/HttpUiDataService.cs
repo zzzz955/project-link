@@ -121,8 +121,10 @@ namespace ProjectLink.Services
             if (requiresAuth)
                 network.EnsureGuestAuth((ok, error) =>
                 {
-                    if (ok) Send();
-                    else onComplete?.Invoke(new ServiceResult<T>("AUTH_FAILED", error));
+                    if (ok) { Send(); return; }
+                    if (error == "SESSION_EXPIRED")
+                        PopupManager.Request(PopupId.SessionExpired);
+                    onComplete?.Invoke(new ServiceResult<T>(error, error));
                 });
             else
                 Send();
@@ -135,7 +137,9 @@ namespace ProjectLink.Services
             {
                 if (!authOk)
                 {
-                    onComplete?.Invoke(new ServiceResult<T>("AUTH_FAILED", authError));
+                    if (authError == "SESSION_EXPIRED")
+                        PopupManager.Request(PopupId.SessionExpired);
+                    onComplete?.Invoke(new ServiceResult<T>(authError, authError));
                     return;
                 }
 

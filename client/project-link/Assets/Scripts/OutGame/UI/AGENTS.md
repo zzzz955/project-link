@@ -23,6 +23,7 @@
 | `DailyChallengePopup.cs` | `DailyChallengePopup` | Prefab controller; binds daily challenge server state to streak/reward/play refs |
 | `AccountPopup.cs` | `AccountPopup` | Prefab controller; binds account/profile server state |
 | `RewardPopup.cs` | `RewardPopup` | Prefab controller; claims reward through `IUiDataService` |
+| `SessionExpiredPopup.cs` | `SessionExpiredPopup` | Code-only popup (no prefab); shown when auth returns SESSION_EXPIRED; confirms → return to Title |
 
 ## Symbols
 | symbol | kind | note |
@@ -64,6 +65,7 @@
 | `DailyChallengePopup.Init()` | method | fetches `DailyChallengeResponse` and renders countdown, streak tiles, reward preview |
 | `AccountPopup.Init()` | method | fetches `AccountMeResponse` and renders profile/link state |
 | `RewardPopup.Init(string,string)` | method | prepares reward claim buttons for base and ad-multiplied claims |
+| `SessionExpiredPopup.Init()` | method | builds code-only UI via `ConfirmPopupBase.Build()`; confirm → return to Title |
 
 ## Cross-refs
 - Consumed by: client `Core.PopupManager` (outgame popups loaded from `Resources/Prefabs/UI/` and pushed via PopupManager.Request)

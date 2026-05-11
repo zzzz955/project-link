@@ -40,7 +40,7 @@
 | `InGameController.RefreshGroupViews(int)` | method | refreshes all PathViews for a given groupId |
 | `InGameController.GetConnectedCount()` | method | counts groups where all nodes are endpoints of complete paths (uses PathValidator.IsGroupConnected) |
 | `UIManager.GetLayer(UILayer)` | method | returns canvas Transform for named layer |
-| `PopupId` | enum | popup request ids: ReturnTitle, ExitGame, Settings, BuyItem, Energy, DailyChallenge, Account, Reward, StageClear |
+| `PopupId` | enum | popup request ids: ReturnTitle, ExitGame, Settings, BuyItem, Energy, DailyChallenge, Account, Reward, StageClear, SessionExpired |
 | `PopupRequest` | struct | event payload: PopupId + optional object payload |
 | `PopupManager.Request(PopupId,object)` | method | static event-driven popup request entry point |
 | `PopupManager.Open<T>()` | method | code-instantiates legacy in-game popup T on Popup layer, pushes stack |

@@ -41,6 +41,8 @@ popup_exit_confirm,EXIT,종료,退出,結束,ออก
 popup_return_title,RETURN TO TITLE,타이틀로 돌아가기,返回标题,返回標題,กลับหน้าแรก
 popup_return_message,Current lobby selection will be kept. Move back to the title screen?,현재 로비 선택은 유지됩니다. 타이틀 화면으로 돌아갈까요?,当前大厅选择将保留。返回标题画面?,目前大廳選擇會保留。返回標題畫面?,จะเก็บการเลือกในล็อบบี้ไว้ กลับไปหน้าแรก?
 popup_return_confirm,GO TO TITLE,타이틀로 이동,前往标题,前往標題,ไปหน้าแรก
+popup_session_expired_title,SESSION EXPIRED,세션 만료,会话已过期,工作階段已過期,เซสชันหมดอายุ
+popup_session_expired_message,Your session has expired. Please return to the title screen.,세션이 만료되었습니다. 타이틀 화면으로 돌아가세요.,您的会话已过期。请返回标题画面。,您的工作階段已過期。請返回標題畫面。,เซสชันของคุณหมดอายุแล้ว กรุณากลับไปหน้าแรก
 language_en,EN,영어,英语,英文,อังกฤษ
 language_ko,KO,한국어,韩语,韓文,เกาหลี
 language_zh_cn,ZH-CN,중국어 간체,简体中文,簡體中文,จีนตัวย่อ

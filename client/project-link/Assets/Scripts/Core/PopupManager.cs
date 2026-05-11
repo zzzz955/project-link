@@ -14,7 +14,8 @@ namespace ProjectLink.Core
         DailyChallenge,
         Account,
         Reward,
-        StageClear
+        StageClear,
+        SessionExpired
     }
 
     public readonly struct PopupRequest
@@ -149,6 +150,9 @@ namespace ProjectLink.Core
                         clearPopup.Init(clearModel);
                     else
                         Open<ProjectLink.InGame.UI.ClearPopup>().Init(clearModel);
+                    break;
+                case PopupId.SessionExpired:
+                    Open<ProjectLink.OutGame.UI.SessionExpiredPopup>().Init();
                     break;
             }
         }

@@ -32,6 +32,14 @@ API → Application → Domain
 Infrastructure → Domain
 API → Infrastructure
 
+## Cross-refs
+| type | refs |
+|------|------|
+| Depends on | `project-link:docs/refs/platform-auth.md` |
+| Platform source | `platform:docs/refs/auth.md` |
+| External API | `platform-auth:GET /.well-known/jwks.json`, `platform-auth:POST /auth/refresh` |
+| Local responsibility | Validate platform JWTs offline; do not own account identity or refresh-token family state. |
+
 ## Serena
 FIND: `[Domain][Type].cs` → `find_symbol('[Domain][Type]')`
 PATTERN: namespace `ProjectLink.[Layer]` or `ProjectLink.[Layer].[Domain]`

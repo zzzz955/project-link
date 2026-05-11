@@ -8,6 +8,7 @@
 | `client/` | Client app - stack defined by user | -> `client/AGENTS.md` |
 | `server/` | Server app + DB schema - stack defined by user | -> `server/AGENTS.md` |
 | `TODO-List/` | Release TODO tracker - per-area task lists + progress summary | -> `TODO-List/AGENTS.md` |
+| `docs/` | Project architecture notes and external platform refs | -> `docs/AGENTS.md` |
 | `open-wsl-cli.bat` | Opens a WSL CLI window at the project root | |
 
 ## Pipeline
@@ -48,6 +49,14 @@ This convention is enforced by AI agents; violations should be fixed before comm
 - `Gen output:` — generated artifacts (data source files only)
 - Use `Layer.ClassName` notation; omit method unless needed for disambiguation
 - Place between `## Symbols` and `## Rules` in leaf files
+
+**Cross-repository refs**:
+- Project Link consumes platform-owned features through public contracts, OpenAPI operations, JWKS/OIDC metadata, and platform architecture docs.
+- Platform implementation internals are not game contracts.
+- For platform auth, read `docs/refs/platform-auth.md` first, then `platform:docs/refs/auth.md`.
+- Use `repo:path`, `repo:SymbolName`, and `service:METHOD /route` notation.
+- Game docs list `Depends on:` platform refs; platform docs list `Consumed by:` game refs.
+- Do not copy platform security rules into gameplay docs unless the local behavior depends on them; link the platform source of truth instead.
 
 ## Agent Context Convention
 - `AGENTS.md` is the single source of truth for AI agent instructions

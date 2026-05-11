@@ -33,6 +33,14 @@ Unity 6000.4.5f1 | URP 2D (17.4.0) | C# | New Input System (1.19.0)
 - Sorting Layers order: Board -> Path -> Node (UI Canvas uses Screen Space Overlay, always on top).
 - Physics Layer `Board` reserved for touch input raycasting.
 
+## Cross-refs
+| type | refs |
+|------|------|
+| Depends on | `project-link:docs/refs/platform-auth.md` |
+| Platform source | `platform:docs/refs/auth.md` |
+| External API | `platform-auth:POST /auth/login`, `platform-auth:POST /auth/refresh`, `platform-auth:POST /auth/logout` |
+| Local responsibility | Login/session UX and token storage; do not implement platform account source-of-truth logic. |
+
 ## Serena
 FIND: `[Domain][Type].cs` -> `find_symbol('[Domain][Type]')`
 ENTRY: `Assets/Scripts/InGame/` -> ingame domain root

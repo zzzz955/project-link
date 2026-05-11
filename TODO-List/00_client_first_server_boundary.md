@@ -6,11 +6,10 @@ Goal: finish client core/UI flow with mock/local services first, then replace ad
 
 ## Phase 1 - Client Contract Boundary
 
-- [ ] Define `IAuthService` in `client/project-link/Assets/Scripts/Core/`
-  - `GuestLoginAsync()`
-  - `LoginAsync(email, password)`
-  - `RefreshAsync()`
-  - `GetAccessToken()`
+- [x] Define `IAuthService` in `client/project-link/Assets/Scripts/Core/`
+  - `EnsureAuth()` (covers guest login)
+  - `Refresh()`
+  - `GetToken()` / `SetToken()` / `ClearToken()`
 - [ ] Define `IProgressService`
   - `GetAllProgress()`
   - `ClearStage(stageId, stars)`
@@ -20,10 +19,9 @@ Goal: finish client core/UI flow with mock/local services first, then replace ad
   - `GetAsync<T>()`
   - `PostAsync<TRequest,TResponse>()`
   - 401 refresh/retry hook
-- [ ] Add service mode switch
-  - `Mock` for scene/UI development
-  - `Local` for PlayerPrefs persistence
-  - `Http` for server integration
+- [x] Add service mode switch
+  - `MockAuthScenario` (Success / Failure / SessionExpired) via `MockAuthService.Scenario`
+  - `Http` mode: replace `MockAuthService` with `HttpAuthService` at `NetworkManager.AuthService` (P4/P5)
 
 ---
 

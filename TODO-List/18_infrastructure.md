@@ -33,6 +33,24 @@ Use 100-port blocks per platform or game. Container ports stay standard; only ho
 
 ---
 
+## Docker Desktop (Dev Monitoring)
+
+Docker Desktop is the primary tool for checking container state in dev.
+
+| task | where |
+|------|-------|
+| Check running containers and health | Docker Desktop → Containers |
+| Read container logs (stdout/stderr) | Docker Desktop → Container → Logs tab |
+| Inspect env vars and port bindings | Docker Desktop → Container → Inspect tab |
+| Check resource usage (CPU/mem) | Docker Desktop → Container → Stats tab |
+
+Convention:
+- Before reporting a dev issue, check Docker Desktop → Containers to confirm all services are running.
+- If a container has exited unexpectedly, check the Logs tab before restarting.
+- `docker compose up -d` from WSL CLI is the authoritative startup; Docker Desktop is read-only monitoring.
+
+---
+
 ## Dev Exposure
 
 Dev should allow direct access from the developer PC.

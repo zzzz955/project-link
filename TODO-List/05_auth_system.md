@@ -9,14 +9,14 @@ Each game is a separate registered app (`client_id`); tokens from one game are i
 
 Used while client scene/UI flow is still being finalized.
 
-- [ ] Define `IAuthService` before implementing HTTP auth
-- [ ] Implement `MockAuthService`
-  - guest login success
-  - login failure
-  - refresh success
-  - session expired
+- [x] Define `IAuthService` before implementing HTTP auth
+- [x] Implement `MockAuthService`
+  - [x] guest login success (`MockAuthScenario.Success`)
+  - [x] login failure (`MockAuthScenario.Failure`)
+  - [x] refresh success
+  - [x] session expired (`MockAuthScenario.SessionExpired`)
 - [ ] Title/Lobby flow depends only on `IAuthService`
-- [ ] Add Auth service mode switch: `Mock`, `Http`
+- [x] Add Auth service mode switch: `MockAuthService` injected at Bootstrap; replace with `HttpAuthService` for Http mode
 - [ ] Session expired UI path works without a real auth server
 
 ---

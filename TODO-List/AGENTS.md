@@ -24,6 +24,7 @@ Navigation and progress tracker for all remaining work before release.
 | [16_ranking.md](16_ranking.md) | Ranking System | DONE |
 | [17_ui_wireframe_server_contracts.md](17_ui_wireframe_server_contracts.md) | UI Wireframe Server Contracts | IN_PROGRESS |
 | [18_infrastructure.md](18_infrastructure.md) | Infrastructure | IN_PROGRESS |
+| [19_integration_roadmap.md](19_integration_roadmap.md) | Integration Roadmap (P1→P5) | IN_PROGRESS |
 
 ## Progress Summary
 
@@ -34,19 +35,20 @@ Stage Editor: TypeScript local web tool implemented for CSV CRUD, validation, so
 Remaining: Client service boundaries, Client Rule Refactor, OutGame UI, UI wireframe server contracts, Infrastructure, Auth/Ad systems, Sound/VFX, Platform build, server sync wiring.
 
 Suggested execution order:
+See `19_integration_roadmap.md` for the current phase-ordered plan (P1–P5).
+Legacy order preserved below for reference:
 1. `00` - service boundaries and mock/local adapters
 2. `01` -> `02` -> `03` - playable end-to-end client loop
 3. `06` (local layer) - persistent progress behind `IProgressService`
 4. `07` - unblock content creation
-5. `11` - packet/DTO contracts for auth/progress
-6. `12` - client runtime support for nodeMap/cellMap rules
-7. `05` - auth client mock first, then shared auth server
-8. `10` - game server wiring after client contracts stabilize
-9. `17` - UI wireframe DTO/API contract gate before new UI HTTP binding
-10. `18` - dev/prod infrastructure, port exposure, SSH-only DB/Redis access
-11. `04` - monetization
-12. `08` - polish
-13. `09` - release build
+5. `12` - client runtime support for nodeMap/cellMap rules
+6. `05` - auth client mock first (P1), then auth server integration (P2)
+7. `10` - game server wiring after client contracts stabilize (P4)
+8. `17` - UI wireframe DTO/API contract gate before new UI HTTP binding
+9. `18` - dev/prod infrastructure, port exposure, SSH-only DB/Redis access
+10. `04` - monetization
+11. `08` - polish
+12. `09` - release build
 
 ## Convention
 

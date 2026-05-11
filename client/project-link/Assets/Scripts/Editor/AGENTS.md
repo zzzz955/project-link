@@ -4,7 +4,7 @@
 | file | class | role |
 |---|---|---|
 | `ProjectLinkUIBuilder.cs` | `ProjectLinkUIBuilder` | [MenuItem] wireframe scene UI, popup prefab builder, AssetResource import/slicing setup |
-| `ProjectLinkUIImageResourceExtractor.cs` | `ProjectLinkUIImageResourceExtractor` | [MenuItem] uploads/loads UI images, removes simple backgrounds, previews connected image elements, saves numbered PNG sprites |
+| `ProjectLinkUIImageResourceExtractor.cs` | `ProjectLinkUIImageResourceExtractor` | [MenuItem] batch-loads transparent UI images in a scrollable editor window, parses alpha-connected resource elements, previews them, saves numbered PNG sprites |
 
 ## Symbols
 | symbol | kind | note |
@@ -21,8 +21,9 @@
 | `ProjectLinkUIBuilder.BuildTitle(...)` | method | attaches TitleWireframeController and assigns serialized refs |
 | `ProjectLinkUIBuilder.BuildGameShell(...)` | method | attaches GameWireframeController and assigns serialized refs |
 | `ProjectLinkUIImageResourceExtractor.Open()` | method | [MenuItem] opens the UI resource extraction editor window |
-| `ProjectLinkUIImageResourceExtractor.AnalyzeSource()` | method | builds a readable texture copy, optionally removes edge-connected background, and extracts connected alpha components |
-| `ProjectLinkUIImageResourceExtractor.SaveResources()` | method | saves extracted previews as `baseFileName_1.png` style PNG files and configures project-local outputs as sprites |
+| `ProjectLinkUIImageResourceExtractor.ParseAllSources()` | method | parses every added image into alpha-connected resource components |
+| `ProjectLinkUIImageResourceExtractor.AddDraggedItems()` | method | accepts multiple dragged Texture assets, image files, or image folders |
+| `ProjectLinkUIImageResourceExtractor.SaveResources()` | method | saves parsed previews as `baseFileName_1.png` style PNG files and configures project-local outputs as sprites |
 
 ## Cross-refs
 - Consumed by: Unity Editor only (not included in player builds)

@@ -15,7 +15,9 @@
 | `SoundManager.cs` | `SoundManager` | BGM + SFX AudioSource management |
 | `HapticManager.cs` | `HapticManager` | Platform haptic feedback (static helpers) |
 | `AppEnvironment.cs` | `AppEnvironment`, `AppConfig` | Env enum (Dev/Prod) + URL constants; prod URLs are placeholders until deployment |
-| `NetworkManager.cs` | `NetworkManager` | HTTP GET/POST/PATCH coroutines with client/protocol/auth headers; baseUrl selected by AppEnvironment |
+| `IAuthService.cs` | `IAuthService` | Auth abstraction: EnsureAuth, Refresh, GetToken, SetToken, ClearToken |
+| `MockAuthService.cs` | `MockAuthService`, `MockAuthScenario` | Mock IAuthService; scenario-driven (Success / Failure / SessionExpired); no HTTP |
+| `NetworkManager.cs` | `NetworkManager` | HTTP GET/POST/PATCH coroutines with client/protocol/auth headers; delegates auth to IAuthService; clears token on 401 |
 | `PoolManager.cs` | `PoolManager` | Keyed GameObject pool |
 | `LocalizationManager.cs` | `LocalizationManager` | String table + language switching; fires LanguageChanged |
 | `FontRegistry.cs` | `FontRegistry` | ScriptableObject: LanguageCode → TMP_FontAsset pair |
@@ -49,9 +51,15 @@
 | `AppConfig.ProdGameServerUrl` | const | placeholder — update when prod server is deployed |
 | `AppConfig.DevPlatformAuthUrl` | const | `http://localhost:20001` |
 | `AppConfig.ProdPlatformAuthUrl` | const | placeholder — update when prod auth is deployed |
-| `NetworkManager.SetAuthToken(string)` | method | sets Bearer token for authenticated API calls |
-| `NetworkManager.EnsureGuestAuth(Action<bool,string>)` | method | obtains `/api/auth/guest` mock token before authenticated UI calls |
-| `NetworkManager.ClearAuthToken()` | method | clears Bearer token |
+| `IAuthService.EnsureAuth(Action<bool,string>)` | method | ensures a valid token exists (guest login if needed); delegates to active IAuthService |
+| `IAuthService.Refresh(Action<bool,string>)` | method | refreshes the current token; scenario-aware in MockAuthService |
+| `IAuthService.GetToken()` | method | returns current Bearer token |
+| `MockAuthScenario` | enum | `Success` \| `Failure` \| `SessionExpired` — controls MockAuthService behavior |
+| `MockAuthService.Scenario` | prop | set to change active auth scenario for UI/flow testing |
+| `NetworkManager.AuthService` | prop | get/set active IAuthService; defaults to MockAuthService on Awake |
+| `NetworkManager.SetAuthToken(string)` | method | delegates to IAuthService.SetToken |
+| `NetworkManager.EnsureGuestAuth(Action<bool,string>)` | method | delegates to IAuthService.EnsureAuth |
+| `NetworkManager.ClearAuthToken()` | method | delegates to IAuthService.ClearToken |
 | `NetworkManager.Get(string,Action<bool,string>)` | method | sends GET with required version/protocol headers |
 | `NetworkManager.Post(string,string,Action<bool,string>)` | method | sends JSON POST with required version/protocol/auth headers |
 | `NetworkManager.Patch(string,string,Action<bool,string>)` | method | sends JSON PATCH with required version/protocol/auth headers |

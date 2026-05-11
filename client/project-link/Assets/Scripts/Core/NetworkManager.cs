@@ -1,7 +1,5 @@
 using System;
 using System.Collections;
-using Newtonsoft.Json;
-using ProjectLink.Contracts.Account;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -15,69 +13,44 @@ namespace ProjectLink.Core
         [SerializeField] string clientVersion = "1.0.0";
         [SerializeField] string protocolVersion = "1";
         [SerializeField] string metaHash = "";
-        [SerializeField] bool autoGuestLogin = true;
-        [SerializeField] string guestLoginEndpoint = "/api/auth/guest";
 
-        string baseUrl;
+        string _baseUrl;
+        IAuthService _authService;
 
-        public string BaseUrl
+        public string BaseUrl { get => _baseUrl; set => _baseUrl = value; }
+
+        public IAuthService AuthService
         {
-            get => baseUrl;
-            set => baseUrl = value;
+            get => _authService;
+            set => _authService = value;
         }
 
-        public string AccessToken { get; private set; }
-        bool _authInFlight;
+        public string AccessToken => _authService?.GetToken() ?? "";
 
         void Awake()
         {
             if (Instance != null) { Destroy(gameObject); return; }
             Instance = this;
             DontDestroyOnLoad(gameObject);
-            baseUrl = environment == AppEnvironment.Prod ? AppConfig.ProdGameServerUrl : AppConfig.DevGameServerUrl;
+            _baseUrl = environment == AppEnvironment.Prod ? AppConfig.ProdGameServerUrl : AppConfig.DevGameServerUrl;
+            _authService ??= new MockAuthService();
         }
 
-        public void SetAuthToken(string accessToken)
-        {
-            AccessToken = accessToken;
-        }
+        public void SetAuthToken(string accessToken) => _authService?.SetToken(accessToken);
 
-        public void ClearAuthToken()
-        {
-            AccessToken = "";
-        }
+        public void ClearAuthToken() => _authService?.ClearToken();
 
         public void EnsureGuestAuth(Action<bool, string> onComplete)
-        {
-            if (!autoGuestLogin || !string.IsNullOrEmpty(AccessToken))
-            {
-                onComplete?.Invoke(true, "");
-                return;
-            }
-
-            if (_authInFlight)
-            {
-                StartCoroutine(WaitForAuth(onComplete));
-                return;
-            }
-
-            StartCoroutine(SendGuestLogin(onComplete));
-        }
+            => _authService.EnsureAuth(onComplete);
 
         public void Get(string endpoint, Action<bool, string> onComplete)
-        {
-            StartCoroutine(SendGet(endpoint, onComplete));
-        }
+            => StartCoroutine(SendGet(endpoint, onComplete));
 
         public void Post(string endpoint, string jsonBody, Action<bool, string> onComplete)
-        {
-            StartCoroutine(SendWithBody(endpoint, "POST", jsonBody, onComplete));
-        }
+            => StartCoroutine(SendWithBody(endpoint, "POST", jsonBody, onComplete));
 
         public void Patch(string endpoint, string jsonBody, Action<bool, string> onComplete)
-        {
-            StartCoroutine(SendWithBody(endpoint, "PATCH", jsonBody, onComplete));
-        }
+            => StartCoroutine(SendWithBody(endpoint, "PATCH", jsonBody, onComplete));
 
         IEnumerator SendGet(string endpoint, Action<bool, string> onComplete)
         {
@@ -99,57 +72,11 @@ namespace ProjectLink.Core
             Complete(req, onComplete);
         }
 
-        IEnumerator SendGuestLogin(Action<bool, string> onComplete)
-        {
-            _authInFlight = true;
-            using var req = new UnityWebRequest(BuildUrl(guestLoginEndpoint), "POST");
-            var bodyBytes = System.Text.Encoding.UTF8.GetBytes("{}");
-            req.uploadHandler = new UploadHandlerRaw(bodyBytes);
-            req.downloadHandler = new DownloadHandlerBuffer();
-            req.SetRequestHeader("Content-Type", "application/json");
-            req.SetRequestHeader("X-Client-Version", clientVersion);
-            req.SetRequestHeader("X-Protocol-Version", protocolVersion);
-            if (!string.IsNullOrEmpty(metaHash))
-                req.SetRequestHeader("X-Meta-Hash", metaHash);
-
-            yield return req.SendWebRequest();
-
-            var body = req.downloadHandler?.text ?? "";
-            if (req.result == UnityWebRequest.Result.Success)
-            {
-                try
-                {
-                    var response = JsonConvert.DeserializeObject<AuthResponse>(body);
-                    AccessToken = response?.AccessToken ?? "";
-                    _authInFlight = false;
-                    onComplete?.Invoke(!string.IsNullOrEmpty(AccessToken), string.IsNullOrEmpty(AccessToken) ? "AUTH_TOKEN_EMPTY" : "");
-                }
-                catch (Exception ex)
-                {
-                    _authInFlight = false;
-                    onComplete?.Invoke(false, ex.Message);
-                }
-            }
-            else
-            {
-                _authInFlight = false;
-                onComplete?.Invoke(false, string.IsNullOrEmpty(body) ? req.error : body);
-            }
-        }
-
-        IEnumerator WaitForAuth(Action<bool, string> onComplete)
-        {
-            while (_authInFlight)
-                yield return null;
-
-            onComplete?.Invoke(!string.IsNullOrEmpty(AccessToken), string.IsNullOrEmpty(AccessToken) ? "AUTH_TOKEN_EMPTY" : "");
-        }
-
         string BuildUrl(string endpoint)
         {
-            if (string.IsNullOrEmpty(endpoint)) return baseUrl;
+            if (string.IsNullOrEmpty(endpoint)) return _baseUrl;
             if (endpoint.StartsWith("http", StringComparison.OrdinalIgnoreCase)) return endpoint;
-            return $"{baseUrl.TrimEnd('/')}/{endpoint.TrimStart('/')}";
+            return $"{_baseUrl.TrimEnd('/')}/{endpoint.TrimStart('/')}";
         }
 
         void ApplyHeaders(UnityWebRequest req)
@@ -160,17 +87,24 @@ namespace ProjectLink.Core
             if (!string.IsNullOrEmpty(metaHash))
                 req.SetRequestHeader("X-Meta-Hash", metaHash);
 
-            if (!string.IsNullOrEmpty(AccessToken))
-                req.SetRequestHeader("Authorization", $"Bearer {AccessToken}");
+            var token = _authService?.GetToken();
+            if (!string.IsNullOrEmpty(token))
+                req.SetRequestHeader("Authorization", $"Bearer {token}");
         }
 
-        static void Complete(UnityWebRequest req, Action<bool, string> onComplete)
+        void Complete(UnityWebRequest req, Action<bool, string> onComplete)
         {
             var body = req.downloadHandler?.text ?? "";
             if (req.result == UnityWebRequest.Result.Success)
+            {
                 onComplete?.Invoke(true, body);
-            else
-                onComplete?.Invoke(false, string.IsNullOrEmpty(body) ? req.error : body);
+                return;
+            }
+
+            if (req.responseCode == 401)
+                _authService?.ClearToken();
+
+            onComplete?.Invoke(false, string.IsNullOrEmpty(body) ? req.error : body);
         }
     }
 }

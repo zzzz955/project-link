@@ -13,6 +13,7 @@ namespace ProjectLink.Core
             CreateManager<UIManager>("UIManager");
             CreateManager<PopupManager>("PopupManager");
             CreateManager<NetworkManager>("NetworkManager");
+            NetworkManager.Instance.AuthService = new MockAuthService();
             CreateManager<PoolManager>("PoolManager");
             CreateManager<SceneLoader>("SceneLoader");
 

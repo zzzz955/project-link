@@ -38,7 +38,7 @@ builder.Services.AddDbContext<AppDbContext>(opts =>
     opts.UseNpgsql(config.GetConnectionString("Postgres")));
 
 // 2. Redis
-builder.Services.AddSingleton<IConnectionMultiplexer>(
+builder.Services.AddSingleton<IConnectionMultiplexer>(_ =>
     ConnectionMultiplexer.Connect(config["Redis:Connection"] ?? "localhost:6379"));
 
 // 3. Static data — singleton loaded once at startup
@@ -203,3 +203,5 @@ app.MapScalarApiReference(options =>
 app.MapControllers();
 
 app.Run();
+
+public partial class Program;

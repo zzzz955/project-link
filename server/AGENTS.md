@@ -12,6 +12,7 @@ ASP.NET Core 8 Web API | C# | Entity Framework Core 8 (ORM only, no migrations) 
 | `src/ProjectLink.Application/` | Use cases (commands/queries), ISessionCache |
 | `src/ProjectLink.Infrastructure/` | EF Core DbContext, repositories, Redis cache, JWT key cache |
 | `src/ProjectLink.API/` | Startup, controllers, middleware, Dockerfile |
+| `tests/` | Engine-free server/API test projects | -> `tests/AGENTS.md` |
 | `generated/` | Auto-generated — DO NOT edit | → see Rules |
 | `../.env.dev.example` | Dev environment variable template |
 | `../.env.prod.example` | Prod environment variable template |

@@ -53,12 +53,12 @@ This phase has no client dependency — verify via curl or Postman.
 - [x] `JwtPublicKeyCache` fetches JWKS from `{Jwt:Authority}/.well-known/jwks.json` (already wired in Program.cs)
 - [x] `AUTH_USE_MOCK=false` path configured in `Program.cs` JWT Bearer + app-claim validation
 - [x] `POST /api/auth/guest` proxies to `{Jwt:Authority}/auth/guest` when `Auth:UseMock=false`
-- [ ] Switch `.env.dev` to `AUTH_USE_MOCK=false` and verify JWKS fetch succeeds (requires platform stack running)
-- [ ] Authenticated endpoint (e.g. `GET /api/lobby`) accepts platform-issued JWT
-- [ ] 401 returned for expired / invalid JWT
-- [ ] Integration test: guest login → lobby fetch full round-trip
+- [x] Switch `.env.dev` to `AUTH_USE_MOCK=false` and verify JWKS fetch succeeds (requires platform stack running)
+- [x] Authenticated endpoint (e.g. `GET /api/lobby`) accepts platform-issued JWT
+- [x] 401 returned for expired / invalid JWT
+- [x] Integration test: guest login → lobby fetch full round-trip
 
-**Gate:** all items checked before P4 starts.
+**Gate:** P2 complete. P4 can begin after P3 gate.
 
 ---
 
@@ -141,3 +141,4 @@ Depends on: P4 (auth flow fully wired, platform OIDC endpoints live).
 | P5 | `05_auth_system.md` (Part B) |
 
 <!-- changed: created as integration roadmap after platform auth system completion 2026-05-12 -->
+<!-- changed: added engine-free API integration tests for P2 auth/lobby gate -->

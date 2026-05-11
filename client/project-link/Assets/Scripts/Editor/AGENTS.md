@@ -4,6 +4,7 @@
 | file | class | role |
 |---|---|---|
 | `ProjectLinkUIBuilder.cs` | `ProjectLinkUIBuilder` | [MenuItem] wireframe scene UI, popup prefab builder, AssetResource import/slicing setup |
+| `ProjectLinkUIImageResourceExtractor.cs` | `ProjectLinkUIImageResourceExtractor` | [MenuItem] uploads/loads UI images, removes simple backgrounds, previews connected image elements, saves numbered PNG sprites |
 
 ## Symbols
 | symbol | kind | note |
@@ -19,6 +20,9 @@
 | `ProjectLinkUIBuilder.BuildBootstrap(...)` | method | attaches BootstrapWireframeController and assigns serialized refs |
 | `ProjectLinkUIBuilder.BuildTitle(...)` | method | attaches TitleWireframeController and assigns serialized refs |
 | `ProjectLinkUIBuilder.BuildGameShell(...)` | method | attaches GameWireframeController and assigns serialized refs |
+| `ProjectLinkUIImageResourceExtractor.Open()` | method | [MenuItem] opens the UI resource extraction editor window |
+| `ProjectLinkUIImageResourceExtractor.AnalyzeSource()` | method | builds a readable texture copy, optionally removes edge-connected background, and extracts connected alpha components |
+| `ProjectLinkUIImageResourceExtractor.SaveResources()` | method | saves extracted previews as `baseFileName_1.png` style PNG files and configures project-local outputs as sprites |
 
 ## Cross-refs
 - Consumed by: Unity Editor only (not included in player builds)

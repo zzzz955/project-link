@@ -3,7 +3,7 @@
 ## Nav
 | file | role |
 |------|------|
-| `config-loader.js` | Loads `template.ini` + `.env`, exports merged config |
+| `config-loader.js` | Loads `template.ini` + `.env.dev`/`.env.prod`, exports merged config |
 | `gen-data.js` | `shared/datas/**/*.csv` -> `*/generated/data/**/*.csv` |
 | `gen-orm.js` | `server/db/schema.json` -> DB CREATE/ALTER TABLE + migration SQL |
 | `gen-all.bat` / `gen-all.sh` | Runs all gen steps in order |
@@ -15,6 +15,7 @@
 
 ## Rules
 - ALL scripts read config from `config-loader.js` - never hardcode paths
+- Tools default to `.env.dev`; use `CONFIG_ENV=prod` or `ENV_FILE=.env.prod` for production values
 - `_` prefix files/dirs are skipped by all gen tools
 - Errors report as: `[tool] ERROR: <file>\n  <location>: <message>`
 - On any error - print all errors, then `process.exit(1)`

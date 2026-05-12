@@ -56,9 +56,8 @@ Convention:
 Dev should allow direct access from the developer PC.
 
 - [x] Expose API on the game block API port, e.g. `20101:8080`
-- [x] Expose PostgreSQL for pgAdmin 4 on localhost, e.g. `127.0.0.1:20132:5432`
+- [x] Expose PostgreSQL on localhost for direct host-side access, e.g. `127.0.0.1:20132:5432`
 - [x] Remove Redis `ports:` unless direct Redis debugging becomes necessary
-- [ ] Verify pgAdmin 4 connects to `localhost:{POSTGRES_HOST_PORT}`
 - [ ] Verify Unity/client calls API through the configured dev API host port
 - [ ] Verify API connects internally with `Host=db;Port=5432`
 - [ ] Verify API connects internally with `redis:6379`
@@ -86,7 +85,7 @@ Production clients must only use `80/443`. DB and Redis must not be internet-rea
 - [ ] Disable SSH password login
 - [ ] Restrict SSH source IPs where infrastructure allows it
 - [ ] Access production PostgreSQL through SSH tunnel only
-- [ ] Create a readonly DB role for pgAdmin 4 inspection
+- [ ] Create a readonly DB role for ops inspection
 - [ ] Keep app DB role separate from readonly ops and migration/admin roles
 - [ ] Use migration/admin credentials only for schema changes
 - [ ] Define emergency data-fix procedure with reviewed SQL scripts
@@ -133,8 +132,6 @@ ssh -L 20132:127.0.0.1:20132 user@prod-server
 - [x] `docker compose build api` passes
 - [ ] `docker compose up -d` starts API, DB, and Redis
 - [ ] API health endpoint returns healthy DB/Redis status
-- [ ] pgAdmin 4 connects in dev
-- [ ] pgAdmin 4 connects in production only through SSH tunnel
 - [ ] External client can reach production API only through `https://`
 - [ ] External client cannot reach production DB/Redis ports directly
 

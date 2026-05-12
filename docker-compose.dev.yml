@@ -6,3 +6,4 @@ services:
   db:
     ports:
       - "${POSTGRES_HOST_BIND:-127.0.0.1}:${POSTGRES_HOST_PORT:-20132}:${POSTGRES_CONTAINER_PORT:-5432}"
+

@@ -48,9 +48,26 @@ function firstEnv(env, keys, fallback = '') {
   return fallback;
 }
 
+function resolveEnvPath() {
+  const explicit = process.env.CONFIG_ENV_FILE || process.env.ENV_FILE;
+  if (explicit) {
+    return path.isAbsolute(explicit) ? explicit : path.join(ROOT, explicit);
+  }
+
+  const rawEnv = process.env.CONFIG_ENV || process.env.GAME_ENV || process.env.NODE_ENV || process.env.ASPNETCORE_ENVIRONMENT || 'dev';
+  const normalized = rawEnv.toLowerCase().startsWith('prod') ? 'prod' : 'dev';
+  const envSpecificPath = path.join(ROOT, `.env.${normalized}`);
+  if (fs.existsSync(envSpecificPath)) return envSpecificPath;
+
+  const legacyEnvPath = path.join(ROOT, '.env');
+  if (fs.existsSync(legacyEnvPath)) return legacyEnvPath;
+
+  return envSpecificPath;
+}
+
 function load() {
   const iniPath = path.join(ROOT, 'template.ini');
-  const envPath = path.join(ROOT, '.env');
+  const envPath = resolveEnvPath();
 
   if (!fs.existsSync(iniPath)) {
     console.error('[config] ERROR: template.ini not found at', iniPath);

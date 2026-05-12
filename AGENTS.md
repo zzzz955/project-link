@@ -10,6 +10,8 @@
 | `TODO-List/` | Release TODO tracker - per-area task lists + progress summary | -> `TODO-List/AGENTS.md` |
 | `docs/` | Project architecture notes and external platform refs | -> `docs/AGENTS.md` |
 | `open-wsl-cli.bat` | Opens a WSL CLI window at the project root | |
+| `docker-compose.dev.bat` | Starts the local dev Docker Compose stack | |
+| `docker-compose.prod.sh` | Starts the production Docker Compose stack | |
 
 ## Pipeline
 ```

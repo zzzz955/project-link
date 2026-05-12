@@ -26,13 +26,13 @@ public class PlayerSettingsRepository : IPlayerSettingsRepository
             VALUES
               ({settings.UserId}, {settings.BgmEnabled}, {settings.SfxEnabled},
                {settings.HapticsEnabled}, {settings.NotificationsEnabled}, {settings.Language}, {settings.UpdatedAt})
-            ON CONFLICT (user_id) DO UPDATE SET
-              bgm_enabled           = EXCLUDED.bgm_enabled,
-              sfx_enabled           = EXCLUDED.sfx_enabled,
-              haptics_enabled       = EXCLUDED.haptics_enabled,
-              notifications_enabled = EXCLUDED.notifications_enabled,
-              language              = EXCLUDED.language,
-              updated_at            = EXCLUDED.updated_at
+            ON DUPLICATE KEY UPDATE
+              bgm_enabled           = VALUES(bgm_enabled),
+              sfx_enabled           = VALUES(sfx_enabled),
+              haptics_enabled       = VALUES(haptics_enabled),
+              notifications_enabled = VALUES(notifications_enabled),
+              language              = VALUES(language),
+              updated_at            = VALUES(updated_at)
             """, ct);
     }
 }

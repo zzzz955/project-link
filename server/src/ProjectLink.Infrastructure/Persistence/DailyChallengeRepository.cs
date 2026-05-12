@@ -19,8 +19,7 @@ public class DailyChallengeRepository : IDailyChallengeRepository
         await _db.Database.ExecuteSqlInterpolatedAsync($"""
             INSERT INTO daily_challenge_progress (user_id, challenge_date, play_count, completed, streak_days, created_at)
             VALUES ({userId}, {date}, 1, false, 0, NOW())
-            ON CONFLICT (user_id, challenge_date) DO UPDATE
-              SET play_count = daily_challenge_progress.play_count + 1
+            ON DUPLICATE KEY UPDATE play_count = play_count + 1
             """, ct);
 
         _db.ChangeTracker.Clear();

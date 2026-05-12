@@ -49,6 +49,6 @@ public class ProgressRepository : IProgressRepository
         => _db.Database.ExecuteSqlInterpolatedAsync(
             $@"INSERT INTO stage_progress (user_id, stage_id, stars, cleared_at)
                VALUES ({userId}, {stageId}, {stars}, NOW())
-               ON CONFLICT (user_id, stage_id) DO UPDATE
-                 SET stars = GREATEST(stage_progress.stars, {stars}), cleared_at = NOW()", ct);
+               ON DUPLICATE KEY UPDATE
+                 stars = GREATEST(stars, {stars}), cleared_at = NOW()", ct);
 }

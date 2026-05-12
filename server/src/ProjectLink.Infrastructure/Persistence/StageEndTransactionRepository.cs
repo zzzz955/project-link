@@ -16,13 +16,13 @@ public class StageEndTransactionRepository : IStageEndTransaction
 
         // Ensure rows exist before locking
         await _db.Database.ExecuteSqlInterpolatedAsync(
-            $"INSERT INTO stage_progress (user_id, stage_id, stars, cleared_at) VALUES ({cmd.UserId}, {cmd.StageId}, 0, NOW()) ON CONFLICT DO NOTHING", ct);
+            $"INSERT IGNORE INTO stage_progress (user_id, stage_id, stars, cleared_at) VALUES ({cmd.UserId}, {cmd.StageId}, 0, NOW())", ct);
         await _db.Database.ExecuteSqlInterpolatedAsync(
-            $"INSERT INTO stage_best_records (user_id, stage_id, best_clear_time_ms, best_score, cleared_at) VALUES ({cmd.UserId}, {cmd.StageId}, 0, 0, NOW()) ON CONFLICT DO NOTHING", ct);
+            $"INSERT IGNORE INTO stage_best_records (user_id, stage_id, best_clear_time_ms, best_score, cleared_at) VALUES ({cmd.UserId}, {cmd.StageId}, 0, 0, NOW())", ct);
         await _db.Database.ExecuteSqlInterpolatedAsync(
-            $"INSERT INTO user_ranking_cache (user_id, total_score, stages_cleared, updated_at) VALUES ({cmd.UserId}, 0, 0, NOW()) ON CONFLICT DO NOTHING", ct);
+            $"INSERT IGNORE INTO user_ranking_cache (user_id, total_score, stages_cleared, updated_at) VALUES ({cmd.UserId}, 0, 0, NOW())", ct);
         await _db.Database.ExecuteSqlInterpolatedAsync(
-            $"INSERT INTO user_currency (user_id, soft_amount) VALUES ({cmd.UserId}, 0) ON CONFLICT DO NOTHING", ct);
+            $"INSERT IGNORE INTO user_currency (user_id, soft_amount) VALUES ({cmd.UserId}, 0)", ct);
 
         // Acquire locks in deterministic order to prevent deadlocks
         var progress = await _db.StageProgress
@@ -90,8 +90,7 @@ public class StageEndTransactionRepository : IStageEndTransaction
             await _db.Database.ExecuteSqlInterpolatedAsync($"""
                 INSERT INTO daily_challenge_progress (user_id, challenge_date, play_count, completed, streak_days, created_at)
                 VALUES ({cmd.UserId}, {cmd.ChallengeDate}, 1, false, 0, NOW())
-                ON CONFLICT (user_id, challenge_date) DO UPDATE
-                  SET play_count = daily_challenge_progress.play_count + 1
+                ON DUPLICATE KEY UPDATE play_count = play_count + 1
                 """, ct);
         }
 

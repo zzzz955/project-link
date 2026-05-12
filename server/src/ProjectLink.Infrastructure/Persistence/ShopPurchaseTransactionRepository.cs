@@ -17,7 +17,7 @@ public class ShopPurchaseTransactionRepository : IShopPurchaseTransaction
         await using var tx = await _db.Database.BeginTransactionAsync(ct);
 
         await _db.Database.ExecuteSqlInterpolatedAsync(
-            $"INSERT INTO user_currency (user_id, soft_amount) VALUES ({userId}, 0) ON CONFLICT DO NOTHING", ct);
+            $"INSERT IGNORE INTO user_currency (user_id, soft_amount) VALUES ({userId}, 0)", ct);
 
         var currency = await _db.UserCurrencies
             .FromSqlInterpolated($"SELECT * FROM user_currency WHERE user_id = {userId} FOR UPDATE")
@@ -47,8 +47,7 @@ public class ShopPurchaseTransactionRepository : IShopPurchaseTransaction
         await _db.Database.ExecuteSqlInterpolatedAsync($"""
             INSERT INTO inventory (user_id, item_id, quantity)
             VALUES ({userId}, {itemId}, {quantity})
-            ON CONFLICT (user_id, item_id) DO UPDATE
-              SET quantity = inventory.quantity + {quantity}
+            ON DUPLICATE KEY UPDATE quantity = quantity + {quantity}
             """, ct);
 
         _db.ChangeTracker.Clear();

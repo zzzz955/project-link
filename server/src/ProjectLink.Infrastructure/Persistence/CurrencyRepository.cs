@@ -22,7 +22,7 @@ public class CurrencyRepository : ICurrencyRepository
         await using var tx = await _db.Database.BeginTransactionAsync(ct);
 
         await _db.Database.ExecuteSqlInterpolatedAsync(
-            $"INSERT INTO user_currency (user_id, soft_amount) VALUES ({userId}, 0) ON CONFLICT DO NOTHING", ct);
+            $"INSERT IGNORE INTO user_currency (user_id, soft_amount) VALUES ({userId}, 0)", ct);
 
         var row = await _db.UserCurrencies
             .FromSqlInterpolated($"SELECT * FROM user_currency WHERE user_id = {userId} FOR UPDATE")
@@ -55,7 +55,7 @@ public class CurrencyRepository : ICurrencyRepository
         await using var tx = await _db.Database.BeginTransactionAsync(ct);
 
         await _db.Database.ExecuteSqlInterpolatedAsync(
-            $"INSERT INTO user_currency (user_id, soft_amount) VALUES ({userId}, 0) ON CONFLICT DO NOTHING", ct);
+            $"INSERT IGNORE INTO user_currency (user_id, soft_amount) VALUES ({userId}, 0)", ct);
 
         var row = await _db.UserCurrencies
             .FromSqlInterpolated($"SELECT * FROM user_currency WHERE user_id = {userId} FOR UPDATE")

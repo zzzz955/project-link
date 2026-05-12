@@ -23,9 +23,9 @@ public class StaminaRefillTransactionRepository : IStaminaRefillTransaction
 
         // Ensure rows exist
         await _db.Database.ExecuteSqlInterpolatedAsync(
-            $"INSERT INTO stamina_state (user_id, current, last_recharged_at) VALUES ({userId}, {maxStamina}, NOW()) ON CONFLICT DO NOTHING", ct);
+            $"INSERT IGNORE INTO stamina_state (user_id, current, last_recharged_at) VALUES ({userId}, {maxStamina}, NOW())", ct);
         await _db.Database.ExecuteSqlInterpolatedAsync(
-            $"INSERT INTO user_currency (user_id, soft_amount) VALUES ({userId}, 0) ON CONFLICT DO NOTHING", ct);
+            $"INSERT IGNORE INTO user_currency (user_id, soft_amount) VALUES ({userId}, 0)", ct);
 
         // Acquire locks
         var state = await _db.StaminaStates

@@ -16,13 +16,13 @@ public class RankingRepository : IRankingRepository
     public async Task UpsertBestRecordAsync(string userId, int stageId, long clearTimeMs, int score, CancellationToken ct)
     {
         await _db.Database.ExecuteSqlInterpolatedAsync(
-            $@"INSERT INTO stage_best_records (user_id, stage_id, best_clear_time_ms, best_score, cleared_at)
-               VALUES ({userId}, {stageId}, {clearTimeMs}, {score}, NOW())
-               ON CONFLICT (user_id, stage_id) DO UPDATE
-                 SET best_clear_time_ms = {clearTimeMs},
-                     best_score = {score},
-                     cleared_at = NOW()
-               WHERE stage_best_records.best_clear_time_ms > {clearTimeMs}", ct);
+            $@"INSERT IGNORE INTO stage_best_records (user_id, stage_id, best_clear_time_ms, best_score, cleared_at)
+               VALUES ({userId}, {stageId}, {clearTimeMs}, {score}, NOW())", ct);
+
+        await _db.Database.ExecuteSqlInterpolatedAsync(
+            $@"UPDATE stage_best_records
+               SET best_clear_time_ms = {clearTimeMs}, best_score = {score}, cleared_at = NOW()
+               WHERE user_id = {userId} AND stage_id = {stageId} AND best_clear_time_ms > {clearTimeMs}", ct);
     }
 
     public async Task UpsertRankingCacheAsync(string userId, long totalScore, int stagesCleared, CancellationToken ct)
@@ -30,8 +30,8 @@ public class RankingRepository : IRankingRepository
         await _db.Database.ExecuteSqlInterpolatedAsync(
             $@"INSERT INTO user_ranking_cache (user_id, total_score, stages_cleared, updated_at)
                VALUES ({userId}, {totalScore}, {stagesCleared}, NOW())
-               ON CONFLICT (user_id) DO UPDATE
-                 SET total_score = {totalScore}, stages_cleared = {stagesCleared}, updated_at = NOW()", ct);
+               ON DUPLICATE KEY UPDATE
+                 total_score = {totalScore}, stages_cleared = {stagesCleared}, updated_at = NOW()", ct);
     }
 
     public Task<List<StageBestRecord>> GetUserBestRecordsAsync(string userId, CancellationToken ct)

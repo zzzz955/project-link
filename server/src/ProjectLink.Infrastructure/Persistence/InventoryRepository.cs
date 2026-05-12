@@ -19,7 +19,7 @@ public class InventoryRepository : IInventoryRepository
         await _db.Database.ExecuteSqlInterpolatedAsync(
             $@"INSERT INTO inventory (user_id, item_id, quantity)
                VALUES ({userId}, {itemId}, {quantity})
-               ON CONFLICT (user_id, item_id) DO UPDATE SET quantity = inventory.quantity + {quantity}", ct);
+               ON DUPLICATE KEY UPDATE quantity = quantity + {quantity}", ct);
 
         _db.ChangeTracker.Clear();
         var row = await _db.Inventories.FirstAsync(i => i.UserId == userId && i.ItemId == itemId, ct);

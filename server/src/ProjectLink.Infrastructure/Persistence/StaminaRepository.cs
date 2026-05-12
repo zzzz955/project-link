@@ -23,7 +23,7 @@ public class StaminaRepository : IStaminaRepository
     private async Task<StaminaState> EnsureAndLockAsync(string userId, int maxStamina, CancellationToken ct)
     {
         await _db.Database.ExecuteSqlInterpolatedAsync(
-            $"INSERT INTO stamina_state (user_id, current, last_recharged_at) VALUES ({userId}, {maxStamina}, NOW()) ON CONFLICT DO NOTHING", ct);
+            $"INSERT IGNORE INTO stamina_state (user_id, current, last_recharged_at) VALUES ({userId}, {maxStamina}, NOW())", ct);
 
         return await _db.StaminaStates
             .FromSqlInterpolated($"SELECT * FROM stamina_state WHERE user_id = {userId} FOR UPDATE")
@@ -33,7 +33,7 @@ public class StaminaRepository : IStaminaRepository
     public async Task<StaminaState> GetComputedAsync(string userId, int maxStamina, int rechargeIntervalMinutes, CancellationToken ct)
     {
         await _db.Database.ExecuteSqlInterpolatedAsync(
-            $"INSERT INTO stamina_state (user_id, current, last_recharged_at) VALUES ({userId}, {maxStamina}, NOW()) ON CONFLICT DO NOTHING", ct);
+            $"INSERT IGNORE INTO stamina_state (user_id, current, last_recharged_at) VALUES ({userId}, {maxStamina}, NOW())", ct);
 
         var state = await _db.StaminaStates.FirstAsync(s => s.UserId == userId, ct);
         ApplyRecharge(state, maxStamina, rechargeIntervalMinutes);

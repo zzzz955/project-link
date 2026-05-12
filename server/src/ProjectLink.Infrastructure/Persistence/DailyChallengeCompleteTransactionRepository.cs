@@ -46,7 +46,7 @@ public class DailyChallengeCompleteTransactionRepository : IDailyChallengeComple
         if (hasSoftReward)
         {
             await _db.Database.ExecuteSqlInterpolatedAsync(
-                $"INSERT INTO user_currency (user_id, soft_amount) VALUES ({userId}, 0) ON CONFLICT DO NOTHING", ct);
+                $"INSERT IGNORE INTO user_currency (user_id, soft_amount) VALUES ({userId}, 0)", ct);
 
             var currency = await _db.UserCurrencies
                 .FromSqlInterpolated($"SELECT * FROM user_currency WHERE user_id = {userId} FOR UPDATE")
@@ -80,8 +80,7 @@ public class DailyChallengeCompleteTransactionRepository : IDailyChallengeComple
             await _db.Database.ExecuteSqlInterpolatedAsync($"""
                 INSERT INTO inventory (user_id, item_id, quantity)
                 VALUES ({userId}, {reward.RewardId}, {reward.Amount})
-                ON CONFLICT (user_id, item_id) DO UPDATE
-                  SET quantity = inventory.quantity + {reward.Amount}
+                ON DUPLICATE KEY UPDATE quantity = quantity + {reward.Amount}
                 """, ct);
 
             _db.ChangeTracker.Clear();

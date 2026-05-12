@@ -10,7 +10,11 @@ if not exist ".env.dev" (
   goto :end
 )
 
-docker compose --env-file .env.dev -f docker-compose.yml -f docker-compose.dev.yml up -d %*
+set /p "BUILD=Build images before starting? (y/n): "
+set "BUILD_FLAG="
+if /i "%BUILD%"=="y" set "BUILD_FLAG=--build"
+
+docker compose --env-file .env.dev -f docker-compose.yml -f docker-compose.dev.yml up -d %BUILD_FLAG% %*
 set "STATUS=%ERRORLEVEL%"
 
 :end

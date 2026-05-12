@@ -37,6 +37,7 @@ popup.force_update.body,A new version is required to continue.,A new version is 
 popup.force_update.cta,Update Now,Update Now,Update Now,Update Now,Update Now
 popup.maintenance.title,Maintenance,Maintenance,Maintenance,Maintenance,Maintenance
 popup.maintenance.body,The service is currently under maintenance.,The service is currently under maintenance.,The service is currently under maintenance.,The service is currently under maintenance.,The service is currently under maintenance.
+popup.auth_internal_error.body,Authentication service is temporarily unavailable. Please try again.,Authentication service is temporarily unavailable. Please try again.,Authentication service is temporarily unavailable. Please try again.,Authentication service is temporarily unavailable. Please try again.,Authentication service is temporarily unavailable. Please try again.
 popup.session.title,Session Expired,Session Expired,Session Expired,Session Expired,Session Expired
 popup.session.body,Please return to the title screen and sign in again.,Please return to the title screen and sign in again.,Please return to the title screen and sign in again.,Please return to the title screen and sign in again.,Please return to the title screen and sign in again.
 popup.settings.title,Settings,Settings,Settings,Settings,Settings

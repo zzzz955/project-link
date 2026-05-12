@@ -11,6 +11,10 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Scalar.AspNetCore" Version="1.*" />
+    <PackageReference Include="Serilog.AspNetCore" Version="8.*" />
+    <PackageReference Include="Serilog.Settings.Configuration" Version="8.*" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="5.*" />
+    <PackageReference Include="Serilog.Sinks.File" Version="5.*" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.*" />
   </ItemGroup>
   <ItemGroup>

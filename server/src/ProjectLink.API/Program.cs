@@ -29,8 +29,17 @@ using Scalar.AspNetCore;
 using StackExchange.Redis;
 using ProjectLink.API.Middleware;
 using ProjectLink.API;
+using Serilog;
+using Serilog.Events;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Host.UseSerilog((context, services, loggerConfiguration) => loggerConfiguration
+    .ReadFrom.Configuration(context.Configuration)
+    .ReadFrom.Services(services)
+    .Enrich.FromLogContext()
+    .Enrich.With<ShortSourceContextEnricher>());
+
+var logNormalRequests = builder.Environment.IsDevelopment();
 var config  = builder.Configuration;
 var appConfig = ProjectLinkConfiguration.Load(config);
 
@@ -184,6 +193,25 @@ var app = builder.Build();
 
 // 10. Middleware pipeline
 app.UseMiddleware<CorrelationIdMiddleware>();
+app.UseSerilogRequestLogging(options =>
+{
+    options.MessageTemplate = "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms";
+    options.GetLevel = (context, elapsed, exception) =>
+    {
+        if (exception is not null || context.Response.StatusCode >= 500)
+            return LogEventLevel.Error;
+
+        if (elapsed > 500)
+            return LogEventLevel.Warning;
+
+        return logNormalRequests ? LogEventLevel.Information : LogEventLevel.Debug;
+    };
+    options.EnrichDiagnosticContext = (diagnosticContext, context) =>
+    {
+        if (context.Items["CorrelationId"] is string correlationId)
+            diagnosticContext.Set("CorrelationId", correlationId);
+    };
+});
 app.UseMiddleware<GlobalExceptionMiddleware>();
 app.UseHttpsRedirection();
 app.UseAuthentication();

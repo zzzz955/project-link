@@ -134,6 +134,31 @@ namespace ProjectLink.Core
             });
         }
 
+        public void AbandonStageAndLoad(string sceneName)
+        {
+            if (_stageEndSubmitted || string.IsNullOrEmpty(GameContext.StageSessionToken) || _uiData == null)
+            {
+                GameContext.ClearStageSession();
+                SceneLoader.Instance.LoadScene(sceneName);
+                return;
+            }
+
+            _stageEndSubmitted = true;
+            SetInputEnabled(false);
+            _timer?.Pause();
+
+            var token = GameContext.StageSessionToken;
+            var elapsedMs = GameContext.StageStartedAtMs > 0
+                ? System.DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - GameContext.StageStartedAtMs
+                : 0L;
+
+            GameContext.ClearStageSession();
+            _uiData.EndStage(_stageId, token, "fail", elapsedMs, _movesUsed, _ =>
+            {
+                SceneLoader.Instance.LoadScene(sceneName);
+            });
+        }
+
         int GetConnectedCount()
         {
             if (_drawer == null || _board == null) return 0;
@@ -253,11 +278,13 @@ namespace ProjectLink.Core
                 if (!stageResult.IsSuccess)
                 {
                     Debug.LogError($"Stage end failed: {stageResult.ErrorCode} {stageResult.ErrorMessage}");
+                    GameContext.ClearStageSession();
                     OpenClearPopup(new StageClearPopupModel(_stageId, 3, 0, 0, _movesUsed, _moveLimit, elapsedMs, 0, false, _stageId + 1, true));
                     return;
                 }
 
                 var value = stageResult.Value;
+                GameContext.ClearStageSession();
                 DataManager.Instance.ClearStage(_stageId, value.Stars);
                 OpenClearPopup(new StageClearPopupModel(
                     _stageId,

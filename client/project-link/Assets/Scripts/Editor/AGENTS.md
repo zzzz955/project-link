@@ -20,7 +20,7 @@
 | `ProjectLinkUIBuilder.BuildBootstrap(...)` | method | Slot_Logo + ProgressBar(Slider+Fill) + Btn_Retry + Txt_NetworkError + PopupLayer; wires BootstrapWireframeController |
 | `ProjectLinkUIBuilder.BuildTitle(...)` | method | Btn_Settings + Slot_Logo + Group_AuthButtons(Btn_Google+Btn_Apple) + Btn_TapToStart + Txt_Version; wires TitleWireframeController |
 | `ProjectLinkUIBuilder.BuildLobby(...)` | method | HUD_Strip(Row_Profile+Row_Stats) + MenuDropdown + Group_TabBodies(Tab_Home+Tab_Shop+Tab_Ranking) + TabBar; wires LobbyWireframeController + LobbyTabController |
-| `ProjectLinkUIBuilder.BuildGame(...)` | method | HUD_Top(Row_TopBar+Row_Objectives) + Group_Board(Bg_Board+layers) + Toolbar_Items; wires GameWireframeController |
+| `ProjectLinkUIBuilder.BuildGame(...)` | method | HUD_Top(Row_TopBar+Row_Objectives) + Toolbar_Items only; board renders in camera/world space; wires GameWireframeController |
 | `ProjectLinkUIBuilder.ApplyButtonSkin(image, key)` | method | assigns sprite from UIButtonSkin.buttons by skin-key; sets color white when matched |
 | `ProjectLinkUIBuilder.ApplySlotSkin(image, key)` | method | assigns sprite from UIButtonSkin.imageSlots by skin-key; sets color white when matched |
 | `ProjectLinkUIBuilder.FindTmpInChildren(root, name)` | method | linear search; returns first TextMeshProUGUI whose name matches |

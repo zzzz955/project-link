@@ -64,7 +64,7 @@ namespace ProjectLink.OutGame.UI
             viewportRect.sizeDelta = Vector2.zero;
             viewportRect.pivot = new Vector2(0, 1);
             viewportGo.AddComponent<CanvasRenderer>();
-            viewportGo.AddComponent<Image>().color = new Color(0, 0, 0, 0);
+            viewportGo.AddComponent<Image>().color = new Color(0, 0, 0, 255);
             viewportGo.AddComponent<Mask>().showMaskGraphic = false;
             scrollRect.viewport = viewportRect;
 
@@ -76,6 +76,12 @@ namespace ProjectLink.OutGame.UI
             contentRect.pivot = new Vector2(0.5f, 1f);
             contentRect.anchoredPosition = Vector2.zero;
             contentRect.sizeDelta = Vector2.zero;
+            var vlg = contentGo.AddComponent<VerticalLayoutGroup>();
+            vlg.childControlHeight = true;
+            vlg.childControlWidth = true;
+            vlg.childForceExpandHeight = false;
+            vlg.childForceExpandWidth = true;
+            vlg.padding = new RectOffset(0, 0, 0, 0);
             var csf = contentGo.AddComponent<ContentSizeFitter>();
             csf.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
             scrollRect.content = contentRect;
@@ -83,10 +89,14 @@ namespace ProjectLink.OutGame.UI
             var itemGo = new GameObject("Item");
             itemGo.transform.SetParent(contentGo.transform, false);
             var itemRect = itemGo.AddComponent<RectTransform>();
-            itemRect.anchorMin = new Vector2(0, 0.5f);
-            itemRect.anchorMax = new Vector2(1, 0.5f);
+            itemRect.anchorMin = new Vector2(0, 1);
+            itemRect.anchorMax = new Vector2(1, 1);
+            itemRect.pivot = new Vector2(0.5f, 1f);
             itemRect.sizeDelta = new Vector2(0, 56);
             itemGo.AddComponent<CanvasRenderer>();
+            var itemLayoutElement = itemGo.AddComponent<LayoutElement>();
+            itemLayoutElement.minHeight = 56f;
+            itemLayoutElement.preferredHeight = 56f;
             var itemImage = itemGo.AddComponent<Image>();
             itemImage.color = new Color(0, 0, 0, 0);
             var itemToggle = itemGo.AddComponent<Toggle>();

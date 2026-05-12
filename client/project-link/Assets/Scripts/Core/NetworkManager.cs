@@ -40,7 +40,7 @@ namespace ProjectLink.Core
             Instance = this;
             DontDestroyOnLoad(gameObject);
             ApplyEnvironment();
-            _authService ??= new PlatformAuthService(this, _authBaseUrl, clientVersion, protocolVersion, environment, httpLogging);
+            _authService ??= new PlatformAuthService(this, _baseUrl, clientVersion, protocolVersion, environment, httpLogging);
         }
 
         public void SetAuthToken(string accessToken) => _authService?.SetToken(accessToken);

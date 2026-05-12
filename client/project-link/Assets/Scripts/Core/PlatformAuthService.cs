@@ -30,7 +30,7 @@ namespace ProjectLink.Core
         public PlatformAuthService(MonoBehaviour runner, string baseUrl, string clientVersion, string protocolVersion, AppEnvironment env = AppEnvironment.Dev, bool httpLogging = true)
         {
             _runner = runner;
-            _baseUrl = string.IsNullOrEmpty(baseUrl) ? AppConfig.DevPlatformAuthUrl : baseUrl.TrimEnd('/');
+            _baseUrl = string.IsNullOrEmpty(baseUrl) ? AppConfig.DevGameServerUrl : baseUrl.TrimEnd('/');
             _clientVersion = clientVersion ?? "";
             _protocolVersion = protocolVersion ?? "";
             _storage = env == AppEnvironment.Prod ? (ITokenStorage)new SecureTokenStorage() : new PlayerPrefsTokenStorage();
@@ -66,8 +66,8 @@ namespace ProjectLink.Core
                 ClientId = _clientId,
                 DisplayName = null,
             };
-            Send<GuestLoginRequest, AuthSessionResponse>("/auth/guest", request, (ok, error, session) =>
-                CompleteSession(ok, error, "guest", session, onComplete));
+            Send<GuestLoginRequest, GameAuthResponse>("/api/auth/guest", request, (ok, error, auth) =>
+                CompleteSession(ok, error, "guest", auth, onComplete));
         }
 
         public void LoginGoogle(string idToken, string nonce, Action<bool, string> onComplete)
@@ -85,8 +85,8 @@ namespace ProjectLink.Core
                 Nonce = string.IsNullOrEmpty(nonce) ? null : nonce,
                 GuestRefreshToken = string.IsNullOrEmpty(_refreshToken) ? null : _refreshToken,
             };
-            Send<GoogleLoginRequest, AuthSessionResponse>("/auth/google", request, (ok, error, session) =>
-                CompleteSession(ok, error, "google", session, onComplete));
+            Send<GoogleLoginRequest, GameAuthResponse>("/api/auth/google", request, (ok, error, auth) =>
+                CompleteSession(ok, error, "google", auth, onComplete));
         }
 
         public void Refresh(Action<bool, string> onComplete)
@@ -97,8 +97,8 @@ namespace ProjectLink.Core
                 return;
             }
 
-            Send<RefreshRequest, AuthSessionResponse>("/auth/refresh", new RefreshRequest { RefreshToken = _refreshToken },
-                (ok, error, session) =>
+            Send<RefreshRequest, GameAuthResponse>("/api/auth/refresh", new RefreshRequest { RefreshToken = _refreshToken },
+                (ok, error, auth) =>
                 {
                     if (!ok)
                     {
@@ -107,7 +107,7 @@ namespace ProjectLink.Core
                         return;
                     }
 
-                    CompleteSession(true, "", string.IsNullOrEmpty(_provider) ? "refresh" : _provider, session, onComplete);
+                    CompleteSession(true, "", string.IsNullOrEmpty(_provider) ? "refresh" : _provider, auth, onComplete);
                 });
         }
 
@@ -120,7 +120,7 @@ namespace ProjectLink.Core
                 return;
             }
 
-            Send<LogoutRequest, EmptyResponse>("/auth/logout",
+            Send<LogoutRequest, EmptyResponse>("/api/auth/logout",
                 new LogoutRequest { RefreshToken = _refreshToken, Reason = "client_logout" },
                 (ok, error, _) =>
                 {
@@ -152,17 +152,17 @@ namespace ProjectLink.Core
             UiEventBus.Publish(new AuthStateChanged(false, ""));
         }
 
-        void CompleteSession(bool ok, string error, string provider, AuthSessionResponse session, Action<bool, string> onComplete)
+        void CompleteSession(bool ok, string error, string provider, GameAuthResponse auth, Action<bool, string> onComplete)
         {
-            if (!ok || session?.Tokens == null)
+            if (!ok || auth == null || string.IsNullOrEmpty(auth.AccessToken))
             {
                 onComplete?.Invoke(false, string.IsNullOrEmpty(error) ? "AUTH_FAILED" : error);
                 return;
             }
 
-            _accessToken = session.Tokens.AccessToken ?? "";
-            _refreshToken = session.Tokens.RefreshToken ?? "";
-            _accessExpiresAt = ParseTime(session.Tokens.AccessTokenExpiresAt);
+            _accessToken = auth.AccessToken ?? "";
+            _refreshToken = auth.RefreshToken ?? "";
+            _accessExpiresAt = ParseTime(auth.ExpiresAt);
             _provider = provider ?? "";
 
             _storage.Set(AccessTokenKey, _accessToken);
@@ -319,22 +319,11 @@ namespace ProjectLink.Core
             public string Reason { get; set; }
         }
 
-        sealed class AuthSessionResponse
+        sealed class GameAuthResponse
         {
-            public string AccountId { get; set; }
-            public string SessionId { get; set; }
-            public string AccountType { get; set; }
-            public string ClientId { get; set; }
-            public AuthTokenResponse Tokens { get; set; }
-        }
-
-        sealed class AuthTokenResponse
-        {
-            public string AccessToken { get; set; }
+            public string AccessToken  { get; set; }
             public string RefreshToken { get; set; }
-            public string AccessTokenExpiresAt { get; set; }
-            public string RefreshTokenExpiresAt { get; set; }
-            public string TokenType { get; set; }
+            public string ExpiresAt    { get; set; }
         }
 
         sealed class AuthErrorResponse

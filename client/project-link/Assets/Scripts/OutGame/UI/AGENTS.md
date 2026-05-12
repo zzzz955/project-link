@@ -41,7 +41,7 @@
 | `BootstrapWireframeController.Start()` | method | creates `BootstrapViewModel`, binds retry button, starts bootstrap load |
 | `BootstrapWireframeController.Render()` | method | renders loading/error/version and opens ForceUpdate or Title scene |
 | `TitleWireframeController.Start()` | method | creates `TitleViewModel`, owns auth button listeners |
-| `TitleWireframeController.Render()` | method | renders auth loading state and opens ForceUpdate/Maintenance/Lobby |
+| `TitleWireframeController.Render()` | method | renders auth loading state and opens ForceUpdate/Maintenance/Lobby after scene transition is idle |
 | `LobbyTabController.Configure(...)` | method | assigns tab buttons and tab panels from generated UI builder |
 | `LobbyWireframeController.RefreshRanking(string)` | method | requests ranking segment through `LobbyViewModel` |
 | `LobbyWireframeController.Render()` | method | renders Lobby/Shop/Ranking viewmodel state and localized errors |

@@ -919,24 +919,6 @@ namespace ProjectLink.EditorTools
             moveTmp.alignment = TextAlignmentOptions.MidlineRight;
             moveTxt.gameObject.AddComponent<LayoutElement>().preferredWidth = 200;
 
-            // Group_Board
-            var board = MakeChild(safe, "Group_Board");
-            SetAnchor(board, Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f));
-            board.offsetMin = new Vector2(40, 200);
-            board.offsetMax = new Vector2(-40, -200);
-            var boardImg = board.gameObject.AddComponent<Image>();
-            boardImg.color = new Color(0, 0, 0, 0);
-
-            var bgBoard = MakeChild(board, "Bg_Board");
-            Stretch(bgBoard);
-            var bgImg = bgBoard.gameObject.AddComponent<Image>();
-            bgImg.color = HexColor("#16213EAA");
-            ApplySlotSkin(bgImg, "slot_board_bg");
-
-            MakeChild(board, "Layer_Cells");
-            MakeChild(board, "Layer_Lines");
-            MakeChild(board, "Layer_Effects");
-
             // Toolbar_Items
             var toolbar = MakeChild(safe, "Toolbar_Items");
             SetAnchor(toolbar, new Vector2(0, 0), new Vector2(1, 0), new Vector2(0.5f, 0));

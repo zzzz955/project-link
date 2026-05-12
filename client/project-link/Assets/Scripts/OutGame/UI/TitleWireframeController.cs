@@ -1,3 +1,4 @@
+using System.Collections;
 using ProjectLink.Services;
 using TMPro;
 using ProjectLink.Core;
@@ -85,7 +86,7 @@ namespace ProjectLink.OutGame.UI
             if (_viewModel.EnterLobbyRequested && !_lobbyLoadRequested)
             {
                 _lobbyLoadRequested = true;
-                LoadLobby();
+                StartCoroutine(LoadLobbyWhenReady());
             }
         }
 
@@ -109,7 +110,15 @@ namespace ProjectLink.OutGame.UI
             button.onClick.AddListener(action);
         }
 
-        static void LoadLobby()
+        IEnumerator LoadLobbyWhenReady()
+        {
+            while (SceneLoader.Instance != null && SceneLoader.Instance.IsLoading)
+                yield return null;
+
+            LoadLobby();
+        }
+
+        void LoadLobby()
         {
             if (SceneLoader.Instance != null)
             {

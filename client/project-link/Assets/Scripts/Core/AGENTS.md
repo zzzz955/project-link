@@ -37,6 +37,7 @@
 | `GameStateMachine.OnStateChanged` | event | `Action<GameState,GameState>` (from, to) |
 | `InGameController.Instance` | prop | singleton; valid during Game scene lifetime |
 | `InGameController.OpenPausePopup()` | method | opens PausePopup with timer pause/resume callbacks |
+| `InGameController.AbandonStageAndLoad(string)` | method | submits stage fail with active session token, clears context, then loads target scene |
 | `UIManager.GetLayer(UILayer)` | method | returns canvas Transform for named layer |
 | `PopupId` | enum | popup ids: ReturnTitle, ExitGame, Settings, BuyItem, Energy, DailyChallenge, Account, Reward, StageClear, SessionExpired, Pause, ForceUpdate, Maintenance |
 | `PopupManager.Request(PopupId,object)` | method | static event-driven popup request entry point |
@@ -45,7 +46,7 @@
 | `PopupBase.BindOverlayClose()` | method | binds the first child Button named "Overlay" to CloseTop; call from each prefab popup Init() |
 | `AppEnvironment` | enum | `Dev` / `Prod` |
 | `AppConfig.DevGameServerUrl` | const | `http://localhost:20101` |
-| `AppConfig.DevPlatformAuthUrl` | const | `http://localhost:20001` |
+| `AppConfig.DevPlatformAuthUrl` | const | `http://localhost:20001` — server-side only; client routes auth via game server |
 | `IAuthService.EnsureAuth(Action<bool,string>)` | method | ensures a valid access token exists; refreshes or guest-logins through active auth service |
 | `IAuthService.LoginGuest(Action<bool,string>)` | method | creates/restores platform guest session |
 | `IAuthService.LoginGoogle(string,string,Action<bool,string>)` | method | submits native Google ID token to platform auth |

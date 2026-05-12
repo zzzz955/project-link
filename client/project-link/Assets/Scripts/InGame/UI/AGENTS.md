@@ -23,8 +23,8 @@
 | `CircularGauge.SetProgress(float)` | method | t in [0,1] draws arc (0=empty, 1=full circle) |
 | `CircularGauge.Hide()` | method | disables gauge |
 | `ClearPopup.Init(StageClearPopupModel)` | method | server-backed stage clear model; binds Next/Retry/Lobby buttons |
-| `PausePopup.Init(Action)` | method | onResume callback; back-press resumes |
-| `TimeoutPopup.Init(int)` | method | stageId only; OnBackPressed() is no-op |
+| `PausePopup.Init(Action)` | method | onResume callback; back-press resumes; Retry/Lobby abandon current stage before navigation |
+| `TimeoutPopup.Init(int)` | method | stageId only; Retry/Lobby abandon current stage before navigation; OnBackPressed() is no-op |
 
 ## Cross-refs
 - Consumed by: client `Core.InGameController` (show/hide popups, call InGameHUD.Init/Refresh/SetTimerDisplay)

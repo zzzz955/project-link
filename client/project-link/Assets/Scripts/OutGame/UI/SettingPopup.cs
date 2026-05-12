@@ -42,16 +42,11 @@ namespace ProjectLink.OutGame.UI
 
         void RefreshAccount()
         {
-            UiServiceLocator.UiData.GetAccountMe(result =>
-            {
-                if (!result.IsSuccess)
-                {
-                    SetText(accountStatusText, result.ErrorCode);
-                    return;
-                }
-
-                SetText(accountStatusText, result.Value.IsGuest ? "Guest" : result.Value.DisplayName);
-            });
+            var provider = ProjectLink.Core.NetworkManager.Instance?.AuthProvider;
+            var label    = string.IsNullOrEmpty(provider) || provider == "guest" || provider == "refresh"
+                ? "Guest"
+                : provider;
+            SetText(accountStatusText, label);
         }
 
         void BindClose(Button button)

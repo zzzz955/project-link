@@ -32,13 +32,19 @@ namespace ProjectLink.InGame.UI
             retryBtn.onClick.AddListener(() =>
             {
                 PopupManager.Instance.CloseAll();
-                SceneLoader.Instance.LoadScene("Game");
+                if (InGameController.Instance != null)
+                    InGameController.Instance.AbandonStageAndLoad("Game");
+                else
+                    SceneLoader.Instance.LoadScene("Game");
             });
 
             lobbyBtn.onClick.AddListener(() =>
             {
                 PopupManager.Instance.CloseAll();
-                SceneLoader.Instance.LoadScene("Lobby");
+                if (InGameController.Instance != null)
+                    InGameController.Instance.AbandonStageAndLoad("Lobby");
+                else
+                    SceneLoader.Instance.LoadScene("Lobby");
             });
         }
 

@@ -123,10 +123,10 @@ else
             {
                 OnTokenValidated = ctx =>
                 {
-                    var clientId = appConfig.App.ClientId;
-                    var appClaim = ctx.Principal?.FindFirst("app")?.Value;
-                    if (appClaim != clientId)
-                        ctx.Fail("Invalid app claim");
+                    var clientId    = appConfig.App.ClientId;
+                    var clientClaim = ctx.Principal?.FindFirst("client_id")?.Value;
+                    if (clientClaim is null || !clientClaim.StartsWith($"{clientId}:", StringComparison.Ordinal))
+                        ctx.Fail("Invalid client_id claim");
                     return Task.CompletedTask;
                 },
             };

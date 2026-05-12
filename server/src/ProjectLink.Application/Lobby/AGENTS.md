@@ -8,7 +8,7 @@
 ## Symbols
 | symbol | kind | note |
 |--------|------|------|
-| `LobbyService.GetAsync` | method | 5 parallel DB reads + 1 conditional yesterday streak read |
+| `LobbyService.GetAsync` | method | 5 sequential DB reads + 1 conditional yesterday streak read |
 
 ## Cross-refs
 - Consumed by: `API.Controllers.LobbyController` → `GET /api/lobby`

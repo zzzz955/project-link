@@ -33,6 +33,28 @@ public class SessionRepository : ISessionRepository
         await _db.SaveChangesAsync(ct);
     }
 
+    public async Task<bool> TryCreateSessionAsync(string userId, string sessionId, DateTimeOffset expiresAt, CancellationToken ct)
+    {
+        try
+        {
+            _db.Sessions.Add(new Session
+            {
+                UserId    = userId,
+                SessionId = sessionId,
+                CreatedAt = DateTimeOffset.UtcNow,
+                ExpiresAt = expiresAt,
+                Active    = true,
+            });
+            await _db.SaveChangesAsync(ct);
+            return true;
+        }
+        catch (DbUpdateException)
+        {
+            _db.ChangeTracker.Clear();
+            return false;
+        }
+    }
+
     public async Task InvalidateAsync(string userId, CancellationToken ct)
     {
         await _db.Sessions

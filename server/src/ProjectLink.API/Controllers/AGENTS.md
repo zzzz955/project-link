@@ -24,7 +24,10 @@
 | symbol | kind | note |
 |--------|------|------|
 | `BootstrapController.GetConfig` | method | `GET /api/bootstrap/config`; no auth; returns `BootstrapConfigResponse` |
-| `AuthController.Guest` | method | `POST /api/auth/guest`; mock mode: returns `mock:guest` token; real mode (`Auth:UseMock=false`): proxies to `{Jwt:Authority}/auth/guest` |
+| `AuthController.Guest` | method | `POST /api/auth/guest`; mock: returns `AuthResponse` with mock:guest token; real: proxies to platform, transforms `AuthSessionResponse` → `AuthResponse` |
+| `AuthController.Refresh` | method | `POST /api/auth/refresh`; mock: returns fresh mock `AuthResponse`; real: proxies to `{authority}/auth/refresh`, transforms response |
+| `AuthController.Google` | method | `POST /api/auth/google`; mock: 400 PROVIDER_UNAVAILABLE; real: proxies to `{authority}/auth/google`, transforms response |
+| `AuthController.Logout` | method | `POST /api/auth/logout`; mock: 204; real: proxies to `{authority}/auth/logout` |
 | `AccountController.Me` | method | `GET /api/account/me`; returns authenticated `AccountMeResponse` |
 | `StageController.Start` | method | `POST /api/stage/{stageId}/start` |
 | `StageController.Lock` | method | `POST /api/stage/{stageId}/lock`; body includes `sessionToken` |

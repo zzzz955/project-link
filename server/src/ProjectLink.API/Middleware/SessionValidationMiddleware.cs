@@ -22,12 +22,26 @@ public class SessionValidationMiddleware
         var sessionId = ctx.User.FindFirstValue("session_id");
         var isMockAuth = ctx.User.FindFirstValue("mock_auth") == "true";
 
-        if (userId is null || sessionId is null || (!isMockAuth && !await sessionService.ValidateSessionAsync(userId, sessionId)))
+        if (userId is null || sessionId is null)
         {
             ctx.Response.StatusCode  = 401;
             ctx.Response.ContentType = "application/json";
             await ctx.Response.WriteAsJsonAsync(new { reason = "session_invalidated" });
             return;
+        }
+
+        if (!isMockAuth && !await sessionService.ValidateSessionAsync(userId, sessionId))
+        {
+            // Platform JWT is valid (passed auth middleware) but session not yet in local store — sync it.
+            var expStr = ctx.User.FindFirstValue("exp");
+            if (expStr is null || !long.TryParse(expStr, out var expUnix))
+            {
+                ctx.Response.StatusCode  = 401;
+                ctx.Response.ContentType = "application/json";
+                await ctx.Response.WriteAsJsonAsync(new { reason = "session_invalidated" });
+                return;
+            }
+            await sessionService.SyncSessionAsync(userId, sessionId, DateTimeOffset.FromUnixTimeSeconds(expUnix), ctx.RequestAborted);
         }
 
         // Upsert user_profiles on every authenticated request (Redis-cached after first insert)

@@ -14,5 +14,5 @@
 
 ## Rules
 - `userId` extracted from authenticated claims in every authenticated controller; never from request body.
-- Unauthenticated endpoints: `GET /health`, `GET /api/bootstrap/config`, `GET /api/events/season`, `POST /api/auth/guest`.
+- Unauthenticated endpoints: `GET /health`, `GET /api/bootstrap/config`, `GET /api/events/season`, `POST /api/auth/guest`, `POST /api/auth/refresh`, `POST /api/auth/google`, `POST /api/auth/logout`.
 - Middleware order in `Program.cs`: CorrelationId -> SerilogRequestLogging -> GlobalException -> HTTPS -> Auth -> Authorization -> RateLimit -> VersionCheck -> MetaHash -> SessionValidation -> Controllers.

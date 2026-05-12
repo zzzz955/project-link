@@ -39,7 +39,7 @@ public sealed class MockAuthenticationHandler : AuthenticationHandler<Authentica
             new Claim("name", "Guest"),
             new Claim("session_id", "mock-session"),
             new Claim("mock_auth", "true"),
-            new Claim("app", "projectlink"),
+            new Claim("client_id", "project-link:mock"),
         };
 
         var identity = new ClaimsIdentity(claims, SchemeName);

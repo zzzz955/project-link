@@ -36,4 +36,16 @@ public class SessionService
         var stored = await _sessionRepo.GetCurrentSessionIdAsync(userId, ct);
         return stored == claimedSessionId;
     }
+
+    // Registers a platform-issued session into the local store on first use.
+    // Safe to call concurrently — duplicate inserts (same session_id UQ constraint) are silently swallowed.
+    public async Task SyncSessionAsync(string userId, string sessionId, DateTimeOffset expiresAt, CancellationToken ct = default)
+    {
+        var ttl = expiresAt - DateTimeOffset.UtcNow;
+        if (ttl <= TimeSpan.Zero) return;
+
+        await _sessionRepo.TryCreateSessionAsync(userId, sessionId, expiresAt, ct);
+
+        await _sessionCache.SetSessionIdAsync(userId, sessionId, ttl);
+    }
 }

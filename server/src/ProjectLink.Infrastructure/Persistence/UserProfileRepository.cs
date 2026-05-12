@@ -30,7 +30,7 @@ public class UserProfileRepository : IUserProfileRepository
         await _db.Database.ExecuteSqlInterpolatedAsync(
             $@"INSERT INTO user_profiles (user_id, display_name, account_created_at, last_login_at)
                VALUES ({userId}, {displayName}, NOW(), NOW())
-               ON CONFLICT (user_id) DO UPDATE SET last_login_at = NOW()",
+               ON DUPLICATE KEY UPDATE last_login_at = NOW()",
             ct);
 
         await _redis.StringSetAsync(cacheKey, "1", ProfileExistsTtl);

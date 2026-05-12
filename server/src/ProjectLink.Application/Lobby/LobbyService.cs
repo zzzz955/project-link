@@ -34,20 +34,11 @@ public class LobbyService
         var dcConfig = _staticData.GetDailyChallengeConfig();
         var today    = DateOnly.FromDateTime(DateTime.UtcNow);
 
-        // Fetch independent data in parallel
-        var profileTask   = _profiles.GetByIdAsync(userId, ct);
-        var staminaTask   = _stamina.GetComputedAsync(userId, config.MaxStamina, config.RechargeSeconds / 60, ct);
-        var balanceTask   = _currency.GetBalanceAsync(userId, ct);
-        var progressTask  = _progress.GetAllAsync(userId, ct);
-        var dailyTask     = _dailyChallenge.GetForDateAsync(userId, today, ct);
-
-        await Task.WhenAll(profileTask, staminaTask, balanceTask, progressTask, dailyTask);
-
-        var profile     = await profileTask;
-        var stamina     = await staminaTask;
-        var balance     = await balanceTask;
-        var cleared     = (await progressTask).ToList();
-        var dailyRow    = await dailyTask;
+        var profile  = await _profiles.GetByIdAsync(userId, ct);
+        var stamina  = await _stamina.GetComputedAsync(userId, config.MaxStamina, config.RechargeSeconds / 60, ct);
+        var balance  = await _currency.GetBalanceAsync(userId, ct);
+        var cleared  = (await _progress.GetAllAsync(userId, ct)).ToList();
+        var dailyRow = await _dailyChallenge.GetForDateAsync(userId, today, ct);
 
         // Derive streak: use today's if completed, else check yesterday
         int streakDays;

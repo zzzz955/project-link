@@ -21,6 +21,7 @@
 | symbol | kind | note |
 |--------|------|------|
 | `UserProfile.AvatarId` | property | default=1; shown in ranking entries and lobby |
+| `UserProfile.MaxClearedStageId` | property | highest sequentially-cleared stage (0 = none); updated by atomic conditional UPDATE in `StageEndTransactionRepository` |
 | `DailyChallengeProgress.StreakDays` | property | set at COMPLETION time (not at row creation); 0 on new rows |
 | `DailyChallengeProgress.LastStreakDate` | property | nullable; date of last consecutive completion |
 | `PlayerSettings.Language` | property | default="EN"; ISO 639-1 code |

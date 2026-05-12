@@ -109,6 +109,7 @@ public class AppDbContext : DbContext
             e.Property(x => x.AvatarId).HasColumnName("avatar_id").HasDefaultValue(1);
             e.Property(x => x.AccountCreatedAt).HasColumnName("account_created_at");
             e.Property(x => x.LastLoginAt).HasColumnName("last_login_at");
+            e.Property(x => x.MaxClearedStageId).HasColumnName("max_cleared_stage_id").HasDefaultValue(0);
         });
 
         modelBuilder.Entity<DailyChallengeProgress>(e =>

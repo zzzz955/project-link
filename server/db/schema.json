@@ -103,8 +103,9 @@
         { "name": "user_id",            "type": "string(36)", "constraints": ["PK","NN"] },
         { "name": "display_name",       "type": "string(64)", "constraints": ["NN"] },
         { "name": "avatar_id",          "type": "int32",      "constraints": ["NN"], "default": "1" },
-        { "name": "account_created_at", "type": "datetime",   "constraints": ["NN"] },
-        { "name": "last_login_at",      "type": "datetime",   "constraints": ["NN"] }
+        { "name": "account_created_at",     "type": "datetime", "constraints": ["NN"] },
+        { "name": "last_login_at",           "type": "datetime", "constraints": ["NN"] },
+        { "name": "max_cleared_stage_id",    "type": "int32",    "constraints": ["NN"], "default": "0" }
       ]
     },
     {

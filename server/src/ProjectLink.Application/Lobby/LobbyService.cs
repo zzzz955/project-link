@@ -52,11 +52,11 @@ public class LobbyService
             streakDays = (yesterdayRow?.Completed == true) ? yesterdayRow.StreakDays : 0;
         }
 
-        var highestCleared  = cleared.Count > 0 ? cleared.Max(p => p.StageId) : 0;
-        var totalStars      = cleared.Sum(p => p.Stars);
-        var allStages       = _staticData.GetAllStages();
-        var maxStageId      = allStages.Count > 0 ? allStages.Max(s => s.StageId) : 0;
-        var nextUnlocked    = Math.Min(highestCleared + 1, maxStageId);
+        var highestSequential = profile?.MaxClearedStageId ?? 0;
+        var totalStars        = cleared.Sum(p => p.Stars);
+        var allStages         = _staticData.GetAllStages();
+        var maxStageId        = allStages.Count > 0 ? allStages.Max(s => s.StageId) : 0;
+        var nextUnlocked      = Math.Min(highestSequential + 1, maxStageId);
 
         var nextRecharge = stamina.Current < config.MaxStamina
             ? stamina.LastRechargedAt.AddSeconds(config.RechargeSeconds)
@@ -95,7 +95,7 @@ public class LobbyService
             },
             ProgressSummary = new LobbyProgressSummary
             {
-                HighestStageId      = highestCleared,
+                HighestStageId      = highestSequential,
                 TotalStarsEarned    = totalStars,
                 NextUnlockedStageId = nextUnlocked,
             },

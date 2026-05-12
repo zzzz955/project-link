@@ -4,6 +4,7 @@ using ProjectLink.Contracts.Stage;
 using ProjectLink.Domain.Exceptions;
 using ProjectLink.Domain.Interfaces;
 using ProjectLink.Domain.Stage;
+using ProjectLink.Domain.Utilities;
 
 namespace ProjectLink.Application.Stage;
 
@@ -45,7 +46,7 @@ public class StageService
         {
             UserId       = userId,
             StageId      = stageId,
-            Token        = Guid.NewGuid().ToString(),
+            Token        = IdHelper.NewId(),
             StartAtMs    = now.ToUnixTimeMilliseconds(),
             IsSetupPhase = true,
             IsExtended   = false
@@ -130,8 +131,7 @@ public class StageService
 
         var serverElapsedMs = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - session.StartAtMs;
         var config          = _staticData.GetStaminaConfig();
-        var toleranceMs     = 2000; // fixed 2s tolerance
-        var adjustedMs      = RankingService.AdjustElapsedMs(clientElapsedMs, serverElapsedMs, toleranceMs);
+        var adjustedMs      = RankingService.AdjustElapsedMs(clientElapsedMs, serverElapsedMs, _rankingService.NetworkToleranceMs);
         var score           = RankingService.ComputeScore(stageData.TimeLimit, adjustedMs);
         var maxScore        = stageData.TimeLimit * 100;
         var stars           = score >= maxScore * 3 / 4 ? 3 : score >= maxScore / 2 ? 2 : 1;

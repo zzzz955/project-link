@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using ProjectLink.Domain.Entities;
 using ProjectLink.Domain.Interfaces;
+using ProjectLink.Domain.Utilities;
 
 namespace ProjectLink.Infrastructure.Persistence;
 
@@ -93,7 +94,7 @@ public class StageEndTransactionRepository : IStageEndTransaction
             _db.CurrencyLogs.Add(new CurrencyLog
             {
                 UserId        = cmd.UserId,
-                TransactionId = Guid.NewGuid().ToString(),
+                TransactionId = IdHelper.NewId(),
                 CurrencyType  = "soft",
                 Delta         = softRewardGranted,
                 BalanceBefore = balanceBefore,
@@ -102,6 +103,16 @@ public class StageEndTransactionRepository : IStageEndTransaction
                 CorrelationId = cmd.CorrelationId,
                 CreatedAt     = DateTimeOffset.UtcNow,
             });
+        }
+
+        // Update sequential progress tracker only when clearing in order
+        if (isFirstClear)
+        {
+            await _db.Database.ExecuteSqlInterpolatedAsync($"""
+                UPDATE user_profiles
+                SET max_cleared_stage_id = {cmd.StageId}
+                WHERE user_id = {cmd.UserId} AND IFNULL(max_cleared_stage_id, 0) = {cmd.StageId} - 1
+                """, ct);
         }
 
         await _db.SaveChangesAsync(ct);

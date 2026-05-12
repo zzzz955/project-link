@@ -33,6 +33,12 @@ using Serilog;
 using Serilog.Events;
 
 var builder = WebApplication.CreateBuilder(args);
+var config    = builder.Configuration;
+var appConfig = ProjectLinkConfiguration.Load(config);
+
+if (Enum.TryParse<LogEventLevel>(appConfig.LogLevel, ignoreCase: true, out var minLevel))
+    config["Serilog:MinimumLevel:Default"] = minLevel.ToString();
+
 builder.Host.UseSerilog((context, services, loggerConfiguration) => loggerConfiguration
     .ReadFrom.Configuration(context.Configuration)
     .ReadFrom.Services(services)
@@ -40,8 +46,6 @@ builder.Host.UseSerilog((context, services, loggerConfiguration) => loggerConfig
     .Enrich.With<ShortSourceContextEnricher>());
 
 var logNormalRequests = builder.Environment.IsDevelopment();
-var config  = builder.Configuration;
-var appConfig = ProjectLinkConfiguration.Load(config);
 
 // 1. DbContext
 builder.Services.AddDbContext<AppDbContext>(opts =>

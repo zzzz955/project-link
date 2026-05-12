@@ -23,6 +23,7 @@ services:
       APP_CLIENT_ID: ${APP_CLIENT_ID:?APP_CLIENT_ID is required}
       APP_ALLOWED_CLIENT_VERSION: ${APP_ALLOWED_CLIENT_VERSION:?APP_ALLOWED_CLIENT_VERSION is required}
       APP_ALLOWED_PROTOCOL_VERSION: ${APP_ALLOWED_PROTOCOL_VERSION:?APP_ALLOWED_PROTOCOL_VERSION is required}
+      LOG_LEVEL: ${LOG_LEVEL:-Information}
     networks:
       - default
       - madalang-net

@@ -9,10 +9,16 @@
 | `ProjectLinkConfiguration.cs` | Strict env/config loader for deploy/runtime values |
 | `MockAuthenticationHandler.cs` | Development/mock auth scheme for local guest tokens |
 | `ShortSourceContextEnricher.cs` | Serilog enricher that shortens SourceContext values to class names |
-| `appsettings.Development.json` | Development Serilog level overrides |
+| `appsettings.Development.json` | Development Serilog level overrides (EF Core DB commands at Debug) |
 | `appsettings.Production.json` | Production Serilog level and WARN+ file sink settings |
+
+## Symbols
+| symbol | kind | note |
+|--------|------|------|
+| `ProjectLinkConfiguration.LogLevel` | property | `required string`; read from env var `LOG_LEVEL` (e.g. `Information`, `Warning`); loaded before `UseSerilog` so it can override `Serilog:MinimumLevel:Default` |
 
 ## Rules
 - `userId` extracted from authenticated claims in every authenticated controller; never from request body.
 - Unauthenticated endpoints: `GET /health`, `GET /api/bootstrap/config`, `GET /api/events/season`, `POST /api/auth/guest`, `POST /api/auth/refresh`, `POST /api/auth/google`, `POST /api/auth/logout`.
 - Middleware order in `Program.cs`: CorrelationId -> SerilogRequestLogging -> GlobalException -> HTTPS -> Auth -> Authorization -> RateLimit -> VersionCheck -> MetaHash -> SessionValidation -> Controllers.
+- `LOG_LEVEL` env var overrides `appsettings.*.json` Serilog minimum level; `ProjectLinkConfiguration` must be loaded before `UseSerilog` for this to take effect.

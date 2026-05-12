@@ -5,6 +5,7 @@ namespace ProjectLink.API;
 public sealed class ProjectLinkConfiguration
 {
     public required string GameEnvironment { get; init; }
+    public required string LogLevel { get; init; }
     public required DatabaseOptions Database { get; init; }
     public required RedisOptions Redis { get; init; }
     public required AuthOptions Auth { get; init; }
@@ -16,6 +17,7 @@ public sealed class ProjectLinkConfiguration
         var loaded = new ProjectLinkConfiguration
         {
             GameEnvironment = EnvRequired("GAME_ENV"),
+            LogLevel = EnvRequired("LOG_LEVEL"),
             Database = new DatabaseOptions
             {
                 Host = EnvRequired("DB_HOST"),

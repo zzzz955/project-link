@@ -1,9 +1,8 @@
 services:
   api:
     ports:
-      - "${API_HOST_BIND:-0.0.0.0}:${API_HOST_PORT:-20101}:${API_CONTAINER_PORT:-8080}"
+      - "${API_BIND_ADDRESS:?API_BIND_ADDRESS is required}:${API_PUBLISHED_PORT:?API_PUBLISHED_PORT is required}:${API_CONTAINER_PORT:?API_CONTAINER_PORT is required}"
 
-  db:
+  mysql:
     ports:
-      - "${POSTGRES_HOST_BIND:-127.0.0.1}:${POSTGRES_HOST_PORT:-20132}:${POSTGRES_CONTAINER_PORT:-5432}"
-
+      - "${DB_BIND_ADDRESS:?DB_BIND_ADDRESS is required}:${DB_PUBLISHED_PORT:?DB_PUBLISHED_PORT is required}:${DB_CONTAINER_PORT:?DB_CONTAINER_PORT is required}"

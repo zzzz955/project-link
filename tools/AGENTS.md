@@ -3,7 +3,7 @@
 ## Nav
 | file | role |
 |------|------|
-| `config-loader.js` | Loads `template.ini` + `.env.dev`/`.env.prod`, exports merged config |
+| `config-loader.js` | Loads required `template.ini` + `.env.dev`/`.env.prod` values and fails with source-specific config errors |
 | `gen-data.js` | `shared/datas/**/*.csv` -> `*/generated/data/**/*.csv` |
 | `gen-orm.js` | `server/db/schema.json` -> DB CREATE/ALTER TABLE + migration SQL |
 | `gen-all.bat` / `gen-all.sh` | Runs all gen steps in order |
@@ -19,7 +19,7 @@
 - `_` prefix files/dirs are skipped by all gen tools
 - Errors report as: `[tool] ERROR: <file>\n  <location>: <message>`
 - On any error - print all errors, then `process.exit(1)`
-- gen-orm default: `dry_run=true` (SQL file only) - set `false` in `template.ini` to execute
+- gen-orm dry-run mode is required in `template.ini`; set `false` to execute
 - gen-orm auto-installs the DB driver package when physical DB sync needs it and it is missing
 
 ## Serena

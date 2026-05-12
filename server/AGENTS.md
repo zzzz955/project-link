@@ -1,7 +1,7 @@
 # server — ASP.NET Core 8 | C# | Entity Framework Core
 
 ## Stack
-ASP.NET Core 8 Web API | C# | Entity Framework Core 8 (ORM only, no migrations) | Npgsql | StackExchange.Redis | JWT Bearer
+ASP.NET Core 8 Web API | C# | Entity Framework Core 8 (ORM only, no migrations) | Pomelo MySQL | StackExchange.Redis | JWT Bearer
 
 ## Nav
 | path | role |

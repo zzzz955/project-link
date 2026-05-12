@@ -58,27 +58,31 @@ game-development-template/
 ### `.env` — 비밀 설정 (커밋 금지)
 
 ```bash
-DB_TYPE=postgresql      # postgresql | mysql | sqlite
-POSTGRES_DB=projectlink_db
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=...
+COMPOSE_PROJECT_NAME=project-link
+GAME_ENV=dev
+ASPNETCORE_ENVIRONMENT=Development
 
-API_HOST_PORT=8080
+API_BIND_ADDRESS=0.0.0.0
+API_PUBLISHED_PORT=20101
 API_CONTAINER_PORT=8080
-POSTGRES_HOST_PORT=5432
-POSTGRES_CONTAINER_HOST=db
-POSTGRES_CONTAINER_PORT=5432
-REDIS_HOST_PORT=6379
-REDIS_CONTAINER_HOST=redis
+
+DB_BIND_ADDRESS=127.0.0.1
+DB_PUBLISHED_PORT=20106
+DB_CONTAINER_PORT=3306
+DB_NAME=projectlink_db
+DB_USER=projectlink
+DB_PASSWORD=...
+DB_ROOT_PASSWORD=...
+
 REDIS_CONTAINER_PORT=6379
 
-DB_HOST=localhost       # host-side tools
-DB_PORT=5432
+APP_CLIENT_ID=projectlink
+APP_ALLOWED_CLIENT_VERSION=1.0.0
+APP_ALLOWED_PROTOCOL_VERSION=1
 
-GITHUB_TOKEN=...
-GITHUB_REPO_URL=https://github.com/{owner}/{repo}
-GITHUB_DEFAULT_PROJECT={project-name}
-GITHUB_DEFAULT_ASSIGNEE={github-username}
+AUTH_USE_MOCK=true
+JWT_AUTHORITY=http://platform-auth:8080
+JWT_AUDIENCE=platform-games
 ```
 
 ### `template.ini` — 일반 설정 (git 관리)

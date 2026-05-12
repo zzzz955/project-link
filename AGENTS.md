@@ -25,7 +25,7 @@ CMD: `tools/gen-all.bat` | `tools/gen-data.bat` | `tools/gen-orm.bat` | `npm run
 - NEVER edit `*/generated/*` — edit source, re-run gen
 - NEVER commit `.env` — use `.env.example`
 - NEVER store secrets in `template.ini` — secrets go in `.env`
-- CONFIG priority: `.env` > `template.ini` > hardcoded defaults
+- CONFIG policy: env vars own deploy/runtime values; `template.ini` owns tooling values; no hardcoded config fallbacks
 - `_` prefix files/dirs are skipped by all gen tools (examples, drafts)
 
 ## Documentation Convention

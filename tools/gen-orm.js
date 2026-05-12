@@ -177,16 +177,20 @@ function generateCreateTable(tbl, dbType) {
   }
 
   lines.push(colDefs.join(',\n'));
-  lines.push(');');
-
-  if (tbl.comment && dbType !== 'sqlite') {
-    lines.push(`COMMENT ON TABLE ${tbl.name} IS '${tbl.comment}';`);
+  if (tbl.comment && dbType === 'mysql') {
+    lines.push(`) COMMENT='${tbl.comment.replace(/'/g, "\\'")}';`);
+  } else {
+    lines.push(');');
+    if (tbl.comment && dbType === 'postgresql') {
+      lines.push(`COMMENT ON TABLE ${tbl.name} IS '${tbl.comment}';`);
+    }
   }
 
   if (tbl.indexes) {
     for (const idx of tbl.indexes) {
       const uniq = idx.unique ? 'UNIQUE ' : '';
-      lines.push(`CREATE ${uniq}INDEX IF NOT EXISTS ${idx.name} ON ${tbl.name} (${idx.columns.join(', ')});`);
+      const ifNotExists = dbType === 'mysql' ? '' : 'IF NOT EXISTS ';
+      lines.push(`CREATE ${uniq}INDEX ${ifNotExists}${idx.name} ON ${tbl.name} (${idx.columns.join(', ')});`);
     }
   }
 
@@ -295,7 +299,7 @@ async function connectDB(dbType) {
     }
     if (dbType === 'mysql') {
       const mysql = requireDbModule(dbType, 'mysql2/promise');
-      const conn  = await mysql.createConnection({ host: connectHost, port, database: name, user, password });
+      const conn  = await mysql.createConnection({ host: connectHost, port, database: name, user, password, multipleStatements: true });
       return {
         query: (sql, params) => conn.query(sql, params),
         exec:  (sql) => conn.query(sql),
@@ -314,7 +318,7 @@ async function connectDB(dbType) {
         isAsync: false,
       };
     }
-    throw new Error(`Unsupported DB_TYPE "${dbType}". Supported: postgresql, mysql, sqlite`);
+    throw new Error(`Unsupported DB type "${dbType}". Supported: mysql`);
   } catch (e) {
     if (e.genOrmInstallFailure) {
       console.error(`[gen-orm] ERROR: Failed to install required package "${e.genOrmPackage}".`);
@@ -328,7 +332,7 @@ async function connectDB(dbType) {
       console.error(`[gen-orm] ERROR: DB connection failed (${dbType}://${connectHost}:${port}/${name})`);
       if (connectHost !== host) console.error(`  Resolved host "${host}" -> "${connectHost}"`);
       console.error(`  ${e.message}`);
-      console.error('  Check .env: DB_HOST/DB_PORT and POSTGRES_DB/POSTGRES_USER/POSTGRES_PASSWORD');
+      console.error(`  Check ${path.relative(cfg.root, cfg.envPath)}: DB_BIND_ADDRESS/DB_PUBLISHED_PORT and DB_NAME/DB_USER/DB_PASSWORD`);
     }
     process.exit(1);
   }
@@ -397,7 +401,9 @@ async function main() {
       for (const col of tbl.columns) {
         if (!existingCols.has(col.name) || !client) {
           const colSQL = buildColumnSQL(col, dbType);
-          const alterSQL = `ALTER TABLE ${tbl.name} ADD COLUMN IF NOT EXISTS ${colSQL};`;
+          const alterSQL = dbType === 'mysql'
+            ? `ALTER TABLE ${tbl.name} ADD COLUMN ${colSQL};`
+            : `ALTER TABLE ${tbl.name} ADD COLUMN IF NOT EXISTS ${colSQL};`;
           alterLines.push(alterSQL);
           if (client) {
             try {

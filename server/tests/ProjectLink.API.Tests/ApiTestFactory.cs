@@ -242,6 +242,7 @@ public sealed class ApiTestFactory : WebApplicationFactory<Program>
     {
         public Task<string?> GetCurrentSessionIdAsync(string userId, CancellationToken ct) => Task.FromResult<string?>(SessionId);
         public Task CreateSessionAsync(string userId, string sessionId, DateTimeOffset expiresAt, CancellationToken ct) => Task.CompletedTask;
+        public Task<bool> TryCreateSessionAsync(string userId, string sessionId, DateTimeOffset expiresAt, CancellationToken ct) => Task.FromResult(true);
         public Task InvalidateAsync(string userId, CancellationToken ct) => Task.CompletedTask;
     }
 

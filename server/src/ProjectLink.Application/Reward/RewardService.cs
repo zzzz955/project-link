@@ -1,6 +1,7 @@
 using ProjectLink.Contracts.Reward;
 using ProjectLink.Domain.Exceptions;
 using ProjectLink.Domain.Interfaces;
+using ProjectLink.Domain.Utilities;
 using StackExchange.Redis;
 
 namespace ProjectLink.Application.Reward;
@@ -32,7 +33,7 @@ public class RewardService
             rewardSource = "default";
 
         if (string.IsNullOrWhiteSpace(rewardToken))
-            rewardToken = Guid.NewGuid().ToString();
+            rewardToken = IdHelper.NewId();
 
         multiplier = Math.Clamp(multiplier, 1, 3);
 

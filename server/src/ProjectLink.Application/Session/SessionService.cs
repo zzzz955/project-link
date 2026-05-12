@@ -1,4 +1,5 @@
 using ProjectLink.Domain.Interfaces;
+using ProjectLink.Domain.Utilities;
 
 namespace ProjectLink.Application.Session;
 
@@ -15,7 +16,7 @@ public class SessionService
 
     public async Task<string> CreateSessionAsync(string userId, TimeSpan tokenLifetime, CancellationToken ct = default)
     {
-        var sessionId = Guid.NewGuid().ToString();
+        var sessionId = IdHelper.NewId();
         var expiresAt = DateTimeOffset.UtcNow.Add(tokenLifetime);
 
         await _sessionRepo.InvalidateAsync(userId, ct);

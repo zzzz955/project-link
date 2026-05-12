@@ -1,5 +1,6 @@
 using ProjectLink.Contracts.Item;
 using ProjectLink.Domain.Interfaces;
+using ProjectLink.Domain.Utilities;
 
 namespace ProjectLink.Application.Inventory;
 
@@ -31,7 +32,7 @@ public class InventoryService
             ?? throw new Domain.Exceptions.InvalidStageResultException();
 
         var totalCost    = (long)item.CostSoft * quantity;
-        var balanceAfter = await _currency.DeductAsync(userId, totalCost, $"item_purchase:{itemId}", Guid.NewGuid().ToString(), correlationId, ct);
+        var balanceAfter = await _currency.DeductAsync(userId, totalCost, $"item_purchase:{itemId}", IdHelper.NewId(), correlationId, ct);
         var qtyAfter     = await _repo.GrantAsync(userId, itemId, quantity, ct);
 
         return new ItemPurchaseResponse

@@ -16,8 +16,6 @@ public class UpsertProgressCommandHandler
 
     public async Task HandleAsync(UpsertProgressCommand command)
     {
-        var transactionId = Guid.NewGuid().ToString();
         await _repo.UpsertBatchAsync(command.UserId, command.Records, command.Ct);
-        _ = transactionId;
     }
 }

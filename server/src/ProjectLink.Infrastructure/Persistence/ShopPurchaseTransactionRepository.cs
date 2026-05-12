@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using ProjectLink.Domain.Entities;
 using ProjectLink.Domain.Exceptions;
 using ProjectLink.Domain.Interfaces;
+using ProjectLink.Domain.Utilities;
 
 namespace ProjectLink.Infrastructure.Persistence;
 
@@ -32,7 +33,7 @@ public class ShopPurchaseTransactionRepository : IShopPurchaseTransaction
         _db.CurrencyLogs.Add(new CurrencyLog
         {
             UserId        = userId,
-            TransactionId = Guid.NewGuid().ToString(),
+            TransactionId = IdHelper.NewId(),
             CurrencyType  = "soft",
             Delta         = -totalCost,
             BalanceBefore = balanceBefore,

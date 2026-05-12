@@ -1,6 +1,7 @@
 using ProjectLink.Contracts.Currency;
 using ProjectLink.Domain.Exceptions;
 using ProjectLink.Domain.Interfaces;
+using ProjectLink.Domain.Utilities;
 using StackExchange.Redis;
 
 namespace ProjectLink.Application.Currency;
@@ -27,10 +28,10 @@ public class CurrencyService
     }
 
     public Task<long> DeductAsync(string userId, long amount, string reason, string correlationId, CancellationToken ct)
-        => _repo.DeductAsync(userId, amount, reason, Guid.NewGuid().ToString(), correlationId, ct);
+        => _repo.DeductAsync(userId, amount, reason, IdHelper.NewId(), correlationId, ct);
 
     public Task<long> GrantAsync(string userId, long amount, string reason, string correlationId, CancellationToken ct)
-        => _repo.GrantAsync(userId, amount, reason, Guid.NewGuid().ToString(), correlationId, ct);
+        => _repo.GrantAsync(userId, amount, reason, IdHelper.NewId(), correlationId, ct);
 
     public async Task<CurrencyAdRewardResponse> AdRewardAsync(string userId, string adToken, string correlationId, CancellationToken ct)
     {

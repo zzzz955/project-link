@@ -6,6 +6,7 @@
 | `Controllers/` | All HTTP endpoints | -> `Controllers/AGENTS.md` |
 | `Middleware/` | Request pipeline: correlation ID, version check, meta-hash, session validation, global exception handler |
 | `Program.cs` | ASP.NET Core entry point: DI registrations, middleware order |
+| `ProjectLinkConfiguration.cs` | Strict env/config loader for deploy/runtime values |
 | `MockAuthenticationHandler.cs` | Development/mock auth scheme for local guest tokens |
 
 ## Rules

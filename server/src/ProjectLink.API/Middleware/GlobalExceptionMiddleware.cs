@@ -1,4 +1,4 @@
-using Npgsql;
+using MySqlConnector;
 using ProjectLink.Contracts.Common;
 using ProjectLink.Domain.Exceptions;
 
@@ -39,7 +39,7 @@ public class GlobalExceptionMiddleware
             ctx.Response.ContentType = "application/json";
             await ctx.Response.WriteAsJsonAsync(new ErrorResponse { ErrorCode = ex.ErrorCode });
         }
-        catch (NpgsqlException ex) when (ex.SqlState == "55P03")
+        catch (MySqlException ex) when (ex.Number is 1205 or 1213 or 3572)
         {
             ctx.Response.StatusCode  = 409;
             ctx.Response.ContentType = "application/json";

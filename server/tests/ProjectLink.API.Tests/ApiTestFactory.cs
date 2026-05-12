@@ -29,8 +29,27 @@ public sealed class ApiTestFactory : WebApplicationFactory<Program>
     public const string AppClientId = "projectlink";
     public const string SessionId = "session-1";
 
+    private readonly Dictionary<string, string?> _previousEnv = new();
     private readonly SymmetricSecurityKey _signingKey =
         new(Encoding.UTF8.GetBytes("projectlink-api-test-signing-key-32b"));
+
+    public ApiTestFactory()
+    {
+        SetEnv("GAME_ENV", "test");
+        SetEnv("DB_HOST", "localhost");
+        SetEnv("DB_PORT", "3306");
+        SetEnv("DB_NAME", "projectlink_tests");
+        SetEnv("DB_USER", "projectlink");
+        SetEnv("DB_PASSWORD", "test-password");
+        SetEnv("REDIS_HOST", "localhost");
+        SetEnv("REDIS_PORT", "6379");
+        SetEnv("AUTH_USE_MOCK", "false");
+        SetEnv("JWT_AUTHORITY", "https://platform.test");
+        SetEnv("JWT_AUDIENCE", Audience);
+        SetEnv("APP_CLIENT_ID", AppClientId);
+        SetEnv("APP_ALLOWED_CLIENT_VERSION", ClientVersion);
+        SetEnv("APP_ALLOWED_PROTOCOL_VERSION", ProtocolVersion);
+    }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
@@ -106,6 +125,26 @@ public sealed class ApiTestFactory : WebApplicationFactory<Program>
                 };
             });
         });
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        foreach (var (key, value) in _previousEnv)
+        {
+            Environment.SetEnvironmentVariable(key, value);
+        }
+
+        base.Dispose(disposing);
+    }
+
+    private void SetEnv(string key, string value)
+    {
+        if (!_previousEnv.ContainsKey(key))
+        {
+            _previousEnv[key] = Environment.GetEnvironmentVariable(key);
+        }
+
+        Environment.SetEnvironmentVariable(key, value);
     }
 
     public string CreatePlatformToken(

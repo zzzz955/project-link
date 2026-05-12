@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Configuration;
+using ProjectLink.API;
 
 namespace ProjectLink.API.Middleware;
 
@@ -8,11 +8,11 @@ public class VersionCheckMiddleware
     private readonly string          _allowedClient;
     private readonly string          _allowedProtocol;
 
-    public VersionCheckMiddleware(RequestDelegate next, IConfiguration config)
+    public VersionCheckMiddleware(RequestDelegate next, ProjectLinkConfiguration config)
     {
         _next            = next;
-        _allowedClient   = config["App:AllowedClientVersion"]   ?? "";
-        _allowedProtocol = config["App:AllowedProtocolVersion"] ?? "";
+        _allowedClient   = config.App.AllowedClientVersion;
+        _allowedProtocol = config.App.AllowedProtocolVersion;
     }
 
     public async Task InvokeAsync(HttpContext ctx)

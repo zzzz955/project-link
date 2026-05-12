@@ -22,6 +22,7 @@ shared/contracts/
 - Only POCOs: public properties, no logic, no dependencies
 - Nullable enabled — use `Type?` for optional fields
 - Namespace: `ProjectLink.Contracts.[Domain]`
+- `auth/` is a separate platform contract project and is excluded from `ProjectLink.Contracts.csproj` default compile items.
 - Server: references via `ProjectReference` in `ProjectLink.API.csproj`
 - Unity: copy `.cs` files to `client/project-link/Assets/Scripts/Generated/Contracts/`
 

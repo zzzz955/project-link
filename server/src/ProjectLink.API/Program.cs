@@ -32,14 +32,15 @@ using ProjectLink.API;
 
 var builder = WebApplication.CreateBuilder(args);
 var config  = builder.Configuration;
+var appConfig = ProjectLinkConfiguration.Load(config);
 
 // 1. DbContext
 builder.Services.AddDbContext<AppDbContext>(opts =>
-    opts.UseNpgsql(config.GetConnectionString("Postgres")));
+    opts.UseMySql(appConfig.Database.ConnectionString, new MySqlServerVersion(new Version(8, 0, 36))));
 
 // 2. Redis
 builder.Services.AddSingleton<IConnectionMultiplexer>(_ =>
-    ConnectionMultiplexer.Connect(config["Redis:Connection"] ?? "localhost:6379"));
+    ConnectionMultiplexer.Connect(appConfig.Redis.ConnectionString));
 
 // 3. Static data — singleton loaded once at startup
 builder.Services.AddSingleton<IStaticDataService, StaticDataService>();
@@ -84,7 +85,9 @@ builder.Services.AddHostedService(sp => sp.GetRequiredService<JwtPublicKeyCache>
 builder.Services.AddHostedService<RankingRebuildHostedService>();
 
 // 7. Auth
-var useMockAuth = config.GetValue<bool?>("Auth:UseMock") ?? string.IsNullOrWhiteSpace(config["Jwt:Authority"]);
+builder.Services.AddSingleton(appConfig);
+
+var useMockAuth = appConfig.Auth.UseMock;
 if (useMockAuth)
 {
     builder.Services.AddAuthentication(MockAuthenticationHandler.SchemeName)
@@ -104,14 +107,14 @@ else
                 IssuerSigningKeyResolver = (_, _, _, _) => keyCache.GetKeys(),
                 ValidateIssuer           = false,
                 ValidateAudience         = true,
-                ValidAudience            = cfg["Jwt:Audience"],
+                ValidAudience            = appConfig.Auth.JwtAudience,
             };
 
             opts.Events = new JwtBearerEvents
             {
                 OnTokenValidated = ctx =>
                 {
-                    var clientId = cfg["App:ClientId"];
+                    var clientId = appConfig.App.ClientId;
                     var appClaim = ctx.Principal?.FindFirst("app")?.Value;
                     if (appClaim != clientId)
                         ctx.Fail("Invalid app claim");
@@ -145,7 +148,7 @@ builder.Services.AddRateLimiter(opts =>
                           ?? "anon",
             factory: _ => new FixedWindowRateLimiterOptions
             {
-                PermitLimit = config.GetValue<int>("RateLimit:StageStartPerHour", 720),
+                PermitLimit = appConfig.RateLimit.StageStartPerHour,
                 Window      = TimeSpan.FromHours(1),
                 QueueLimit  = 0
             }));
@@ -158,7 +161,7 @@ builder.Services.AddRateLimiter(opts =>
                           ?? "anon",
             factory: _ => new FixedWindowRateLimiterOptions
             {
-                PermitLimit = config.GetValue<int>("RateLimit:RankingPerMinute", 60),
+                PermitLimit = appConfig.RateLimit.RankingPerMinute,
                 Window      = TimeSpan.FromMinutes(1),
                 QueueLimit  = 0
             }));

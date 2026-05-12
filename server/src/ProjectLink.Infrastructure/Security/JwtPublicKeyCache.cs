@@ -15,8 +15,14 @@ public class JwtPublicKeyCache : IHostedService, IDisposable
 
     public JwtPublicKeyCache(IConfiguration config, HttpClient http)
     {
+        var authority = config["Jwt:Authority"];
+        if (string.IsNullOrWhiteSpace(authority))
+        {
+            throw new InvalidOperationException("Configuration error at configuration:Jwt:Authority: missing required value.");
+        }
+
         _http    = http;
-        _jwksUrl = $"{config["Jwt:Authority"]?.TrimEnd('/')}/.well-known/jwks.json";
+        _jwksUrl = $"{authority.TrimEnd('/')}/.well-known/jwks.json";
     }
 
     public IEnumerable<SecurityKey> GetKeys() => _keys;

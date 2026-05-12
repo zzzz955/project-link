@@ -5,4 +5,7 @@
     <LangVersion>9.0</LangVersion>
     <ImplicitUsings>disable</ImplicitUsings>
   </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="auth\**\*.cs" />
+  </ItemGroup>
 </Project>

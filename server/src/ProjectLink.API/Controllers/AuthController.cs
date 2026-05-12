@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ProjectLink.API;
 using ProjectLink.Contracts.Account;
 
 namespace ProjectLink.API.Controllers;
@@ -9,15 +10,15 @@ namespace ProjectLink.API.Controllers;
 [AllowAnonymous]
 public class AuthController : ControllerBase
 {
-    readonly IConfiguration _config;
+    readonly ProjectLinkConfiguration _config;
     readonly IHttpClientFactory _httpFactory;
     readonly bool _useMock;
 
-    public AuthController(IConfiguration config, IHttpClientFactory httpFactory)
+    public AuthController(ProjectLinkConfiguration config, IHttpClientFactory httpFactory)
     {
         _config   = config;
         _httpFactory = httpFactory;
-        _useMock  = config.GetValue<bool?>("Auth:UseMock") ?? true;
+        _useMock  = config.Auth.UseMock;
     }
 
     [HttpPost("guest")]
@@ -42,7 +43,7 @@ public class AuthController : ControllerBase
             });
         }
 
-        var authority = _config["Jwt:Authority"]?.TrimEnd('/');
+        var authority = _config.Auth.JwtAuthority.TrimEnd('/');
         var http      = _httpFactory.CreateClient();
         var response  = await http.PostAsync($"{authority}/auth/guest", null, ct);
         var body      = await response.Content.ReadAsStringAsync(ct);

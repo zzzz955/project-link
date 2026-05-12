@@ -75,7 +75,7 @@ shared/contracts/
 | `StageStartRequest` | class | empty body — stageId in route |
 | `StageStartResponse` | class | `SessionToken`, `ServerStartAt`, `MoveLimit` (0=unlimited), `TimeLimitSeconds` (0=unlimited), `ItemCounts` (Dict\<int,int\>), `StaminaCurrent` |
 | `StageEndRequest` | class | `SessionToken`, `Result` ("success"\|"fail"), `ClientElapsedMs`, `MovesUsed` |
-| `StageEndResponse` | class | `Score`, `Stars`, `AdjustedElapsedMs`, `IsBestRecord`, `SoftBalanceAfter`, `SoftReward`, `MovesUsed`, `MoveLimit`, `NextStageId?`, `NextStageUnlocked` |
+| `StageEndResponse` | class | `Score`, `Stars`, `AdjustedElapsedMs`, `IsBestRecord`, `SoftBalanceAfter`, `SoftReward` (actual granted), `MovesUsed`, `MoveLimit`, `NextStageId?`, `NextStageUnlocked` |
 | `StaminaAdRewardRequest` | class | `AdToken` — platform-issued, idempotency key |
 | `StaminaRefillRequest` | class | empty — server reads cost from static data |
 | `StaminaResponse` | class | `Current`, `Max`, `NextRechargeAt?` (ISO 8601) |

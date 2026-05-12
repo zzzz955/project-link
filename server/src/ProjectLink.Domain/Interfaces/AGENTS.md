@@ -15,7 +15,7 @@
 | `IRankingRepository.cs` | `IRankingRepository` | Stage best records + ranking cache DB CRUD |
 | `IDailyChallengeRepository.cs` | `IDailyChallengeRepository` | Daily challenge progress read + play count increment |
 | `IPlayerSettingsRepository.cs` | `IPlayerSettingsRepository` | Player settings get/upsert |
-| `IStageEndTransaction.cs` | `IStageEndTransaction` | Atomic stage-end DB transaction (progress+best+ranking+currency+daily) |
+| `IStageEndTransaction.cs` | `IStageEndTransaction` | Atomic stage-end DB transaction (progress+best+stamina+ranking+currency+daily) |
 | `IStaminaRefillTransaction.cs` | `IStaminaRefillTransaction` | Atomic full stamina refill (stamina+currency+log) with FOR UPDATE |
 | `IDailyChallengeCompleteTransaction.cs` | `IDailyChallengeCompleteTransaction` | Atomic challenge complete (mark done+streak+rewards) |
 | `IShopPurchaseTransaction.cs` | `IShopPurchaseTransaction` | Atomic shop purchase (currency deduct+inventory grant) |
@@ -23,7 +23,8 @@
 ## Symbols
 | symbol | kind | note |
 |--------|------|------|
-| `IStageEndTransaction.ExecuteAsync` | method | `StageEndDbCommand` → `StageEndDbResult`; uses FOR UPDATE NOWAIT on stage rows |
+| `IStageEndTransaction.ExecuteAsync` | method | `StageEndDbCommand` → `StageEndDbResult`; first clear grants soft reward, clear refunds start stamina, uses FOR UPDATE NOWAIT on stage rows |
+| `StageEndDbResult.SoftRewardGranted` | property | actual soft currency granted by stage end; 0 on already-cleared replay |
 | `StageEndDbResult.TotalScore` | property | post-commit ranking cache total score for Redis ZADD |
 | `StageEndDbResult.StagesCleared` | property | post-commit stages cleared count for Redis ZADD |
 | `IDailyChallengeRepository.IncrementPlayCountAsync` | method | atomic INSERT ON CONFLICT; returns new play_count |

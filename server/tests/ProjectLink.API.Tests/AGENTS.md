@@ -16,6 +16,8 @@
 | `AuthIntegrationTests.PlatformGuestLoginToken_CanFetchLobby` | test | Guest login proxy token can call lobby without Unity |
 | `StageServiceTests.StartAsync_ReplacesActiveSessionWithNewPaidAttempt` | test | Active session is overwritten by a newly charged attempt instead of returning STAGE_ALREADY_ACTIVE |
 | `StageServiceTests.StartAsync_InvalidatesPreviousSessionToken` | test | Previous active token cannot end after retry start; new token can fail-end and clear the session |
+| `StageServiceTests.EndAsync_SuccessRequestsStartStaminaRefund` | test | Successful stage end passes the one-stamina clear refund into the DB transaction |
+| `StageServiceTests.EndAsync_ReplayReturnsGrantedSoftRewardOnly` | test | Stage end response uses actual granted soft reward, so replay clears can return 0 |
 | `ApiTestFactory.CreatePlatformToken` | method | Creates signed JWTs matching test auth options |
 | `ApiTestFactory.ConfigureWebHost` | method | Replaces external DB/Redis/platform dependencies with test fakes |
 

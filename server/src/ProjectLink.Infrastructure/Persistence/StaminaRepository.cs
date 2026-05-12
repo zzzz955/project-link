@@ -68,7 +68,7 @@ public class StaminaRepository : IStaminaRepository
         state.Current     = Math.Min(maxStamina, state.Current + toAdd);
         var added         = state.Current - before;
 
-        if (before >= maxStamina)
+        if (before < maxStamina && state.Current >= maxStamina)
             state.LastRechargedAt = DateTimeOffset.UtcNow;
 
         await _db.SaveChangesAsync(ct);

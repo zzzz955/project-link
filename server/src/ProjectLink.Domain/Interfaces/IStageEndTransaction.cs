@@ -8,6 +8,9 @@ public class StageEndDbCommand
     public int     Score           { get; set; }
     public long    AdjustedMs      { get; set; }
     public int     SoftReward      { get; set; }
+    public int     StaminaRefund   { get; set; }
+    public int     MaxStamina      { get; set; }
+    public int     RechargeIntervalMinutes { get; set; }
     public int     MovesUsed       { get; set; }
     public int     MaxStages       { get; set; }
     public string  CorrelationId        { get; set; } = default!;
@@ -19,6 +22,7 @@ public class StageEndDbResult
 {
     public bool  IsBestRecord      { get; set; }
     public long  SoftBalanceAfter  { get; set; }
+    public int   SoftRewardGranted { get; set; }
     public int   DailyPlayCount    { get; set; }
     public bool  NextStageUnlocked { get; set; }
     public long  TotalScore        { get; set; }

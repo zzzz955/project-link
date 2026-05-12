@@ -19,3 +19,4 @@
 ## Rules
 - Refill cost is authoritative from `IStaticDataService.GetStaminaConfig().RefillCostSoft` — never trust client-provided cost
 - `RefillAsync` is atomic: stamina increment + currency deduction in `IStaminaRefillTransaction`
+- Manual stamina adds update `last_recharged_at` only when the add caps stamina to max.

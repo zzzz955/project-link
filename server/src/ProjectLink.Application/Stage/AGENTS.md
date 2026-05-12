@@ -10,7 +10,7 @@
 |--------|------|------|
 | `StageService.StartAsync` | method | Deducts stamina, replaces any active session with a new paid attempt, returns `StageStartResponse` with item counts from static data |
 | `StageService.LockAsync` | method | Validates `sessionToken`, transitions session to locked state; must be called before EndAsync |
-| `StageService.EndAsync` | method | Validates sessionToken + move limit; checks `DailyChallengeStageSelector` to set `IsDailyChallengeStage`; delegates to `IStageEndTransaction`; calls `RankingService.OnStageEndAsync` only on best record |
+| `StageService.EndAsync` | method | Validates sessionToken + move limit; checks `DailyChallengeStageSelector`; delegates first-clear reward + clear stamina refund to `IStageEndTransaction`; calls `RankingService.OnStageEndAsync` only on best record |
 | `StageService.ExtendAsync` | method | Refunds stamina on stage-fail; validates sessionToken; cost from `IStaticDataService.GetStaminaConfig()` |
 
 ## Cross-refs

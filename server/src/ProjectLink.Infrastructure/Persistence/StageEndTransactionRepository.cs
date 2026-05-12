@@ -10,6 +10,15 @@ public class StageEndTransactionRepository : IStageEndTransaction
 
     public StageEndTransactionRepository(AppDbContext db) => _db = db;
 
+    private static void ApplyRecharge(StaminaState state, int maxStamina, int rechargeIntervalMinutes)
+    {
+        if (state.Current >= maxStamina) return;
+        var ticks = (int)((DateTimeOffset.UtcNow - state.LastRechargedAt).TotalMinutes / rechargeIntervalMinutes);
+        if (ticks <= 0) return;
+        state.Current         = Math.Min(maxStamina, state.Current + ticks);
+        state.LastRechargedAt += TimeSpan.FromMinutes(ticks * rechargeIntervalMinutes);
+    }
+
     public async Task<StageEndDbResult> ExecuteAsync(StageEndDbCommand cmd, CancellationToken ct)
     {
         await using var tx = await _db.Database.BeginTransactionAsync(ct);
@@ -23,6 +32,8 @@ public class StageEndTransactionRepository : IStageEndTransaction
             $"INSERT IGNORE INTO user_ranking_cache (user_id, total_score, stages_cleared, updated_at) VALUES ({cmd.UserId}, 0, 0, NOW())", ct);
         await _db.Database.ExecuteSqlInterpolatedAsync(
             $"INSERT IGNORE INTO user_currency (user_id, soft_amount) VALUES ({cmd.UserId}, 0)", ct);
+        await _db.Database.ExecuteSqlInterpolatedAsync(
+            $"INSERT IGNORE INTO stamina_state (user_id, current, last_recharged_at) VALUES ({cmd.UserId}, {cmd.MaxStamina}, NOW())", ct);
 
         // Acquire locks in deterministic order to prevent deadlocks
         var progress = await _db.StageProgress
@@ -30,6 +41,9 @@ public class StageEndTransactionRepository : IStageEndTransaction
             .FirstAsync(ct);
         var bestRecord = await _db.StageBestRecords
             .FromSqlInterpolated($"SELECT * FROM stage_best_records WHERE user_id = {cmd.UserId} AND stage_id = {cmd.StageId} FOR UPDATE NOWAIT")
+            .FirstAsync(ct);
+        var stamina = await _db.StaminaStates
+            .FromSqlInterpolated($"SELECT * FROM stamina_state WHERE user_id = {cmd.UserId} FOR UPDATE")
             .FirstAsync(ct);
         var currency = await _db.UserCurrencies
             .FromSqlInterpolated($"SELECT * FROM user_currency WHERE user_id = {cmd.UserId} FOR UPDATE")
@@ -62,18 +76,26 @@ public class StageEndTransactionRepository : IStageEndTransaction
         rankingCache.StagesCleared += isFirstClear ? 1 : 0;
         rankingCache.UpdatedAt      = DateTimeOffset.UtcNow;
 
-        // Grant soft reward
-        var balanceBefore = currency.SoftAmount;
-        currency.SoftAmount += cmd.SoftReward;
+        // Refund the stamina spent to start this cleared attempt.
+        ApplyRecharge(stamina, cmd.MaxStamina, cmd.RechargeIntervalMinutes);
+        var staminaBeforeRefund = stamina.Current;
+        stamina.Current = Math.Min(cmd.MaxStamina, stamina.Current + cmd.StaminaRefund);
+        if (staminaBeforeRefund < cmd.MaxStamina && stamina.Current >= cmd.MaxStamina)
+            stamina.LastRechargedAt = DateTimeOffset.UtcNow;
 
-        if (cmd.SoftReward > 0)
+        // Grant soft reward only on first clear
+        var softRewardGranted = isFirstClear ? cmd.SoftReward : 0;
+        var balanceBefore = currency.SoftAmount;
+        currency.SoftAmount += softRewardGranted;
+
+        if (softRewardGranted > 0)
         {
             _db.CurrencyLogs.Add(new CurrencyLog
             {
                 UserId        = cmd.UserId,
                 TransactionId = Guid.NewGuid().ToString(),
                 CurrencyType  = "soft",
-                Delta         = cmd.SoftReward,
+                Delta         = softRewardGranted,
                 BalanceBefore = balanceBefore,
                 BalanceAfter  = currency.SoftAmount,
                 Reason        = $"stage_clear:{cmd.StageId}",
@@ -106,6 +128,7 @@ public class StageEndTransactionRepository : IStageEndTransaction
         {
             IsBestRecord      = isBestRecord,
             SoftBalanceAfter  = currency.SoftAmount,
+            SoftRewardGranted = softRewardGranted,
             DailyPlayCount    = dailyRow?.PlayCount ?? 0,
             NextStageUnlocked = isFirstClear && cmd.StageId < cmd.MaxStages,
             TotalScore        = rankingCache.TotalScore,

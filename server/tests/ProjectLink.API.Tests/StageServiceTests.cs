@@ -58,14 +58,72 @@ public sealed class StageServiceTests
         Assert.Null(cache.Current);
     }
 
+    [Fact]
+    public async Task EndAsync_SuccessRequestsStartStaminaRefund()
+    {
+        var cache = new TestStageSessionCache
+        {
+            Current = new StageSession
+            {
+                UserId = "user-1",
+                StageId = 1,
+                Token = "token",
+                StartAtMs = DateTimeOffset.UtcNow.AddSeconds(-10).ToUnixTimeMilliseconds(),
+                IsSetupPhase = false,
+            },
+        };
+        var stageEndTx = new TestStageEndTransaction();
+        var service = CreateService(cache, new TestStaminaRepository(), stageEndTx);
+
+        await service.EndAsync("user-1", 1, "token", "success", 10_000, 10, "test", CancellationToken.None);
+
+        Assert.NotNull(stageEndTx.LastCommand);
+        Assert.Equal(1, stageEndTx.LastCommand.StaminaRefund);
+        Assert.Equal(5, stageEndTx.LastCommand.MaxStamina);
+        Assert.Equal(5, stageEndTx.LastCommand.RechargeIntervalMinutes);
+    }
+
+    [Fact]
+    public async Task EndAsync_ReplayReturnsGrantedSoftRewardOnly()
+    {
+        var cache = new TestStageSessionCache
+        {
+            Current = new StageSession
+            {
+                UserId = "user-1",
+                StageId = 1,
+                Token = "token",
+                StartAtMs = DateTimeOffset.UtcNow.AddSeconds(-10).ToUnixTimeMilliseconds(),
+                IsSetupPhase = false,
+            },
+        };
+        var stageEndTx = new TestStageEndTransaction
+        {
+            Result = new StageEndDbResult
+            {
+                SoftBalanceAfter = 100,
+                SoftRewardGranted = 0,
+            },
+        };
+        var service = CreateService(cache, new TestStaminaRepository(), stageEndTx);
+
+        var response = await service.EndAsync("user-1", 1, "token", "success", 10_000, 10, "test", CancellationToken.None);
+
+        Assert.Equal(100, response.SoftBalanceAfter);
+        Assert.Equal(0, response.SoftReward);
+    }
+
     static StageService CreateService(TestStageSessionCache cache, TestStaminaRepository stamina)
+        => CreateService(cache, stamina, new TestStageEndTransaction());
+
+    static StageService CreateService(TestStageSessionCache cache, TestStaminaRepository stamina, TestStageEndTransaction stageEndTx)
         => new(
             cache,
             stamina,
             new TestInventoryRepository(),
             new TestStaticDataService(),
             null!,
-            new TestStageEndTransaction());
+            stageEndTx);
 
     sealed class TestStageSessionCache : IStageSessionCache
     {
@@ -129,7 +187,13 @@ public sealed class StageServiceTests
 
     sealed class TestStageEndTransaction : IStageEndTransaction
     {
+        public StageEndDbCommand? LastCommand { get; private set; }
+        public StageEndDbResult Result { get; set; } = new();
+
         public Task<StageEndDbResult> ExecuteAsync(StageEndDbCommand command, CancellationToken ct)
-            => Task.FromResult(new StageEndDbResult());
+        {
+            LastCommand = command;
+            return Task.FromResult(Result);
+        }
     }
 }

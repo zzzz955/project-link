@@ -3,7 +3,7 @@ Commit changes from the current `git diff` by grouping them into logical work un
 Arguments: $ARGUMENTS — optional guidance for work type, issue number, or commit scope.
 
 ## Repository Source
-1. Read `.env`.
+1. Read `.env.dev`.
 2. Use `GITHUB_REPO_URL` as the target GitHub repository.
 3. If `GITHUB_REPO_URL` is missing, STOP and return an exception to the user.
 4. Use the issue list from `GITHUB_REPO_URL` to choose matching issue numbers.
@@ -29,7 +29,7 @@ Examples:
 Never use `cd {path} && git ...`. Always use `git -C {repo_path} <subcommand>` to avoid permission prompts.
 
 ## Steps
-1. Read `.env` and verify `GITHUB_REPO_URL` exists.
+1. Read `.env.dev` and verify `GITHUB_REPO_URL` exists.
 2. Run `git status` and inspect the current `git diff`.
 3. Fetch or inspect the issue list for `GITHUB_REPO_URL`.
 4. Group changed files and hunks by work nature.
@@ -39,7 +39,7 @@ Never use `cd {path} && git ...`. Always use `git -C {repo_path} <subcommand>` t
    b. If no suitable issue exists and the work is large enough to need issue tracking, share the list of issues that should be created with the user before committing.
    c. If the work is small enough that issue tracking is unnecessary, omit the issue number and use `{작업 성질}: {커밋 메시지}`.
    d. Stage only files or hunks belonging to that work unit.
-      Never stage `.env` or files ignored by `.gitignore`.
+      Never stage `.env.dev` or files ignored by `.gitignore`.
    e. Commit immediately with the selected message format.
 6. Report each commit hash and message after completion.
 

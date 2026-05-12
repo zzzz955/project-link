@@ -1,0 +1,5 @@
+[mcp_servers.mcp-unity]
+command = "C:\\Program Files\\nodejs\\node.exe"
+args = ["C:\\Users\\SangHyeok\\Desktop\\git\\madalang-games\\project-link\\client\\project-link\\Packages\\mcp-unity\\Server~\\build\\index.js"]
+startup_timeout_sec = 30
+tool_timeout_sec = 120

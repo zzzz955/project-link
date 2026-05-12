@@ -37,9 +37,6 @@ public class StageService
         var stageData = _staticData.GetStage(stageId)
             ?? throw new StageNotFoundException(stageId);
 
-        if (await _sessionCache.GetAsync(userId, ct) != null)
-            throw new StageAlreadyActiveException();
-
         var config = _staticData.GetStaminaConfig();
         var stateAfter = await _stamina.DeductAsync(userId, config.MaxStamina, config.RechargeSeconds / 60, ct);
 

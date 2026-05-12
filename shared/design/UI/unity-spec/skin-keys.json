@@ -1,0 +1,57 @@
+{
+  "$schema": "skin-keys.schema",
+  "description": "UIButtonSkin element-name registry. Each entry will be a row in the UIButtonSkin ScriptableObject.",
+  "categories": {
+    "buttons": [
+      { "key": "btn_primary",       "role": "Primary CTA pill",                  "sizeHint": [560, 128], "9slice": [24,24,24,24] },
+      { "key": "btn_secondary",     "role": "Outlined pill secondary",           "sizeHint": [560, 128], "9slice": [24,24,24,24] },
+      { "key": "btn_danger",        "role": "Solid red destructive",             "sizeHint": [560, 128], "9slice": [24,24,24,24] },
+      { "key": "btn_disabled",      "role": "Disabled pill state",               "sizeHint": [560, 128], "9slice": [24,24,24,24] },
+      { "key": "btn_ad",            "role": "Ad-gated pill (with film icon)",    "sizeHint": [320, 112], "9slice": [24,24,24,24] }
+    ],
+    "iconButtons": [
+      { "key": "btn_icon_pause",    "role": "InGame pause",            "sizeHint": [96, 96] },
+      { "key": "btn_icon_settings", "role": "Settings gear",           "sizeHint": [96, 96] },
+      { "key": "btn_icon_menu",     "role": "Three-dot kebab menu",    "sizeHint": [96, 96] },
+      { "key": "btn_icon_close",    "role": "Popup × close",           "sizeHint": [80, 80] },
+      { "key": "btn_icon_back",     "role": "Generic back arrow",      "sizeHint": [80, 80] },
+      { "key": "btn_carousel_prev", "role": "Carousel ◀",              "sizeHint": [96, 96] },
+      { "key": "btn_carousel_next", "role": "Carousel ▶",              "sizeHint": [96, 96] }
+    ],
+    "tabs": [
+      { "key": "btn_tab_shop",      "role": "Shop tab icon",   "sizeHint": [72, 72] },
+      { "key": "btn_tab_home",      "role": "Home tab icon",   "sizeHint": [72, 72] },
+      { "key": "btn_tab_ranking",   "role": "Ranking tab icon","sizeHint": [72, 72] },
+      { "key": "slot_tab_indicator","role": "Active tab pill/underline", "sizeHint": [120, 8] }
+    ],
+    "slots": [
+      { "key": "slot_avatar",            "role": "Player avatar circle frame", "sizeHint": [128, 128] },
+      { "key": "slot_avatar_mask",       "role": "Circular mask for avatar",   "sizeHint": [128, 128] },
+      { "key": "slot_currency_soft",     "role": "Soft currency 💎 icon",       "sizeHint": [48, 48] },
+      { "key": "slot_stamina_icon",      "role": "Stamina ♥ icon",              "sizeHint": [48, 48] },
+      { "key": "slot_star_filled",       "role": "Filled star rating",          "sizeHint": [56, 56] },
+      { "key": "slot_star_empty",        "role": "Empty star rating",           "sizeHint": [56, 56] },
+      { "key": "slot_stage_node",        "role": "Stage carousel card bg",      "sizeHint": [560, 720], "9slice": [32,32,32,32] },
+      { "key": "slot_stage_node_locked", "role": "Locked-stage overlay (🔒)",    "sizeHint": [560, 720] },
+      { "key": "slot_daily_card",        "role": "Daily challenge card bg",     "sizeHint": [1000, 240], "9slice": [32,32,32,32] },
+      { "key": "slot_event_banner",      "role": "Season event banner bg",      "sizeHint": [1000, 240], "9slice": [32,32,32,32] },
+      { "key": "slot_reward_currency",   "role": "Reward currency big icon",    "sizeHint": [180, 180] },
+      { "key": "slot_provider_google",   "role": "OAuth provider mark A",       "sizeHint": [56, 56], "notes": "Generic provider mark — final brand art supplied by client" },
+      { "key": "slot_provider_apple",    "role": "OAuth provider mark B",       "sizeHint": [56, 56], "notes": "Generic provider mark — final brand art supplied by client" },
+      { "key": "slot_streak_tile_done",  "role": "Daily streak tile filled",    "sizeHint": [88, 88] },
+      { "key": "slot_streak_tile_open",  "role": "Daily streak tile empty",     "sizeHint": [88, 88] },
+      { "key": "slot_objective_seg",     "role": "Objective bar segment fill",  "sizeHint": [40, 24] },
+      { "key": "slot_popup_bg",          "role": "Standard popup panel bg",     "sizeHint": [960, 1200], "9slice": [40,40,40,40] },
+      { "key": "slot_popup_overlay",     "role": "Modal scrim (semi black)",    "sizeHint": [4, 4] },
+      { "key": "slot_toast_bg",          "role": "Toast strip bg",              "sizeHint": [960, 140], "9slice": [24,24,24,24] },
+      { "key": "slot_hud_bg",            "role": "Lobby HUD strip bg",          "sizeHint": [1080, 240], "9slice": [0,32,0,0] }
+    ],
+    "spineSlots": [
+      { "key": "spine_logo",       "role": "Logo (Bootstrap/Title)" },
+      { "key": "spine_stage_idle", "role": "Stage carousel idle/win celebrate" },
+      { "key": "spine_reward",     "role": "Reward popup celebration" },
+      { "key": "spine_timeout",    "role": "Timeout popup animation" },
+      { "key": "spine_clear",      "role": "Clear popup celebration" }
+    ]
+  }
+}

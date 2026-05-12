@@ -1,0 +1,111 @@
+{
+  "$schema": "strings.schema",
+  "description": "All client-visible strings keyed for localization. Apply via LocalizedText component on every TMP_Text.",
+  "locales": ["en", "ko"],
+  "strings": {
+    "common.confirm":          { "en": "Confirm",     "ko": "확인" },
+    "common.cancel":           { "en": "Cancel",      "ko": "취소" },
+    "common.save":             { "en": "Save",        "ko": "저장" },
+    "common.close":            { "en": "Close",       "ko": "닫기" },
+    "common.retry":            { "en": "Retry",       "ko": "다시 시도" },
+    "common.claim":            { "en": "Claim",       "ko": "받기" },
+    "common.purchase":         { "en": "Purchase",    "ko": "구매" },
+    "common.play":             { "en": "Play",        "ko": "플레이" },
+    "common.resume":           { "en": "Resume",      "ko": "이어하기" },
+    "common.link":             { "en": "Link",        "ko": "연결" },
+    "common.linked":           { "en": "Linked",      "ko": "연결됨" },
+    "common.complete":         { "en": "Complete",    "ko": "완료" },
+    "common.next":             { "en": "Next",        "ko": "다음" },
+    "common.lobby":            { "en": "Lobby",       "ko": "로비" },
+
+    "bootstrap.loading":       { "en": "Loading…",                       "ko": "불러오는 중…" },
+    "bootstrap.network_error": { "en": "Network error. Please retry.",   "ko": "네트워크 오류. 다시 시도해 주세요." },
+
+    "title.tap_to_start":      { "en": "TAP TO START",                   "ko": "탭하여 시작" },
+    "title.continue_google":   { "en": "Continue with Provider A",       "ko": "Provider A로 계속하기" },
+    "title.continue_apple":    { "en": "Sign in with Provider B",        "ko": "Provider B로 로그인" },
+    "title.version_fmt":       { "en": "v{version}",                     "ko": "v{version}" },
+
+    "hud.menu":                { "en": "Menu",        "ko": "메뉴" },
+    "hud.settings":            { "en": "Settings",    "ko": "설정" },
+    "hud.language":            { "en": "Language",    "ko": "언어" },
+    "hud.stamina_fmt":         { "en": "{cur}/{max}", "ko": "{cur}/{max}" },
+    "hud.stamina_timer_fmt":   { "en": "{mm}:{ss}",   "ko": "{mm}:{ss}" },
+
+    "tab.shop":                { "en": "Shop",        "ko": "상점" },
+    "tab.home":                { "en": "Home",        "ko": "홈" },
+    "tab.ranking":             { "en": "Rank",        "ko": "랭킹" },
+
+    "home.daily_title":        { "en": "Daily Challenge",                       "ko": "일일 도전" },
+    "home.daily_streak_fmt":   { "en": "Streak: {n} days",                      "ko": "연속: {n}일" },
+    "home.daily_progress_fmt": { "en": "{cur}/{max}",                           "ko": "{cur}/{max}" },
+    "home.event_title_fmt":    { "en": "Season Event: {name}",                  "ko": "시즌 이벤트: {name}" },
+    "home.event_ends_fmt":     { "en": "Ends in {d}d {h}h",                     "ko": "남은 시간 {d}일 {h}시간" },
+    "home.stage_play":         { "en": "Play",                                  "ko": "플레이" },
+
+    "shop.section_stamina":    { "en": "STAMINA",     "ko": "스태미나" },
+    "shop.section_items":      { "en": "ITEMS",       "ko": "아이템" },
+    "shop.product_stamina_5":  { "en": "+5 Stamina",  "ko": "스태미나 +5" },
+    "shop.product_stamina_20": { "en": "+20 Stamina", "ko": "스태미나 +20" },
+    "shop.product_extramove":  { "en": "Extra Move",  "ko": "추가 이동" },
+    "shop.product_extramove_desc": { "en": "Grants +5 moves", "ko": "이동 +5 부여" },
+
+    "rank.tab_clear":          { "en": "Stages Cleared", "ko": "클리어 수" },
+    "rank.tab_score":          { "en": "Score",          "ko": "점수" },
+    "rank.you":                { "en": "YOU",            "ko": "나" },
+
+    "game.stage_fmt":          { "en": "Stage {n}",      "ko": "스테이지 {n}" },
+    "game.timer_fmt":          { "en": "{mm}:{ss}",      "ko": "{mm}:{ss}" },
+    "game.moves_fmt":          { "en": "Moves: {cur}/{max}", "ko": "이동: {cur}/{max}" },
+
+    "popup.force_update.title":   { "en": "Update Required", "ko": "업데이트 필요" },
+    "popup.force_update.body":    { "en": "A new version of the game is available. Please update to continue playing.", "ko": "새 버전이 출시되었습니다. 계속 플레이하려면 업데이트해 주세요." },
+    "popup.force_update.cta":     { "en": "Open Store",     "ko": "스토어 열기" },
+
+    "popup.maintenance.title":    { "en": "Under Maintenance", "ko": "점검 중" },
+    "popup.maintenance.body":     { "en": "{message}",          "ko": "{message}" },
+
+    "popup.session.title":        { "en": "Session Expired",    "ko": "세션 만료" },
+    "popup.session.body":         { "en": "Your session has expired. Please log in again.", "ko": "세션이 만료되었습니다. 다시 로그인해 주세요." },
+
+    "popup.settings.title":       { "en": "Settings",   "ko": "설정" },
+    "popup.settings.bgm":         { "en": "BGM",        "ko": "BGM" },
+    "popup.settings.sfx":         { "en": "SFX",        "ko": "효과음" },
+    "popup.settings.haptics":     { "en": "Haptics",    "ko": "진동" },
+    "popup.settings.notif":       { "en": "Notifications", "ko": "알림" },
+
+    "popup.energy.title":         { "en": "Stamina",    "ko": "스태미나" },
+    "popup.energy.full_in_fmt":   { "en": "Full in {hh}:{mm}:{ss}", "ko": "{hh}:{mm}:{ss} 후 완충" },
+    "popup.energy.watch_ad_fmt":  { "en": "Watch Ad +{n}", "ko": "광고 시청 +{n}" },
+    "popup.energy.refill_fmt":    { "en": "Refill ({cost} 💎)", "ko": "충전 ({cost} 💎)" },
+
+    "popup.stage.title_fmt":      { "en": "Stage {n}",  "ko": "스테이지 {n}" },
+    "popup.stage.best_fmt":       { "en": "Best: {score} pts", "ko": "최고 점수: {score}점" },
+    "popup.stage.my_rank_fmt":    { "en": "My Rank: #{rank}", "ko": "내 랭킹: #{rank}" },
+
+    "popup.daily.title":          { "en": "Daily Challenge", "ko": "일일 도전" },
+    "popup.daily.today_fmt":      { "en": "Today: Play {cur}/{max} stages", "ko": "오늘: {cur}/{max} 스테이지 플레이" },
+    "popup.daily.reward_fmt":     { "en": "Reward: 💎 ×{n}", "ko": "보상: 💎 ×{n}" },
+
+    "popup.reward.title":         { "en": "Reward!", "ko": "보상!" },
+    "popup.reward.x2":            { "en": "×2",      "ko": "×2" },
+
+    "popup.account.title":        { "en": "Profile",         "ko": "프로필" },
+    "popup.account.joined_fmt":   { "en": "Joined: {date}",  "ko": "가입일: {date}" },
+    "popup.account.linked_label": { "en": "Linked Accounts:", "ko": "연결된 계정:" },
+
+    "popup.clear.title":          { "en": "STAGE CLEAR!", "ko": "스테이지 클리어!" },
+    "popup.clear.score_fmt":      { "en": "Score: {score}", "ko": "점수: {score}" },
+    "popup.clear.new_record":     { "en": "NEW RECORD!",    "ko": "신기록!" },
+    "popup.clear.retry":          { "en": "Retry",          "ko": "다시 시도" },
+
+    "popup.pause.title":          { "en": "Paused",         "ko": "일시정지" },
+    "popup.pause.retry":          { "en": "Retry",          "ko": "다시 시도" },
+
+    "popup.timeout.title":        { "en": "Time's Up!",     "ko": "시간 종료!" },
+
+    "toast.network_error":        { "en": "Network error. Please retry.", "ko": "네트워크 오류. 다시 시도해 주세요." },
+    "toast.stamina_refilled":     { "en": "Stamina refilled successfully.", "ko": "스태미나가 충전되었습니다." },
+    "toast.settings_saved":       { "en": "Settings saved.", "ko": "설정이 저장되었습니다." }
+  }
+}

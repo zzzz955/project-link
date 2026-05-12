@@ -1,0 +1,374 @@
+{
+  "$schema": "popups.schema",
+  "description": "Popup prefabs. Each instantiated under <Scene>/PopupLayer at runtime by PopupManager.",
+  "shellTemplate": {
+    "name": "Pop_<id>",
+    "comment": "Standard popup shell. Non-dismissible popups: dismissibleOverlay=false and Btn_Close.active=false.",
+    "rect": { "anchor": "stretch", "offsets": [0,0,0,0] },
+    "components": [
+      { "type": "Canvas", "overrideSorting": true, "sortingOrder": 100 },
+      { "type": "GraphicRaycaster" },
+      { "type": "PopupController", "fields": { "dismissibleOverlay": true, "enterAnim": "scale_fade_in_250", "exitAnim": "scale_fade_out_200" } }
+    ],
+    "children": [
+      { "name": "Overlay", "rect": { "anchor": "stretch", "offsets": [0,0,0,0] },
+        "components": [
+          { "type": "Image", "color": "#000000B3", "skinKey": "slot_popup_overlay" },
+          { "type": "Button", "onClick": "evt.popup.tryDismiss" }
+        ] },
+      { "name": "Panel",
+        "rect": { "anchor": "middle-center", "sizeDelta": [960, 0] },
+        "components": [
+          { "type": "Image", "skinKey": "slot_popup_bg", "color": "#16213E" },
+          { "type": "VerticalLayoutGroup", "spacing": 24, "padding": [40, 32, 40, 32], "childAlignment": "UpperCenter", "childForceExpand": [true,false] },
+          { "type": "ContentSizeFitter", "vertical": "PreferredSize" }
+        ],
+        "children": [
+          { "name": "Header", "rect": { "anchor": "top-stretch", "sizeDelta": [0, 80] },
+            "components": [ { "type": "HorizontalLayoutGroup", "spacing": 16, "childAlignment": "MiddleLeft" } ],
+            "children": [
+              { "name": "Txt_Title", "rect": { "anchor": "middle-center", "sizeDelta": [0,60] },
+                "components": [
+                  { "type": "LayoutElement", "flexibleWidth": 1 },
+                  { "type": "TMP_Text", "stringKey": "<title>", "font": "bold", "size": 36, "color": "#FFFFFF", "align": "MidlineLeft" }
+                ] },
+              { "name": "Btn_Close", "rect": { "anchor": "middle-right", "sizeDelta": [72,72] },
+                "components": [
+                  { "type": "Image", "skinKey": "btn_icon_close", "color": "#FFFFFF26" },
+                  { "type": "Button", "onClick": "evt.popup.close" }
+                ] }
+            ] },
+          { "name": "Divider_Top", "rect": { "anchor": "top-stretch", "sizeDelta": [0,2] },
+            "components": [ { "type": "Image", "color": "#FFFFFF1A" } ] },
+          { "name": "Content", "comment": "Popup-specific content goes here." },
+          { "name": "Divider_Bot", "rect": { "anchor": "top-stretch", "sizeDelta": [0,2] },
+            "components": [ { "type": "Image", "color": "#FFFFFF1A" } ] },
+          { "name": "Footer", "comment": "Action buttons (HorizontalLayoutGroup, spacing 16)." }
+        ]
+      }
+    ]
+  },
+
+  "popups": [
+    {
+      "id": "ForceUpdatePopup",
+      "dismissible": false,
+      "title": "popup.force_update.title",
+      "content": [
+        { "name": "Icon", "rect": { "anchor": "top-center", "sizeDelta": [128,128] },
+          "components": [ { "type": "Image", "skinKey": "slot_icon_update", "color": "#FFB300" } ] },
+        { "name": "Txt_Body", "rect": { "anchor": "top-stretch", "sizeDelta": [0, 160] },
+          "components": [ { "type": "TMP_Text", "stringKey": "popup.force_update.body", "size": 26, "color": "#B0BEC5", "align": "Center" } ] }
+      ],
+      "footer": [
+        { "name": "Btn_OpenStore", "primary": true, "stringKey": "popup.force_update.cta", "onClick": "evt.update.openStore", "skinKey": "btn_primary" }
+      ]
+    },
+    {
+      "id": "MaintenancePopup",
+      "dismissible": false,
+      "title": "popup.maintenance.title",
+      "content": [
+        { "name": "Icon", "rect": { "anchor": "top-center", "sizeDelta": [128,128] },
+          "components": [ { "type": "Image", "skinKey": "slot_icon_maintenance", "color": "#FFB300" } ] },
+        { "name": "Txt_Body", "rect": { "anchor": "top-stretch", "sizeDelta": [0, 200] },
+          "components": [ { "type": "TMP_Text", "stringKey": "popup.maintenance.body", "args": { "message": "{maintenance.message}" }, "size": 26, "color": "#B0BEC5", "align": "Center" } ] }
+      ],
+      "footer": []
+    },
+    {
+      "id": "SessionExpiredPopup",
+      "dismissible": false,
+      "title": "popup.session.title",
+      "content": [
+        { "name": "Icon", "rect": { "anchor": "top-center", "sizeDelta": [128,128] },
+          "components": [ { "type": "Image", "skinKey": "slot_icon_session", "color": "#FF5252" } ] },
+        { "name": "Txt_Body", "rect": { "anchor": "top-stretch", "sizeDelta": [0, 160] },
+          "components": [ { "type": "TMP_Text", "stringKey": "popup.session.body", "size": 26, "color": "#B0BEC5", "align": "Center" } ] }
+      ],
+      "footer": [
+        { "name": "Btn_Confirm", "primary": true, "stringKey": "common.confirm", "onClick": "evt.session.toTitle", "skinKey": "btn_primary" }
+      ]
+    },
+    {
+      "id": "SettingPopup",
+      "dismissible": true,
+      "title": "popup.settings.title",
+      "content": [
+        { "name": "Row_Bgm", "type": "ToggleRow", "labelKey": "popup.settings.bgm", "bind": "settings.bgm" },
+        { "name": "Row_Sfx", "type": "ToggleRow", "labelKey": "popup.settings.sfx", "bind": "settings.sfx" },
+        { "name": "Row_Haptics", "type": "ToggleRow", "labelKey": "popup.settings.haptics", "bind": "settings.haptics" },
+        { "name": "Row_Notif", "type": "ToggleRow", "labelKey": "popup.settings.notif", "bind": "settings.notifications" },
+        { "name": "Row_Language", "type": "DropdownRow", "labelKey": "hud.language", "bind": "settings.language", "optionsBind": "settings.languageOptions" }
+      ],
+      "footer": [
+        { "name": "Btn_Cancel", "stringKey": "common.cancel", "onClick": "evt.settings.cancel", "skinKey": "btn_secondary" },
+        { "name": "Btn_Save",   "primary": true, "stringKey": "common.save", "onClick": "evt.settings.save", "skinKey": "btn_primary" }
+      ],
+      "atomicPrefabs": {
+        "ToggleRow": {
+          "size": [800, 88],
+          "components": [ { "type": "HorizontalLayoutGroup", "spacing": 16, "childAlignment": "MiddleLeft" } ],
+          "children": [
+            { "name": "Txt_Label", "rect": { "anchor": "middle-left", "sizeDelta": [400,48] },
+              "components": [ { "type": "LayoutElement", "flexibleWidth": 1 }, { "type": "TMP_Text", "size": 26, "color": "#FFFFFF" } ] },
+            { "name": "Toggle", "rect": { "anchor": "middle-right", "sizeDelta": [120,56] },
+              "components": [ { "type": "Toggle" }, { "type": "Image", "skinKey": "slot_toggle_track" } ],
+              "children": [
+                { "name": "Handle", "rect": { "anchor": "middle-left", "sizeDelta": [48,48], "anchoredPos": [4,0] },
+                  "components": [ { "type": "Image", "skinKey": "slot_toggle_handle" } ] }
+              ] }
+          ]
+        },
+        "DropdownRow": {
+          "size": [800, 88],
+          "components": [ { "type": "HorizontalLayoutGroup", "spacing": 16, "childAlignment": "MiddleLeft" } ],
+          "children": [
+            { "name": "Txt_Label", "rect": { "anchor": "middle-left", "sizeDelta": [300,48] },
+              "components": [ { "type": "LayoutElement", "flexibleWidth": 1 }, { "type": "TMP_Text", "size": 26, "color": "#FFFFFF" } ] },
+            { "name": "Dropdown", "rect": { "anchor": "middle-right", "sizeDelta": [320,72] },
+              "components": [ { "type": "TMP_Dropdown" }, { "type": "Image", "color": "#FFFFFF11" } ] }
+          ]
+        }
+      }
+    },
+    {
+      "id": "EnergyPopup",
+      "dismissible": true,
+      "title": "popup.energy.title",
+      "content": [
+        { "name": "Group_Hearts", "rect": { "anchor": "top-stretch", "sizeDelta": [0, 100] },
+          "components": [ { "type": "HorizontalLayoutGroup", "spacing": 12, "childAlignment": "MiddleCenter" } ],
+          "prefabChildren": [
+            { "name": "Heart", "comment": "{stamina.max} hearts: filled (slot_stamina_icon) / empty (slot_stamina_icon_empty)" },
+            { "name": "Txt_Frac", "comment": "Trailing text {cur}/{max}" }
+          ] },
+        { "name": "Txt_FullIn", "rect": { "anchor": "top-stretch", "sizeDelta": [0, 48] },
+          "components": [ { "type": "TMP_Text", "stringKey": "popup.energy.full_in_fmt",
+            "args": { "hh": "{stamina.hh}", "mm": "{stamina.mm}", "ss": "{stamina.ss}" },
+            "font": "mono", "size": 24, "color": "#B0BEC5", "align": "Center" } ] }
+      ],
+      "footer": [
+        { "name": "Btn_WatchAd",
+          "primary": true,
+          "stringKey": "popup.energy.watch_ad_fmt", "args": { "n": 2 },
+          "onClick": "evt.energy.watchAd",
+          "skinKey": "btn_ad",
+          "color": "#00E5FF" },
+        { "name": "Btn_Refill",
+          "stringKey": "popup.energy.refill_fmt", "args": { "cost": 50 },
+          "onClick": "evt.energy.refill",
+          "skinKey": "btn_secondary" }
+      ]
+    },
+    {
+      "id": "StageDetailPopup",
+      "dismissible": true,
+      "title": "popup.stage.title_fmt", "titleArgs": { "n": "{stage.index}" },
+      "content": [
+        { "name": "Group_Stars", "rect": { "anchor": "top-stretch", "sizeDelta": [0, 80] },
+          "components": [ { "type": "HorizontalLayoutGroup", "spacing": 16, "childAlignment": "MiddleCenter" } ],
+          "prefabChildren": [
+            { "name": "Star", "comment": "3 instances, filled per stage.stars" }
+          ] },
+        { "name": "Txt_Best", "rect": { "anchor": "top-stretch", "sizeDelta": [0, 48] },
+          "components": [ { "type": "TMP_Text", "stringKey": "popup.stage.best_fmt", "args": { "score": "{stage.best}" }, "size": 26, "color": "#B0BEC5", "align": "Center" } ] },
+        { "name": "Txt_MyRank", "rect": { "anchor": "top-stretch", "sizeDelta": [0, 48] },
+          "components": [ { "type": "TMP_Text", "stringKey": "popup.stage.my_rank_fmt", "args": { "rank": "{stage.rank}" }, "size": 26, "color": "#B0BEC5", "align": "Center" } ] }
+      ],
+      "footer": [
+        { "name": "Btn_Play", "primary": true, "stringKey": "common.play", "onClick": "evt.stage.play", "skinKey": "btn_primary" }
+      ]
+    },
+    {
+      "id": "DailyChallengePopup",
+      "dismissible": true,
+      "title": "popup.daily.title",
+      "content": [
+        { "name": "Txt_Streak", "rect": { "anchor": "top-stretch", "sizeDelta": [0, 48] },
+          "components": [ { "type": "TMP_Text", "stringKey": "home.daily_streak_fmt", "args": { "n": "{daily.streak}" }, "font": "bold", "size": 28, "color": "#FFB300", "align": "Center" } ] },
+        { "name": "Row_Streak_Tiles", "rect": { "anchor": "top-stretch", "sizeDelta": [0, 96] },
+          "components": [ { "type": "HorizontalLayoutGroup", "spacing": 12, "childAlignment": "MiddleCenter" } ],
+          "prefabChildren": [
+            { "name": "Tile", "comment": "7 tiles: skinKey slot_streak_tile_done / _open" }
+          ] },
+        { "name": "Txt_Today", "rect": { "anchor": "top-stretch", "sizeDelta": [0, 48] },
+          "components": [ { "type": "TMP_Text", "stringKey": "popup.daily.today_fmt", "args": { "cur": "{daily.cur}", "max": "{daily.max}" }, "size": 26, "color": "#FFFFFF", "align": "Center" } ] },
+        { "name": "Bar_Progress", "rect": { "anchor": "top-stretch", "sizeDelta": [0, 24] },
+          "components": [
+            { "type": "Image", "color": "#FFFFFF22" },
+            { "type": "Slider", "bind": "daily.progress" }
+          ] },
+        { "name": "Txt_Reward", "rect": { "anchor": "top-stretch", "sizeDelta": [0, 48] },
+          "components": [ { "type": "TMP_Text", "stringKey": "popup.daily.reward_fmt", "args": { "n": "{daily.reward}" }, "size": 26, "color": "#00E5FF", "align": "Center" } ] }
+      ],
+      "footer": [
+        { "name": "Btn_Complete", "primary": true, "stringKey": "common.complete",
+          "onClick": "evt.daily.complete",
+          "skinKey": "btn_primary",
+          "interactableBind": "daily.canComplete" }
+      ]
+    },
+    {
+      "id": "RewardPopup",
+      "dismissible": true,
+      "title": "popup.reward.title",
+      "content": [
+        { "name": "Slot_Spine", "rect": { "anchor": "top-center", "sizeDelta": [400, 400] },
+          "components": [ { "type": "SpineGraphic", "skinKey": "spine_reward", "loopAnim": "celebrate" } ] },
+        { "name": "Row_Currency", "rect": { "anchor": "top-stretch", "sizeDelta": [0, 80] },
+          "components": [ { "type": "HorizontalLayoutGroup", "spacing": 16, "childAlignment": "MiddleCenter" } ],
+          "children": [
+            { "name": "Icon", "rect": { "anchor": "middle-center", "sizeDelta": [64,64] },
+              "components": [ { "type": "Image", "skinKey": "slot_reward_currency" } ] },
+            { "name": "Txt_Amount", "rect": { "anchor": "middle-center", "sizeDelta": [200,80] },
+              "components": [ { "type": "TMP_Text", "bind": "reward.amount", "font": "bold", "size": 48, "color": "#FFFFFF", "prefix": "× " } ] }
+          ] }
+      ],
+      "footer": [
+        { "name": "Btn_Claim", "primary": true, "stringKey": "common.claim", "onClick": "evt.reward.claim", "skinKey": "btn_primary" },
+        { "name": "Btn_ClaimX2", "stringKey": "popup.reward.x2", "onClick": "evt.reward.claimX2",
+          "skinKey": "btn_ad",
+          "comment": "Ad-gated. Shows film icon left of label.",
+          "color": "#00E5FF" }
+      ]
+    },
+    {
+      "id": "AccountPopup",
+      "dismissible": true,
+      "title": "popup.account.title",
+      "content": [
+        { "name": "Slot_Avatar", "rect": { "anchor": "top-center", "sizeDelta": [160, 160] },
+          "components": [ { "type": "Image", "skinKey": "slot_avatar" }, { "type": "Mask" } ],
+          "children": [
+            { "name": "Img_AvatarPhoto", "rect": { "anchor": "stretch", "offsets": [6,6,6,6] },
+              "components": [ { "type": "RawImage", "bind": "user.avatarUrl" } ] }
+          ] },
+        { "name": "Txt_Nickname", "rect": { "anchor": "top-stretch", "sizeDelta": [0, 48] },
+          "components": [ { "type": "TMP_Text", "bind": "user.nickname", "font": "bold", "size": 32, "color": "#FFFFFF", "align": "Center" } ] },
+        { "name": "Txt_Joined", "rect": { "anchor": "top-stretch", "sizeDelta": [0, 36] },
+          "components": [ { "type": "TMP_Text", "stringKey": "popup.account.joined_fmt", "args": { "date": "{user.joinedAt}" }, "size": 22, "color": "#B0BEC5", "align": "Center" } ] },
+        { "name": "Header_Linked", "rect": { "anchor": "top-stretch", "sizeDelta": [0, 40] },
+          "components": [ { "type": "TMP_Text", "stringKey": "popup.account.linked_label", "size": 24, "color": "#B0BEC5", "align": "MidlineLeft" } ] },
+        { "name": "Row_ProviderA", "type": "ProviderRow", "provider": "ProviderA", "bind": "auth.providerA" },
+        { "name": "Row_ProviderB", "type": "ProviderRow", "provider": "ProviderB", "bind": "auth.providerB" }
+      ],
+      "footer": [],
+      "atomicPrefabs": {
+        "ProviderRow": {
+          "size": [800, 96],
+          "components": [
+            { "type": "Image", "color": "#FFFFFF0D" },
+            { "type": "HorizontalLayoutGroup", "spacing": 16, "padding": [16,8,16,8], "childAlignment": "MiddleLeft" }
+          ],
+          "children": [
+            { "name": "Icon", "rect": { "anchor": "middle-left", "sizeDelta": [56,56] },
+              "components": [ { "type": "Image", "skinKey": "slot_provider_<provider>" } ] },
+            { "name": "Txt_Name", "rect": { "anchor": "middle-center", "sizeDelta": [0,48] },
+              "components": [ { "type": "LayoutElement", "flexibleWidth": 1 },
+                              { "type": "TMP_Text", "bind": "provider.name", "size": 26, "color": "#FFFFFF" } ] },
+            { "name": "Btn_LinkState", "rect": { "anchor": "middle-right", "sizeDelta": [200,72] },
+              "components": [
+                { "type": "Image", "skinKey": "btn_secondary" },
+                { "type": "Button", "onClick": "evt.account.toggleLink" },
+                { "type": "ProviderLinkButton", "fields": { "linkedKey": "common.linked", "unlinkedKey": "common.link" } }
+              ] }
+          ]
+        }
+      }
+    },
+
+    {
+      "id": "ClearPopup",
+      "context": "GameScene",
+      "dismissible": true,
+      "title": "popup.clear.title",
+      "content": [
+        { "name": "Slot_Spine", "rect": { "anchor": "top-center", "sizeDelta": [440, 440] },
+          "components": [ { "type": "SpineGraphic", "skinKey": "spine_clear", "loopAnim": "celebrate" } ] },
+        { "name": "Group_Stars", "rect": { "anchor": "top-stretch", "sizeDelta": [0, 96] },
+          "components": [
+            { "type": "HorizontalLayoutGroup", "spacing": 24, "childAlignment": "MiddleCenter" },
+            { "type": "StarFillSequence", "fields": { "delayPerStar": 0.25, "burstSpine": "spine_star_burst" } }
+          ],
+          "prefabChildren": [
+            { "name": "Star", "comment": "3 instances filled in sequence" }
+          ] },
+        { "name": "Txt_Score", "rect": { "anchor": "top-stretch", "sizeDelta": [0, 56] },
+          "components": [ { "type": "TMP_Text", "stringKey": "popup.clear.score_fmt", "args": { "score": "{clear.score}" }, "font": "bold", "size": 36, "color": "#FFFFFF", "align": "Center" } ] },
+        { "name": "Badge_NewRecord", "active": "bind:clear.isNewRecord",
+          "rect": { "anchor": "top-center", "sizeDelta": [320, 56] },
+          "components": [
+            { "type": "Image", "color": "#FFB300", "skinKey": "slot_badge_record" },
+            { "type": "TMP_Text", "stringKey": "popup.clear.new_record", "font": "bold", "size": 24, "color": "#1A1A2E", "align": "Center" }
+          ] },
+        { "name": "Row_Reward", "rect": { "anchor": "top-stretch", "sizeDelta": [0, 60] },
+          "components": [ { "type": "HorizontalLayoutGroup", "spacing": 12, "childAlignment": "MiddleCenter" } ],
+          "children": [
+            { "name": "Icon", "rect": { "anchor": "middle-center", "sizeDelta": [48,48] },
+              "components": [ { "type": "Image", "skinKey": "slot_currency_soft" } ] },
+            { "name": "Txt_Amount", "rect": { "anchor": "middle-center", "sizeDelta": [180,56] },
+              "components": [ { "type": "TMP_Text", "bind": "clear.reward", "font": "bold", "size": 28, "color": "#FFFFFF", "prefix": "+" } ] }
+          ] }
+      ],
+      "footer": [
+        { "name": "Btn_Lobby", "stringKey": "common.lobby", "onClick": "evt.clear.toLobby", "skinKey": "btn_secondary" },
+        { "name": "Btn_Retry", "stringKey": "popup.clear.retry", "onClick": "evt.clear.retry", "skinKey": "btn_secondary" },
+        { "name": "Btn_Next",  "primary": true, "stringKey": "common.next", "onClick": "evt.clear.next", "skinKey": "btn_primary" }
+      ]
+    },
+    {
+      "id": "PausePopup",
+      "context": "GameScene",
+      "dismissible": true,
+      "title": "popup.pause.title",
+      "content": [],
+      "footer": [
+        { "name": "Btn_Resume", "primary": true, "stringKey": "common.resume", "onClick": "evt.pause.resume", "skinKey": "btn_primary", "fullWidth": true },
+        { "name": "Btn_Retry",  "stringKey": "popup.pause.retry", "onClick": "evt.pause.retry", "skinKey": "btn_secondary", "fullWidth": true },
+        { "name": "Btn_Lobby",  "stringKey": "common.lobby", "onClick": "evt.pause.toLobby", "skinKey": "btn_secondary", "fullWidth": true }
+      ],
+      "footerLayout": "vertical"
+    },
+    {
+      "id": "TimeoutPopup",
+      "context": "GameScene",
+      "dismissible": false,
+      "title": "popup.timeout.title",
+      "content": [
+        { "name": "Slot_Spine", "rect": { "anchor": "top-center", "sizeDelta": [400, 400] },
+          "components": [ { "type": "SpineGraphic", "skinKey": "spine_timeout", "loopAnim": "loop" } ] }
+      ],
+      "footer": [
+        { "name": "Btn_Retry", "primary": true, "stringKey": "common.retry", "onClick": "evt.timeout.retry", "skinKey": "btn_primary" },
+        { "name": "Btn_Lobby", "stringKey": "common.lobby", "onClick": "evt.timeout.toLobby", "skinKey": "btn_secondary" }
+      ]
+    }
+  ],
+
+  "toast": {
+    "id": "ToastItem",
+    "comment": "Prefab spawned by ToastStack under <Scene>/ToastLayer.",
+    "size": [960, 120],
+    "components": [
+      { "type": "Image", "skinKey": "slot_toast_bg", "color": "#16213EF5" },
+      { "type": "HorizontalLayoutGroup", "spacing": 16, "padding": [24,16,24,16], "childAlignment": "MiddleLeft" },
+      { "type": "ToastItem", "fields": { "autoDismissSec": 3, "enterAnim": "slide_down_fade", "exitAnim": "slide_up_fade" } }
+    ],
+    "children": [
+      { "name": "Icon_Status", "rect": { "anchor": "middle-left", "sizeDelta": [48,48] },
+        "components": [ { "type": "Image", "skinKey": "slot_toast_icon", "color": "#76FF03",
+                          "comment": "color swap per severity: success #76FF03, warn #FFB300, error #FF5252" } ] },
+      { "name": "Txt_Body", "rect": { "anchor": "middle-center", "sizeDelta": [0,56] },
+        "components": [
+          { "type": "LayoutElement", "flexibleWidth": 1 },
+          { "type": "TMP_Text", "bind": "toast.body", "size": 24, "color": "#FFFFFF", "align": "MidlineLeft" }
+        ] },
+      { "name": "Btn_Close", "rect": { "anchor": "middle-right", "sizeDelta": [56,56] },
+        "components": [
+          { "type": "Image", "skinKey": "btn_icon_close", "color": "#FFFFFF33" },
+          { "type": "Button", "onClick": "evt.toast.dismiss" }
+        ] }
+    ]
+  }
+}

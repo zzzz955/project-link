@@ -1,0 +1,716 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Project Link — Wireframes</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Caveat:wght@500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --paper:#f6f3ea;
+    --ink:#1d1d1d;
+    --ink-soft:#5a5a5a;
+    --grid:#0000000d;
+    --accent:#7B2FBE;
+    --accent2:#E040FB;
+    --pos:#00b56e;
+    --warn:#e08a00;
+    --danger:#d63838;
+    --link:#1a5ad9;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--paper);color:var(--ink);font-family:"Patrick Hand", "Comic Sans MS", system-ui, sans-serif;font-size:17px;line-height:1.35}
+  body{
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 24px 24px;
+    min-height:100vh;
+  }
+  header{
+    padding:18px 24px 8px;
+    border-bottom:2px dashed #00000022;
+    background:var(--paper);
+    position:sticky; top:0; z-index:10;
+  }
+  h1{font-family:"Caveat", cursive; font-weight:700; font-size:36px; margin:0 0 4px}
+  .sub{color:var(--ink-soft); font-size:18px; margin:0}
+  .files{display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; font-family:"JetBrains Mono", monospace; font-size:13px}
+  .files a{
+    text-decoration:none; color:var(--link);
+    border:1.5px solid var(--link); border-radius:6px;
+    padding:3px 8px; background:#fff;
+  }
+  .files a:hover{background:#eef3ff}
+  .layout{display:grid; grid-template-columns: 220px 1fr; gap:16px; padding:16px 24px 60px}
+  nav.scene-nav{
+    background:#fff;
+    border:2px solid var(--ink);
+    border-radius:14px;
+    padding:12px;
+    position:sticky; top:128px;
+    height:fit-content;
+    box-shadow:3px 3px 0 #00000022;
+  }
+  nav h2{font-family:"Caveat", cursive; font-size:22px; margin:6px 4px}
+  nav button{
+    display:block; width:100%;
+    text-align:left;
+    background:transparent; border:none;
+    font:inherit; color:var(--ink);
+    padding:6px 8px; border-radius:6px;
+    cursor:pointer;
+  }
+  nav button:hover{background:#0000000a}
+  nav button.active{background:var(--ink); color:var(--paper)}
+  nav .sect{font-family:"Caveat", cursive; font-size:18px; color:var(--ink-soft); margin:10px 4px 2px; border-top:1.5px dashed #00000022; padding-top:8px}
+  main{display:grid; grid-template-columns: 380px 1fr; gap:24px}
+
+  /* phone frame */
+  .phone{
+    width:380px; height:760px;
+    background:#16213E;
+    border:3px solid var(--ink);
+    border-radius:38px;
+    box-shadow:6px 6px 0 #00000022;
+    position:relative;
+    overflow:hidden;
+    color:#fff;
+    font-family:"Patrick Hand", sans-serif;
+  }
+  .phone .notch{
+    position:absolute; top:0; left:50%; transform:translateX(-50%);
+    width:120px; height:22px; background:#000; border-radius:0 0 12px 12px; z-index:5;
+  }
+  .phone .statusbar{position:absolute; top:0; left:0; right:0; height:28px; padding:4px 22px; display:flex; justify-content:space-between; font-size:12px; font-family:"JetBrains Mono", monospace; color:#fff; opacity:.7; z-index:4}
+  .phone .screen{position:absolute; inset:28px 0 0 0; overflow:hidden}
+
+  /* sketch shapes */
+  .sk{ border:2.5px solid var(--ink); border-radius:14px; background:#ffffff14; padding:8px; position:absolute; }
+  .sk--white{background:#ffffff14}
+  .sk--dark{background:#00000033}
+  .sk--label{color:#fff; font-size:14px; opacity:.95}
+  .sk--mono{font-family:"JetBrains Mono", monospace; font-size:12px}
+  .sk-pill{border-radius:999px}
+  .sk-accent{border-color:#fff; background:linear-gradient(135deg,#7B2FBE,#E040FB); color:#fff}
+  .sk-accent .sk--label{color:#fff;font-weight:700}
+  .sk-outline{background:transparent}
+  .sk-danger{background:#FF525233; border-color:#FF5252}
+  .sk-circ{border-radius:50%}
+  .sk-center{display:flex; align-items:center; justify-content:center; text-align:center}
+  .sk-row{display:flex; align-items:center; gap:6px}
+  .sk-col{display:flex; flex-direction:column; gap:6px}
+  .sk-tag{
+    position:absolute; right:-6px; top:-10px;
+    background:var(--paper); color:var(--ink);
+    border:1.5px solid var(--ink); border-radius:6px;
+    padding:1px 5px; font-family:"JetBrains Mono", monospace; font-size:10px;
+    transform:rotate(-2deg);
+  }
+  .annot{
+    position:absolute; color:#ffe082; font-family:"Caveat",cursive; font-size:14px;
+    pointer-events:none;
+  }
+  .annot::before{content:"↳ "; opacity:.7}
+
+  /* hatched placeholder */
+  .hatch{
+    background-image:repeating-linear-gradient(45deg,#ffffff22 0 6px,transparent 6px 12px);
+  }
+
+  /* spec panel */
+  .spec{
+    background:#fff;
+    border:2px solid var(--ink);
+    border-radius:14px;
+    padding:14px 18px;
+    font-family:"JetBrains Mono", monospace;
+    font-size:13px;
+    line-height:1.55;
+    box-shadow:3px 3px 0 #00000022;
+    height:fit-content;
+  }
+  .spec h3{font-family:"Caveat", cursive; font-weight:700; font-size:26px; margin:0 0 6px; color:var(--ink)}
+  .spec .sub{font-family:"Patrick Hand"; font-size:17px; color:var(--ink-soft); margin:0 0 12px}
+  .spec table{border-collapse:collapse; width:100%; margin:6px 0 14px}
+  .spec th{
+    text-align:left; padding:4px 8px;
+    background:#f1eee5; border:1px solid #d8d3c4;
+    font-weight:600; font-size:12px;
+  }
+  .spec td{padding:4px 8px; border:1px solid #e5e1d4; vertical-align:top; font-size:12px}
+  .spec td.k{color:#7B2FBE; white-space:nowrap}
+  .spec td.s{color:#00754f; white-space:nowrap}
+  .spec td.e{color:#d63838; white-space:nowrap}
+  .spec details{margin-top:8px; border-top:1px dashed #00000022; padding-top:8px}
+  .spec summary{cursor:pointer; font-family:"Caveat",cursive; font-size:18px}
+  .spec pre{background:#f7f5ed; border:1px solid #e0dccd; padding:10px; border-radius:8px; overflow:auto; max-height:340px; font-size:11.5px; line-height:1.45}
+  .pillinfo{display:inline-block; border:1.5px solid var(--ink); border-radius:999px; padding:1px 8px; font-size:11px; font-family:"JetBrains Mono",monospace; margin-right:4px; margin-bottom:2px; background:#fff}
+  .pillinfo.warn{border-color:var(--warn); color:var(--warn)}
+  .pillinfo.danger{border-color:var(--danger); color:var(--danger)}
+  .pillinfo.pos{border-color:var(--pos); color:var(--pos)}
+
+  .page{display:none}
+  .page.active{display:block}
+
+  @media (max-width: 1100px){
+    main{grid-template-columns: 1fr}
+    .phone{margin: 0 auto}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Project Link — Wireframes &amp; UI Spec</h1>
+  <p class="sub">Hyper-casual puzzle · portrait mobile · Unity6 + UIButtonSkin · machine-readable hierarchy in <code>unity-spec/</code></p>
+  <div class="files">
+    <a href="unity-spec/README.md">README.md</a>
+    <a href="unity-spec/scenes.json">scenes.json</a>
+    <a href="unity-spec/popups.json">popups.json</a>
+    <a href="unity-spec/flow.json">flow.json</a>
+    <a href="unity-spec/strings.json">strings.json</a>
+    <a href="unity-spec/skin-keys.json">skin-keys.json</a>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="scene-nav" id="nav">
+    <h2>Scenes</h2>
+    <button data-page="bootstrap" class="active">Bootstrap</button>
+    <button data-page="title">Title</button>
+    <button data-page="lobby-home">Lobby / Home</button>
+    <button data-page="lobby-shop">Lobby / Shop</button>
+    <button data-page="lobby-rank">Lobby / Ranking</button>
+    <button data-page="game">Game</button>
+    <div class="sect">Popups · Global</div>
+    <button data-page="p-force">ForceUpdate</button>
+    <button data-page="p-maint">Maintenance</button>
+    <button data-page="p-session">SessionExpired</button>
+    <button data-page="p-setting">Settings</button>
+    <button data-page="p-energy">Energy</button>
+    <button data-page="p-stage">StageDetail</button>
+    <button data-page="p-daily">DailyChallenge</button>
+    <button data-page="p-reward">Reward</button>
+    <button data-page="p-account">Account</button>
+    <div class="sect">Popups · Game</div>
+    <button data-page="p-clear">Clear</button>
+    <button data-page="p-pause">Pause</button>
+    <button data-page="p-timeout">Timeout</button>
+    <div class="sect">System</div>
+    <button data-page="p-toast">Toast</button>
+    <button data-page="flow">Flow / Nav</button>
+  </nav>
+
+  <section id="pages">
+    <!-- pages injected by script -->
+  </section>
+</div>
+
+<script>
+// Helpers to keep sketches concise
+const Phone = (inner, opts={}) => `
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="statusbar"><span>9:41</span><span>●●●● 100%</span></div>
+    <div class="screen" style="background:${opts.bg||'#1A1A2E'}">${inner}</div>
+  </div>`;
+
+// Pre-built sketches per scene
+const sketches = {
+
+  bootstrap: Phone(`
+    <div class="sk sk-center" style="left:90px;top:230px;width:200px;height:200px;background:transparent;border-style:dashed">
+      <div class="sk--label">[SPINE: Logo]<br>spine_logo</div>
+      <div class="sk-tag">Slot_Logo</div>
+    </div>
+    <div class="sk" style="left:60px;top:560px;right:60px;height:22px;padding:0;border-radius:11px;background:#ffffff22">
+      <div style="width:42%;height:100%;background:linear-gradient(90deg,#7B2FBE,#E040FB);border-radius:11px"></div>
+      <div class="sk-tag">ProgressBar</div>
+    </div>
+    <div class="annot" style="left:84px;top:594px">Slider · fill #7B2FBE</div>
+    <div class="sk sk-pill sk-accent sk-center" style="left:90px;top:660px;width:200px;height:54px;display:none">Retry</div>
+  `),
+
+  title: Phone(`
+    <div class="sk sk-circ" style="right:18px;top:42px;width:42px;height:42px;background:#ffffff22;border-color:#fff" >
+      <div class="sk-tag">⚙ Btn_Settings</div>
+    </div>
+    <div class="sk sk-center" style="left:60px;top:90px;right:60px;height:240px;border-style:dashed;background:transparent">
+      <div class="sk--label">[SPINE: Logo]<br>spine_logo</div>
+      <div class="sk-tag">Slot_Logo</div>
+    </div>
+    <div class="sk sk-pill sk-outline sk-row" style="left:40px;top:370px;right:40px;height:54px;padding:0 16px;border-color:#fff">
+      <div class="sk-circ" style="width:24px;height:24px;background:#fff"></div>
+      <div class="sk--label" style="margin-left:10px">Continue with Provider A</div>
+      <div class="sk-tag">Btn_Google</div>
+    </div>
+    <div class="sk sk-pill sk-outline sk-row" style="left:40px;top:438px;right:40px;height:54px;padding:0 16px;border-color:#fff">
+      <div class="sk-circ" style="width:24px;height:24px;background:#fff"></div>
+      <div class="sk--label" style="margin-left:10px">Sign in with Provider B</div>
+      <div class="sk-tag">Btn_Apple</div>
+    </div>
+    <div class="sk sk-pill sk-accent sk-center" style="left:60px;top:560px;right:60px;height:60px">
+      <div>▶ TAP TO START</div>
+      <div class="sk-tag">Btn_TapToStart</div>
+    </div>
+    <div class="annot" style="right:50px;top:622px">PulseAnim 1.4s</div>
+    <div class="sk--mono" style="position:absolute;right:18px;bottom:8px;color:#546E7A">v1.0.0</div>
+  `),
+
+  'lobby-home': Phone(`
+    ${HUD()}
+    ${TabBar('home')}
+    <div class="sk sk-circ sk-center" style="left:14px;top:300px;width:34px;height:34px;background:#ffffff22"><span style="font-size:14px">◀</span></div>
+    <div class="sk sk-circ sk-center" style="right:14px;top:300px;width:34px;height:34px;background:#ffffff22"><span style="font-size:14px">▶</span></div>
+
+    <div class="sk sk-center" style="left:24px;top:200px;width:80px;height:220px;background:#16213E;opacity:.6;border-color:#fff">
+      <div class="sk--label" style="font-size:12px">01<br>★★☆</div>
+    </div>
+    <div class="sk sk-center" style="left:120px;top:170px;width:140px;height:280px;background:#16213E;border-color:#E040FB">
+      <div class="sk--label">02<br>★★★<br><span class="hatch" style="display:inline-block;width:60px;height:60px;border:1px dashed #fff;margin-top:6px">[SPINE]</span></div>
+      <div class="sk-tag">StageNode</div>
+    </div>
+    <div class="sk sk-center" style="right:24px;top:200px;width:80px;height:220px;background:#16213E;opacity:.6;border-color:#fff">
+      <div class="sk--label" style="font-size:12px">03<br>🔒</div>
+    </div>
+    <div class="sk sk-pill sk-accent sk-center" style="left:130px;top:464px;width:120px;height:36px">▶ PLAY</div>
+
+    <div class="sk sk-row" style="left:18px;right:18px;top:520px;height:60px;background:#16213E;padding:8px 12px">
+      <div class="sk--label" style="flex:1">📅 Daily Challenge<br><span style="opacity:.7;font-size:12px">Streak 5 · 4/5</span></div>
+      <div class="sk--mono" style="opacity:.8">▣▣▣▣□</div>
+      <div class="sk-tag">Card_Daily</div>
+    </div>
+    <div class="sk sk-row" style="left:18px;right:18px;top:592px;height:60px;background:#16213E;padding:8px 12px">
+      <div class="sk--label" style="flex:1">🎪 Season Event: Link Fest<br><span style="opacity:.7;font-size:12px">Ends 2d 14h</span></div>
+      <div class="hatch sk--label" style="width:54px;height:44px;border:1px dashed #fff;display:flex;align-items:center;justify-content:center;font-size:11px">[SPINE]</div>
+      <div class="sk-tag">Card_Event</div>
+    </div>
+  `),
+
+  'lobby-shop': Phone(`
+    ${HUD()}
+    ${TabBar('shop')}
+    <div class="sk--label sk--mono" style="position:absolute;left:24px;top:200px;letter-spacing:3px;opacity:.7">── STAMINA ──</div>
+    <div class="sk sk-col" style="left:18px;top:230px;width:160px;height:200px;background:#16213E;padding:8px">
+      <div class="hatch" style="height:80px;border:1px dashed #fff"></div>
+      <div class="sk--label" style="font-size:13px">+5 Stamina</div>
+      <div class="sk--label sk--mono">💎 50</div>
+      <div class="sk sk-pill sk-accent sk-center" style="position:relative;height:24px;left:0;top:0;font-size:12px">Purchase</div>
+      <div class="sk-tag">ShopProductCard</div>
+    </div>
+    <div class="sk sk-col" style="right:18px;top:230px;width:160px;height:200px;background:#16213E;padding:8px">
+      <div class="hatch" style="height:80px;border:1px dashed #fff"></div>
+      <div class="sk--label" style="font-size:13px">+20 Stamina</div>
+      <div class="sk--label sk--mono">💎 180</div>
+      <div class="sk sk-pill sk-accent sk-center" style="position:relative;height:24px;font-size:12px">Purchase</div>
+    </div>
+    <div class="sk--label sk--mono" style="position:absolute;left:24px;top:444px;letter-spacing:3px;opacity:.7">── ITEMS ──</div>
+    <div class="sk sk-row" style="left:18px;right:18px;top:470px;height:90px;background:#16213E;padding:8px 10px">
+      <div class="hatch" style="width:64px;height:64px;border:1px dashed #fff"></div>
+      <div class="sk-col" style="flex:1;padding-left:8px">
+        <div class="sk--label" style="font-size:14px">Extra Move</div>
+        <div class="sk--label" style="opacity:.7;font-size:12px">Grants +5 moves</div>
+        <div class="sk--label sk--mono">💎 120</div>
+      </div>
+      <div class="sk sk-pill sk-accent sk-center" style="position:relative;width:78px;height:30px;font-size:12px">Purchase</div>
+      <div class="sk-tag">ShopItemRow</div>
+    </div>
+  `),
+
+  'lobby-rank': Phone(`
+    ${HUD()}
+    ${TabBar('rank')}
+    <div class="sk sk-row" style="left:24px;right:24px;top:200px;height:40px;background:#ffffff11;padding:0 4px">
+      <div class="sk-pill sk-center" style="flex:1;background:#7B2FBE">Stages Cleared</div>
+      <div class="sk-center" style="flex:1;color:#fff;opacity:.7">Score</div>
+      <div class="sk-tag">Seg_Mode</div>
+    </div>
+    ${rankRow(1,'🥇','Aurora',350,260)}
+    ${rankRow(2,'🥈','Nimbus',310,300)}
+    ${rankRow(3,'🥉','Vela',290,340)}
+    ${rankRow(4,'4.','Ren',250,380)}
+    ${rankRow(5,'5.','Mio',240,420)}
+    <div class="sk sk-row" style="left:18px;right:18px;top:560px;height:48px;background:#7B2FBE40;border-color:#E040FB;padding:0 10px">
+      <div class="sk--label sk--mono" style="width:32px">#12</div>
+      <div class="sk-circ" style="width:32px;height:32px;background:#fff;opacity:.5"></div>
+      <div class="sk--label" style="flex:1;color:#E040FB;font-weight:700;padding-left:8px">YOU</div>
+      <div class="sk--label sk--mono">180</div>
+      <div class="sk-tag">Row_MyRank_Pinned</div>
+    </div>
+  `),
+
+  game: Phone(`
+    <div class="sk sk-row" style="left:0;right:0;top:0;height:80px;background:#0E1430CC;border:none;border-radius:0;padding:8px 14px">
+      <div class="sk sk-circ sk-center" style="position:relative;width:36px;height:36px;background:#ffffff22"><span style="font-size:14px">⏸</span>
+        <div class="sk-tag">Btn_Pause</div>
+      </div>
+      <div class="sk--label" style="flex:1;text-align:center;font-weight:700">Stage 12</div>
+      <div class="sk--label sk--mono">02:30</div>
+    </div>
+    <div class="sk" style="left:14px;right:14px;top:90px;height:18px;padding:0;border-radius:9px;background:#ffffff22;border:none">
+      <div style="display:flex;height:100%;gap:2px">
+        <div style="flex:3;background:#7B2FBE;border-radius:9px 0 0 9px"></div>
+        <div style="flex:2;background:#00E5FF"></div>
+        <div style="flex:5;background:#ffffff22;border-radius:0 9px 9px 0"></div>
+      </div>
+      <div class="sk-tag">Bar_Objective</div>
+    </div>
+    <div class="sk--label sk--mono" style="position:absolute;right:14px;top:114px">Moves 8/20</div>
+    <div class="sk hatch sk-center" style="left:24px;top:160px;right:24px;height:380px;border-style:dashed">
+      <div class="sk--label">[GAME BOARD]<br>grid · path lines<br>GameBoardView</div>
+      <div class="sk-tag">Group_Board</div>
+    </div>
+    <div class="sk sk-row" style="left:24px;right:24px;top:580px;height:80px;background:transparent;border:none;gap:14px;padding:0">
+      ${itemSlot('🔧','2')}${itemSlot('⚡','1')}${itemSlot('🎯','3')}
+    </div>
+  `),
+
+  // Popups (each shown atop a dimmed phone)
+  'p-force':  popupSketch('Update Required','popup.force_update.title','A new version of the game is available. Please update to continue playing.', [['Open Store','primary']], {dismissible:false, icon:'🔄', iconColor:'#FFB300'}),
+  'p-maint':  popupSketch('Under Maintenance','popup.maintenance.title','{MaintenanceMessage}', [], {dismissible:false, icon:'🛠', iconColor:'#FFB300'}),
+  'p-session':popupSketch('Session Expired','popup.session.title','Your session has expired. Please log in again.', [['Confirm','primary']], {dismissible:false, icon:'⏰', iconColor:'#FF5252'}),
+  'p-setting':popupSketch('Settings','popup.settings.title', null,
+                          [['Cancel','secondary'],['Save','primary']],
+                          {dismissible:true, rows:[
+                            ['BGM','toggle'],['SFX','toggle'],['Haptics','toggle'],['Notifications','toggle'],
+                            ['Language','dropdown']
+                          ]}),
+  'p-energy': popupSketch('Stamina','popup.energy.title', null,
+                          [['📺 Watch Ad +2','positive'],['💎 Refill (50)','secondary']],
+                          {dismissible:true, hearts:5, heartsFilled:3, sub:'Full in 01:20:00'}),
+  'p-stage':  popupSketch('Stage 12','popup.stage.title_fmt', null,
+                          [['▶ Play','primary']],
+                          {dismissible:true, stars:3, sub:'Best: 8,450 pts · My Rank: #14'}),
+  'p-daily':  popupSketch('Daily Challenge','popup.daily.title', null,
+                          [['Complete ✓','primary']],
+                          {dismissible:true, streakRow:true, progress:0.8, sub:'Today: 4/5 · Reward 💎×50'}),
+  'p-reward': popupSketch('Reward!','popup.reward.title', null,
+                          [['Claim','primary'],['×2 📺','positive']],
+                          {dismissible:true, spineBox:true, currency:'💎 × 50'}),
+  'p-account':popupSketch('Profile','popup.account.title', null,
+                          [],
+                          {dismissible:true, avatarBox:true, joined:'Joined: 2025-01-10', providers:[['G','Linked'],['','Link']]}),
+  'p-clear':  popupSketch('STAGE CLEAR!','popup.clear.title', null,
+                          [['Lobby','secondary'],['Retry','secondary'],['Next ▶','primary']],
+                          {dismissible:true, spineBox:true, stars:3, sub:'Score 12,800 · 🏆 NEW RECORD · +💎30', accent:true}),
+  'p-pause':  popupSketch('Paused','popup.pause.title', null,
+                          [['▶ Resume','primary'],['🔄 Retry','secondary'],['🏠 Lobby','secondary']],
+                          {dismissible:true, footerVertical:true}),
+  'p-timeout':popupSketch('Time\'s Up!','popup.timeout.title', null,
+                          [['🔄 Retry','primary'],['🏠 Lobby','secondary']],
+                          {dismissible:false, spineBox:true}),
+
+  'p-toast': Phone(`
+    <div style="position:absolute;left:14px;right:14px;top:14px;display:flex;flex-direction:column;gap:6px">
+      <div class="sk sk-row" style="position:relative;height:42px;background:#16213EF5;padding:0 10px">
+        <div class="sk-circ" style="width:18px;height:18px;background:#76FF03"></div>
+        <div class="sk--label" style="flex:1;padding-left:8px;font-size:13px">Settings saved.</div>
+        <div class="sk--label" style="opacity:.5">×</div>
+      </div>
+      <div class="sk sk-row" style="position:relative;height:42px;background:#16213EF5;padding:0 10px">
+        <div class="sk-circ" style="width:18px;height:18px;background:#76FF03"></div>
+        <div class="sk--label" style="flex:1;padding-left:8px;font-size:13px">Stamina refilled successfully.</div>
+        <div class="sk--label" style="opacity:.5">×</div>
+      </div>
+      <div class="sk sk-row" style="position:relative;height:42px;background:#16213EF5;padding:0 10px;border-color:#FF5252">
+        <div class="sk-circ" style="width:18px;height:18px;background:#FF5252"></div>
+        <div class="sk--label" style="flex:1;padding-left:8px;font-size:13px">Network error. Please retry.</div>
+        <div class="sk--label" style="opacity:.5">×</div>
+        <div class="sk-tag">ToastItem</div>
+      </div>
+    </div>
+    <div class="annot" style="left:18px;top:200px">stack max 3 · auto-dismiss 3s · newest at bottom</div>
+  `),
+
+  flow: `
+    <div class="phone" style="height:760px;background:#fff;color:#1d1d1d;border-color:#1d1d1d">
+      <div class="notch"></div>
+      <div class="statusbar" style="color:#1d1d1d;opacity:.5"><span>flow</span><span>nav</span></div>
+      <div class="screen" style="background:#fff;padding:14px;font-family:'Patrick Hand';font-size:14px;color:#1d1d1d">
+        <div style="text-align:center;font-family:'Caveat',cursive;font-size:22px;margin-top:14px">Bootstrap</div>
+        <div style="text-align:center;color:#5a5a5a;margin-top:-4px">↓ auto:boot.success</div>
+        <div style="text-align:center;font-family:'Caveat',cursive;font-size:22px;margin-top:10px">Title</div>
+        <div style="text-align:center;color:#5a5a5a;margin-top:-4px">↓ tapToStart</div>
+        <div style="text-align:center;font-family:'Caveat',cursive;font-size:24px;margin-top:10px;color:#7B2FBE">Lobby</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin:8px 8px">
+          <div style="text-align:center;border:1.5px dashed #1d1d1d;border-radius:8px;padding:4px">Shop</div>
+          <div style="text-align:center;border:1.5px solid #7B2FBE;border-radius:8px;padding:4px;color:#7B2FBE">Home</div>
+          <div style="text-align:center;border:1.5px dashed #1d1d1d;border-radius:8px;padding:4px">Rank</div>
+        </div>
+        <div style="text-align:center;color:#5a5a5a">↓ stageNode.tap → StageDetail → play</div>
+        <div style="text-align:center;font-family:'Caveat',cursive;font-size:22px;margin-top:10px">Game</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin:8px 8px">
+          <div style="text-align:center;border:1.5px dashed #1d1d1d;border-radius:8px;padding:4px">Pause</div>
+          <div style="text-align:center;border:1.5px dashed #1d1d1d;border-radius:8px;padding:4px">Clear</div>
+          <div style="text-align:center;border:1.5px dashed #1d1d1d;border-radius:8px;padding:4px">Timeout</div>
+        </div>
+        <div style="margin-top:10px;border-top:1.5px dashed #00000033;padding-top:8px;font-size:13px;color:#5a5a5a">
+          Modals (any scene): ForceUpdate · Maintenance · SessionExpired<br>
+          Inline popups: Settings · Energy · Daily · Reward · Account
+        </div>
+      </div>
+    </div>`
+};
+
+function HUD(){
+  return `
+    <div class="sk" style="left:0;right:0;top:0;height:88px;background:#0E1430CC;border:none;border-radius:0">
+      <div class="sk-row" style="height:38px">
+        <div class="sk-circ" style="position:relative;width:34px;height:34px;background:#fff;opacity:.5"></div>
+        <div class="sk--label" style="flex:1;padding-left:8px;font-weight:700">Nickname</div>
+        <div class="sk sk-circ sk-center" style="position:relative;width:30px;height:30px;background:#ffffff22"><span style="font-size:14px">⋮</span></div>
+      </div>
+      <div class="sk-row" style="margin-top:6px">
+        <div class="sk-circ" style="width:18px;height:18px;background:#FF5252"></div>
+        <div class="sk--label sk--mono" style="padding-left:4px">3/5</div>
+        <div class="sk--label sk--mono" style="padding-left:8px;opacity:.7">23:45</div>
+        <div style="flex:1"></div>
+        <div class="sk-circ" style="width:18px;height:18px;background:#00E5FF"></div>
+        <div class="sk--label sk--mono" style="padding-left:4px">340</div>
+      </div>
+      <div class="sk-tag">HUD_Strip</div>
+    </div>`;
+}
+function TabBar(active){
+  const tab=(id,label,icon)=>`
+    <div class="sk-col sk-center" style="flex:1;gap:2px;color:${active===id?'#fff':'#B0BEC5'};font-weight:${active===id?700:400}">
+      <span>${icon}</span><span style="font-size:12px">${label}</span>
+      ${active===id?'<div style="width:30px;height:4px;background:#E040FB;border-radius:2px;margin-top:2px"></div>':''}
+    </div>`;
+  return `
+    <div class="sk sk-row" style="left:0;right:0;bottom:0;height:64px;background:#0E1430EE;border:none;border-radius:0;padding:6px 12px">
+      ${tab('shop','Shop','🛒')}
+      ${tab('home','Home','🏠')}
+      ${tab('rank','Rank','🏆')}
+      <div class="sk-tag" style="top:-10px">TabBar</div>
+    </div>`;
+}
+function rankRow(rank,medal,name,score,top){
+  return `<div class="sk sk-row" style="left:18px;right:18px;top:${top}px;height:36px;background:#16213E80;padding:0 10px;border-color:#00000000">
+    <div class="sk--label sk--mono" style="width:32px">${medal} ${rank}</div>
+    <div class="sk-circ" style="width:26px;height:26px;background:#fff;opacity:.5"></div>
+    <div class="sk--label" style="flex:1;padding-left:8px;font-size:13px">${name}</div>
+    <div class="sk--label sk--mono" style="font-size:13px">${score}</div>
+  </div>`;
+}
+function itemSlot(icon,n){
+  return `<div class="sk sk-col sk-center" style="position:relative;flex:1;height:80px;background:#16213EE0">
+    <div style="font-size:28px">${icon}</div>
+    <div class="sk-circ sk--mono" style="position:absolute;top:-6px;right:-6px;width:22px;height:22px;background:#E040FB;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff">${n}</div>
+  </div>`;
+}
+
+function popupSketch(title, titleKey, body, footer, opts={}){
+  const stars = opts.stars ? `<div class="sk-row" style="justify-content:center;gap:8px;font-size:24px;color:#FFB300">${'★'.repeat(opts.stars)}${'☆'.repeat(3-opts.stars)}</div>` : '';
+  const hearts = opts.hearts ? `<div class="sk-row" style="justify-content:center;gap:4px;font-size:22px;color:#FF5252">${'♥'.repeat(opts.heartsFilled)}<span style="color:#ffffff33">${'♥'.repeat(opts.hearts-opts.heartsFilled)}</span><span style="font-family:'JetBrains Mono';font-size:14px;color:#fff;margin-left:6px">${opts.heartsFilled}/${opts.hearts}</span></div>` : '';
+  const spine = opts.spineBox ? `<div class="hatch sk-center" style="height:90px;border:1.5px dashed #fff;color:#fff;font-size:13px;border-radius:10px">[SPINE]</div>` : '';
+  const avatar = opts.avatarBox ? `<div class="sk-circ" style="width:64px;height:64px;background:#fff;opacity:.5;margin:0 auto;border:1.5px solid #fff"></div><div style="text-align:center;font-size:14px;margin-top:4px">Username</div><div style="text-align:center;font-size:12px;opacity:.6">${opts.joined}</div>` : '';
+  const providers = opts.providers ? `<div style="margin-top:8px;font-size:12px;opacity:.7">Linked Accounts</div>${opts.providers.map(([k,state])=>`<div class="sk-row" style="margin-top:4px;background:#ffffff14;padding:4px 8px;border:1.5px solid #ffffff66;border-radius:8px"><div class="sk-circ" style="width:18px;height:18px;background:#fff;opacity:.6"></div><div style="flex:1;padding-left:8px;font-size:13px">Provider ${k||'B'}</div><div style="font-size:12px;color:${state==='Linked'?'#76FF03':'#fff'}">${state}</div></div>`).join('')}` : '';
+  const rows = opts.rows ? opts.rows.map(([label,kind])=>`<div class="sk-row" style="margin-top:6px;padding:0 4px"><div style="flex:1;font-size:13px">${label}</div>${kind==='toggle'?'<div class="sk-pill" style="width:38px;height:20px;background:#7B2FBE;border:1.5px solid #fff;position:relative"><div class="sk-circ" style="width:14px;height:14px;background:#fff;position:absolute;right:2px;top:1px"></div></div>':'<div class="sk--mono" style="font-size:12px;border:1.5px solid #fff;border-radius:6px;padding:1px 8px">English ▼</div>'}</div>`).join('') : '';
+  const streak = opts.streakRow ? `<div style="text-align:center;color:#FFB300;font-weight:700">Streak: 5 🔥</div><div class="sk-row" style="justify-content:center;gap:4px;margin-top:6px">${[1,1,1,1,0,0,0].map(d=>`<div class="sk-circ" style="width:22px;height:22px;background:${d?'#7B2FBE':'#ffffff22'};border:1.5px solid #fff"></div>`).join('')}</div>` : '';
+  const progress = opts.progress ? `<div style="margin-top:8px;height:10px;background:#ffffff22;border-radius:5px;overflow:hidden"><div style="width:${opts.progress*100}%;height:100%;background:linear-gradient(90deg,#7B2FBE,#E040FB)"></div></div>` : '';
+  const currency = opts.currency ? `<div style="text-align:center;font-family:'JetBrains Mono';font-size:24px;color:#fff;margin-top:4px">${opts.currency}</div>` : '';
+  const sub = opts.sub ? `<div style="text-align:center;font-size:13px;opacity:.85;margin-top:4px">${opts.sub}</div>` : '';
+  const newRecord = opts.accent ? '' : '';
+  const icon = opts.icon ? `<div style="text-align:center;font-size:42px;color:${opts.iconColor||'#fff'};margin-bottom:4px">${opts.icon}</div>` : '';
+  const bodyHTML = body ? `<div style="text-align:center;font-size:14px;opacity:.85;line-height:1.4;margin-top:4px">${body}</div>` : '';
+
+  const closeBtn = opts.dismissible ? `<div class="sk-circ sk-center" style="position:absolute;right:10px;top:10px;width:24px;height:24px;background:#ffffff22;border:1.5px solid #fff;font-size:13px">×</div>` : '';
+  const footerDir = opts.footerVertical ? 'column' : 'row';
+  const footerHTML = footer.length ? `<div style="display:flex;flex-direction:${footerDir};gap:8px;margin-top:14px">${footer.map(([label,kind])=>{
+    const cls = kind==='primary' ? 'sk sk-pill sk-accent sk-center' : kind==='positive' ? 'sk sk-pill sk-center' : 'sk sk-pill sk-outline sk-center';
+    const extra = kind==='positive' ? 'background:#00E5FF;color:#1A1A2E;border-color:#00E5FF;' : '';
+    return `<div class="${cls}" style="position:relative;flex:1;height:34px;${extra}font-size:13px">${label}</div>`;
+  }).join('')}</div>` : '';
+
+  return Phone(`
+    <div style="position:absolute;inset:0;background:#000000B3"></div>
+    <div style="position:absolute;left:18px;right:18px;top:50%;transform:translateY(-50%);background:#16213E;border:2px solid #1d1d1d;border-radius:18px;padding:18px 16px;color:#fff;box-shadow:4px 4px 0 #00000055;">
+      ${closeBtn}
+      <div style="text-align:center;font-family:'Caveat',cursive;font-size:24px;color:#fff;font-weight:700">${title}</div>
+      <div style="height:1.5px;background:#ffffff22;margin:8px 0"></div>
+      ${icon}
+      ${spine}
+      ${avatar}
+      ${hearts}
+      ${stars}
+      ${streak}
+      ${rows}
+      ${currency}
+      ${progress}
+      ${providers}
+      ${sub}
+      ${bodyHTML}
+      ${footer.length?'<div style="height:1.5px;background:#ffffff22;margin-top:12px"></div>':''}
+      ${footerHTML}
+      <div class="sk-tag" style="right:8px;top:-12px;background:#f6f3ea">${titleKey}</div>
+    </div>
+  `);
+}
+
+// Spec data per page
+const specs = {
+  bootstrap: {
+    title: 'BootstrapScene',
+    sub:'Loading screen · network error fallback · gates ForceUpdate/Maintenance popups',
+    elements: [
+      ['Slot_Logo', 'spine_logo', '—', 'Spine'],
+      ['ProgressBar', 'slot_progress_track', 'bootstrap.loading*', 'Slider · fill #7B2FBE'],
+      ['Btn_Retry', 'btn_primary', 'common.retry', 'evt.bootstrap.retry'],
+      ['Txt_NetworkError', '—', 'bootstrap.network_error', '—'],
+      ['PopupLayer (overlay)', '—', '—', 'ForceUpdate / Maintenance'],
+    ],
+    states:['loading','net_error','force_update','maintenance']
+  },
+  title: {
+    title:'TitleScene',
+    sub:'Logo · 2 OAuth buttons · TAP TO START · settings entry',
+    elements:[
+      ['Btn_Settings', 'btn_icon_settings', '—', 'evt.title.openSettings'],
+      ['Slot_Logo', 'spine_logo', '—', 'Spine'],
+      ['Btn_Google', 'btn_secondary · slot_provider_google', 'title.continue_google', 'evt.title.oauth.providerA'],
+      ['Btn_Apple', 'btn_secondary · slot_provider_apple', 'title.continue_apple', 'evt.title.oauth.providerB'],
+      ['Chip_AuthBadge', 'slot_chip_success', '{auth.providerA.displayName}', 'shown after success'],
+      ['Btn_TapToStart','btn_primary','title.tap_to_start','evt.title.tapToStart · PulseAnim'],
+      ['Txt_Version','—','title.version_fmt','{app.version}'],
+    ],
+    states:['fresh','auth_a_done','auth_b_done']
+  },
+  'lobby-home':{
+    title:'LobbyScene · Tab_Home',
+    sub:'Stage carousel · daily card · season event card',
+    elements:[
+      ['Carousel_Stages','—','—','StageCarousel · spring physics'],
+      ['Btn_Prev / Btn_Next','btn_carousel_prev/next','—','evt.carousel.prev/next · LongPressRepeater'],
+      ['StageNode (prefab)','slot_stage_node · slot_stage_node_locked','—','evt.stageNode.tap → StageDetailPopup'],
+      ['Btn_Play','btn_primary','home.stage_play','evt.carousel.openCurrent'],
+      ['Card_Daily','slot_daily_card','home.daily_title','evt.lobby.openDaily → DailyChallengePopup'],
+      ['Card_Event','slot_event_banner','home.event_title_fmt','evt.lobby.openEvent · hidden if !event.active'],
+    ]
+  },
+  'lobby-shop':{
+    title:'LobbyScene · Tab_Shop',
+    sub:'Scrollable · sectioned product grid + item list',
+    elements:[
+      ['Header_Stamina','—','shop.section_stamina','—'],
+      ['Grid_Stamina','—','—','GridLayoutGroup 2-col'],
+      ['ShopProductCard (prefab)','slot_popup_bg + btn_primary','shop.product_stamina_5/20 · common.purchase','evt.shop.purchase'],
+      ['Header_Items','—','shop.section_items','—'],
+      ['ShopItemRow (prefab)','slot_popup_bg + btn_primary','shop.product_extramove* · common.purchase','evt.shop.purchase'],
+    ]
+  },
+  'lobby-rank':{
+    title:'LobbyScene · Tab_Ranking',
+    sub:'Segmented control · ScrollRect · pinned-self row',
+    elements:[
+      ['Seg_Mode','—','rank.tab_clear / rank.tab_score','SegmentedControl'],
+      ['ScrollList → RankRow (prefab)','slot_avatar','{row.name} · {row.score}','—'],
+      ['Row_MyRank_Pinned','slot_rank_self · slot_avatar','rank.you','always visible, highlighted'],
+    ]
+  },
+  game:{
+    title:'GameScene',
+    sub:'Top HUD · objective bar · GameBoard (AspectRatioFitter) · item toolbar',
+    elements:[
+      ['Btn_Pause','btn_icon_pause','—','evt.game.pause → PausePopup'],
+      ['Txt_Stage','—','game.stage_fmt','{stage.index}'],
+      ['Txt_Timer','—','game.timer_fmt','{timer.mm}:{timer.ss}'],
+      ['Bar_Objective','slot_objective_seg','—','ObjectiveBar (segments)'],
+      ['Txt_Moves','—','game.moves_fmt','{moves.cur}/{moves.max}'],
+      ['Group_Board','slot_board_bg','—','GameBoardView (cells + lines + fx)'],
+      ['ItemSlot (prefab) ×3','—','—','evt.game.useItem'],
+    ]
+  },
+
+  'p-force':   popupSpec('ForceUpdatePopup',     'modal · non-dismissible', [['Btn_OpenStore','popup.force_update.cta','btn_primary','evt.update.openStore']], 'popup.force_update.title · body'),
+  'p-maint':   popupSpec('MaintenancePopup',     'modal · non-dismissible', [], 'popup.maintenance.title · body={maintenance.message}'),
+  'p-session': popupSpec('SessionExpiredPopup',  'modal · non-dismissible', [['Btn_Confirm','common.confirm','btn_primary','evt.session.toTitle → TitleScene']], 'popup.session.title · body'),
+  'p-setting': popupSpec('SettingPopup',         'dismissible',             [['Btn_Cancel','common.cancel','btn_secondary','evt.settings.cancel'],['Btn_Save','common.save','btn_primary','evt.settings.save → toast.settings_saved']], 'rows: ToggleRow ×4 (bgm/sfx/haptics/notif) · DropdownRow (language)'),
+  'p-energy':  popupSpec('EnergyPopup',          'dismissible',             [['Btn_WatchAd','popup.energy.watch_ad_fmt','btn_ad','evt.energy.watchAd → $ads:rewarded'],['Btn_Refill','popup.energy.refill_fmt','btn_secondary','evt.energy.refill → $api:purchaseRefill']], 'hearts row · timer popup.energy.full_in_fmt'),
+  'p-stage':   popupSpec('StageDetailPopup',     'dismissible',             [['Btn_Play','common.play','btn_primary','evt.stage.play → GameScene']], 'star group · popup.stage.best_fmt · popup.stage.my_rank_fmt'),
+  'p-daily':   popupSpec('DailyChallengePopup',  'dismissible',             [['Btn_Complete','common.complete','btn_primary','evt.daily.complete · interactableBind=daily.canComplete']], '7 streak tiles (slot_streak_tile_done/open) · progress · popup.daily.reward_fmt'),
+  'p-reward':  popupSpec('RewardPopup',          'dismissible',             [['Btn_Claim','common.claim','btn_primary','evt.reward.claim'],['Btn_ClaimX2','popup.reward.x2','btn_ad','evt.reward.claimX2 → $ads:rewarded']], 'Spine spine_reward · slot_reward_currency · {reward.amount}'),
+  'p-account': popupSpec('AccountPopup',         'dismissible',             [], 'slot_avatar · {user.nickname} · popup.account.joined_fmt · ProviderRow ×2 (toggleLink)'),
+  'p-clear':   popupSpec('ClearPopup',           'GameScene · dismissible', [['Btn_Lobby','common.lobby','btn_secondary','evt.clear.toLobby → LobbyScene'],['Btn_Retry','popup.clear.retry','btn_secondary','evt.clear.retry → GameScene'],['Btn_Next','common.next','btn_primary','evt.clear.next → GameScene']], 'spine_clear · StarFillSequence · popup.clear.score_fmt · Badge_NewRecord (bind clear.isNewRecord) · soft reward'),
+  'p-pause':   popupSpec('PausePopup',           'GameScene · dismissible · footerVertical', [['Btn_Resume','common.resume','btn_primary','evt.pause.resume → $close'],['Btn_Retry','popup.pause.retry','btn_secondary','evt.pause.retry → GameScene'],['Btn_Lobby','common.lobby','btn_secondary','evt.pause.toLobby → LobbyScene']], '—'),
+  'p-timeout': popupSpec('TimeoutPopup',         'GameScene · non-dismissible', [['Btn_Retry','common.retry','btn_primary','evt.timeout.retry → GameScene'],['Btn_Lobby','common.lobby','btn_secondary','evt.timeout.toLobby → LobbyScene']], 'spine_timeout · no × button'),
+
+  'p-toast':{
+    title:'ToastItem',
+    sub:'Spawned by ToastStack under <Scene>/ToastLayer · sortingOrder 200',
+    elements:[
+      ['Icon_Status','slot_toast_icon','—','color swap: #76FF03 success · #FFB300 warn · #FF5252 error'],
+      ['Txt_Body','—','toast.network_error · toast.stamina_refilled · toast.settings_saved','{toast.body}'],
+      ['Btn_Close','btn_icon_close','—','evt.toast.dismiss'],
+    ],
+    extra:'Max 3 visible · auto-dismiss 3s · enter slide_down_fade · exit slide_up_fade · newest at bottom of stack'
+  },
+  flow:{
+    title:'Navigation Flow',
+    sub:'See unity-spec/flow.json for full edge list + API hooks',
+    elements:[
+      ['Bootstrap → Title','auto:boot.success','—','—'],
+      ['Title → Lobby','evt.title.tapToStart','—','—'],
+      ['Lobby Home → StageDetail → Game','stageNode.tap → evt.stage.play','—','POST /api/stage/start'],
+      ['Game → ClearPopup → Lobby/Retry/Next','auto:stage.clear','—','—'],
+      ['Game → TimeoutPopup','auto:stage.timeout','—','non-dismissible'],
+      ['Any → ForceUpdate / Maintenance / SessionExpired','auto / api response','—','non-dismissible'],
+    ]
+  }
+};
+
+function popupSpec(id, attrs, footer, content){
+  return {
+    title:id,
+    sub:attrs,
+    elements: footer.map(([n,k,sk,e])=>[n,sk,k,e]),
+    extra: 'Content: ' + content
+  };
+}
+
+function specHTML(s){
+  const rows = (s.elements||[]).map(([n,sk,k,e])=>`<tr>
+      <td>${n}</td>
+      <td class="k">${sk}</td>
+      <td class="s">${k}</td>
+      <td class="e">${e}</td>
+    </tr>`).join('');
+  const states = s.states ? `<div style="margin-top:8px">${s.states.map(x=>`<span class="pillinfo">${x}</span>`).join('')}</div>` : '';
+  const extra = s.extra ? `<div style="margin-top:8px;color:#5a5a5a">${s.extra}</div>` : '';
+  return `<div class="spec">
+    <h3>${s.title}</h3>
+    <div class="sub">${s.sub||''}</div>
+    <table>
+      <thead><tr><th>Element</th><th>skinKey</th><th>stringKey / bind</th><th>event / note</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    ${states}${extra}
+  </div>`;
+}
+
+// build pages
+const pagesEl = document.getElementById('pages');
+Object.keys(sketches).forEach((id,i)=>{
+  const div = document.createElement('div');
+  div.className = 'page' + (i===0?' active':'');
+  div.id = 'page-'+id;
+  div.innerHTML = `<main>${sketches[id]}${specHTML(specs[id]||{title:id,sub:'',elements:[]})}</main>`;
+  pagesEl.appendChild(div);
+});
+
+// nav
+document.querySelectorAll('#nav button').forEach(b=>{
+  b.addEventListener('click', ()=>{
+    document.querySelectorAll('#nav button').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    document.getElementById('page-'+b.dataset.page).classList.add('active');
+    window.scrollTo({top:0, behavior:'smooth'});
+  });
+});
+</script>
+</body>
+</html>

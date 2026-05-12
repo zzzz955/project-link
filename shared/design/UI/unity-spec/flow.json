@@ -1,0 +1,90 @@
+{
+  "$schema": "flow.schema",
+  "description": "Navigation graph. Edges are event names defined in scenes.json / popups.json onClick fields.",
+  "entry": "BootstrapScene",
+  "nodes": [
+    { "id": "BootstrapScene", "type": "scene" },
+    { "id": "TitleScene",     "type": "scene" },
+    { "id": "LobbyScene",     "type": "scene" },
+    { "id": "GameScene",      "type": "scene" },
+
+    { "id": "ForceUpdatePopup",   "type": "popup", "modal": true },
+    { "id": "MaintenancePopup",   "type": "popup", "modal": true },
+    { "id": "SessionExpiredPopup","type": "popup", "modal": true },
+    { "id": "SettingPopup",       "type": "popup" },
+    { "id": "EnergyPopup",        "type": "popup" },
+    { "id": "StageDetailPopup",   "type": "popup" },
+    { "id": "DailyChallengePopup","type": "popup" },
+    { "id": "RewardPopup",        "type": "popup" },
+    { "id": "AccountPopup",       "type": "popup" },
+    { "id": "ClearPopup",         "type": "popup", "context": "GameScene" },
+    { "id": "PausePopup",         "type": "popup", "context": "GameScene" },
+    { "id": "TimeoutPopup",       "type": "popup", "context": "GameScene", "modal": true }
+  ],
+  "edges": [
+    { "from": "BootstrapScene",   "event": "evt.bootstrap.retry",     "to": "BootstrapScene", "note": "reattempt boot" },
+    { "from": "BootstrapScene",   "event": "auto:boot.success",       "to": "TitleScene" },
+    { "from": "BootstrapScene",   "event": "auto:net.fail",           "to": "$state:net_error" },
+    { "from": "BootstrapScene",   "event": "auto:version.outdated",   "to": "ForceUpdatePopup" },
+    { "from": "BootstrapScene",   "event": "auto:server.maint",       "to": "MaintenancePopup" },
+    { "from": "ForceUpdatePopup", "event": "evt.update.openStore",    "to": "$external:appStore" },
+
+    { "from": "TitleScene", "event": "evt.title.openSettings",   "to": "SettingPopup" },
+    { "from": "TitleScene", "event": "evt.title.oauth.providerA","to": "$auth:providerA" },
+    { "from": "TitleScene", "event": "evt.title.oauth.providerB","to": "$auth:providerB" },
+    { "from": "TitleScene", "event": "evt.title.tapToStart",     "to": "LobbyScene" },
+
+    { "from": "LobbyScene", "event": "evt.tab.goShop",       "to": "$tab:shop" },
+    { "from": "LobbyScene", "event": "evt.tab.goHome",       "to": "$tab:home" },
+    { "from": "LobbyScene", "event": "evt.tab.goRanking",    "to": "$tab:ranking" },
+    { "from": "LobbyScene", "event": "evt.lobby.toggleMenu", "to": "$ui:menuDropdown" },
+    { "from": "LobbyScene", "event": "evt.lobby.openSettings","to": "SettingPopup" },
+    { "from": "LobbyScene", "event": "evt.lobby.openLanguage","to": "SettingPopup", "note": "scroll to language row" },
+    { "from": "LobbyScene", "event": "evt.lobby.openAccount", "to": "AccountPopup" },
+    { "from": "LobbyScene", "event": "evt.lobby.openEnergy",  "to": "EnergyPopup" },
+    { "from": "LobbyScene", "event": "evt.lobby.openDaily",   "to": "DailyChallengePopup" },
+    { "from": "LobbyScene", "event": "evt.lobby.openEvent",   "to": "$external:event" },
+    { "from": "LobbyScene", "event": "evt.carousel.prev",     "to": "$ui:carouselPrev" },
+    { "from": "LobbyScene", "event": "evt.carousel.next",     "to": "$ui:carouselNext" },
+    { "from": "LobbyScene", "event": "evt.carousel.openCurrent","to": "StageDetailPopup" },
+    { "from": "LobbyScene", "event": "evt.stageNode.tap",     "to": "StageDetailPopup" },
+
+    { "from": "StageDetailPopup",    "event": "evt.stage.play",     "to": "GameScene" },
+    { "from": "DailyChallengePopup", "event": "evt.daily.complete", "to": "RewardPopup" },
+    { "from": "EnergyPopup",         "event": "evt.energy.watchAd", "to": "$ads:rewarded", "then": "$state:staminaRefilled" },
+    { "from": "EnergyPopup",         "event": "evt.energy.refill",  "to": "$api:purchaseRefill" },
+
+    { "from": "GameScene", "event": "evt.game.pause",  "to": "PausePopup" },
+    { "from": "GameScene", "event": "auto:stage.clear","to": "ClearPopup" },
+    { "from": "GameScene", "event": "auto:stage.timeout","to": "TimeoutPopup" },
+    { "from": "GameScene", "event": "evt.game.useItem","to": "$ui:useItem" },
+
+    { "from": "PausePopup", "event": "evt.pause.resume", "to": "$close" },
+    { "from": "PausePopup", "event": "evt.pause.retry",  "to": "GameScene", "note": "restart current stage" },
+    { "from": "PausePopup", "event": "evt.pause.toLobby","to": "LobbyScene" },
+
+    { "from": "ClearPopup", "event": "evt.clear.toLobby","to": "LobbyScene" },
+    { "from": "ClearPopup", "event": "evt.clear.retry",  "to": "GameScene", "note": "restart current stage" },
+    { "from": "ClearPopup", "event": "evt.clear.next",   "to": "GameScene", "note": "advance stage index" },
+
+    { "from": "TimeoutPopup", "event": "evt.timeout.retry",  "to": "GameScene" },
+    { "from": "TimeoutPopup", "event": "evt.timeout.toLobby","to": "LobbyScene" },
+
+    { "from": "SessionExpiredPopup", "event": "evt.session.toTitle", "to": "TitleScene" },
+
+    { "from": "RewardPopup", "event": "evt.reward.claim",   "to": "$close" },
+    { "from": "RewardPopup", "event": "evt.reward.claimX2", "to": "$ads:rewarded", "then": "$close" },
+
+    { "from": "AccountPopup", "event": "evt.account.toggleLink", "to": "$auth:toggleLink" },
+
+    { "from": "SettingPopup", "event": "evt.settings.save",   "to": "$close", "side": "toast.settings_saved" },
+    { "from": "SettingPopup", "event": "evt.settings.cancel", "to": "$close" }
+  ],
+  "apiHooks": [
+    { "event": "evt.stage.play",     "method": "POST", "endpoint": "/api/stage/start" },
+    { "event": "evt.daily.complete", "method": "POST", "endpoint": "/api/daily/complete" },
+    { "event": "evt.energy.refill",  "method": "POST", "endpoint": "/api/stamina/refill" },
+    { "event": "evt.shop.purchase",  "method": "POST", "endpoint": "/api/shop/purchase" },
+    { "event": "evt.account.toggleLink", "method": "POST", "endpoint": "/api/auth/link" }
+  ]
+}

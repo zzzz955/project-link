@@ -1,0 +1,834 @@
+{
+  "$schema": "scenes.schema",
+  "canvasDefaults": {
+    "renderMode": "ScreenSpaceOverlay",
+    "referenceResolution": [1080, 1920],
+    "screenMatchMode": "MatchWidthOrHeight",
+    "matchWidthOrHeight": 0.5,
+    "referencePixelsPerUnit": 100,
+    "sortingOrder": { "scene": 0, "popup": 100, "toast": 200, "loading": 300 }
+  },
+  "palette": {
+    "bgPrimary":   "#1A1A2E",
+    "bgSurface":   "#16213E",
+    "accentA":     "#7B2FBE",
+    "accentB":     "#E040FB",
+    "positive":    "#00E5FF",
+    "lime":        "#76FF03",
+    "warning":     "#FFB300",
+    "danger":      "#FF5252",
+    "text":        "#FFFFFF",
+    "textMuted":   "#B0BEC5",
+    "textDisabled":"#546E7A",
+    "scrim":       "#000000B3"
+  },
+  "fonts": {
+    "default": "TMP_FontAsset: Rounded-Regular",
+    "bold":    "TMP_FontAsset: Rounded-Bold",
+    "mono":    "TMP_FontAsset: Mono-Bold"
+  },
+
+  "scenes": [
+    {
+      "id": "BootstrapScene",
+      "unityScenePath": "Assets/Scenes/Bootstrap.unity",
+      "entryController": "Assets/Scripts/UI/BootstrapController.cs",
+      "root": {
+        "name": "BootstrapCanvas",
+        "rect": { "anchor": "stretch", "offsets": [0,0,0,0] },
+        "components": [
+          { "type": "Canvas", "sortingOrder": 0 },
+          { "type": "CanvasScaler" },
+          { "type": "GraphicRaycaster" }
+        ],
+        "children": [
+          {
+            "name": "Panel_Background",
+            "rect": { "anchor": "stretch", "offsets": [0,0,0,0] },
+            "components": [
+              { "type": "Image", "color": "#1A1A2E", "raycast": false }
+            ]
+          },
+          {
+            "name": "SafeArea",
+            "rect": { "anchor": "stretch", "offsets": [0,0,0,0] },
+            "components": [ { "type": "SafeAreaFitter" } ],
+            "children": [
+              {
+                "name": "Slot_Logo",
+                "rect": { "anchor": "middle-center", "sizeDelta": [560, 560], "anchoredPos": [0, 200] },
+                "components": [
+                  { "type": "SpineGraphic", "skinKey": "spine_logo", "loopAnim": "idle", "scale": 1 }
+                ]
+              },
+              {
+                "name": "ProgressBar",
+                "rect": { "anchor": "bottom-stretch", "offsets": [80, 0, 80, 0], "sizeDelta": [0, 24], "anchoredPos": [0, 240] },
+                "components": [
+                  { "type": "Image", "color": "#FFFFFF22", "skinKey": "slot_progress_track" },
+                  { "type": "Slider", "minValue": 0, "maxValue": 1, "value": 0.4, "direction": "LeftToRight",
+                    "fillRect": "ProgressBar/Fill", "handleRect": null, "interactable": false }
+                ],
+                "children": [
+                  {
+                    "name": "Fill",
+                    "rect": { "anchor": "stretch", "offsets": [2,2,2,2] },
+                    "components": [
+                      { "type": "Image", "color": "#7B2FBE", "raycast": false }
+                    ]
+                  }
+                ]
+              },
+              {
+                "name": "Btn_Retry",
+                "active": false,
+                "rect": { "anchor": "middle-center", "sizeDelta": [400, 128], "anchoredPos": [0, -120] },
+                "components": [
+                  { "type": "Image", "skinKey": "btn_primary" },
+                  { "type": "Button", "onClick": "evt.bootstrap.retry" }
+                ],
+                "children": [
+                  {
+                    "name": "Txt_Label",
+                    "rect": { "anchor": "stretch", "offsets": [0,0,0,0] },
+                    "components": [
+                      { "type": "TMP_Text", "stringKey": "common.retry", "font": "bold", "size": 32, "color": "#FFFFFF", "align": "Center" }
+                    ]
+                  }
+                ]
+              },
+              {
+                "name": "Txt_NetworkError",
+                "active": false,
+                "rect": { "anchor": "middle-center", "sizeDelta": [800, 60], "anchoredPos": [0, -40] },
+                "components": [
+                  { "type": "TMP_Text", "stringKey": "bootstrap.network_error", "size": 28, "color": "#FF5252", "align": "Center" }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "PopupLayer",
+            "rect": { "anchor": "stretch", "offsets": [0,0,0,0] },
+            "comment": "ForceUpdate / Maintenance popups parent here. See popups.json"
+          }
+        ]
+      },
+      "states": [
+        { "id": "loading",    "show": ["Slot_Logo","ProgressBar"], "hide": ["Btn_Retry","Txt_NetworkError"] },
+        { "id": "net_error",  "show": ["Slot_Logo","Btn_Retry","Txt_NetworkError"], "hide": ["ProgressBar"] },
+        { "id": "force_update","overlay": "popups#ForceUpdatePopup" },
+        { "id": "maintenance","overlay": "popups#MaintenancePopup" }
+      ]
+    },
+
+    {
+      "id": "TitleScene",
+      "unityScenePath": "Assets/Scenes/Title.unity",
+      "entryController": "Assets/Scripts/UI/TitleController.cs",
+      "root": {
+        "name": "TitleCanvas",
+        "rect": { "anchor": "stretch", "offsets": [0,0,0,0] },
+        "components": [
+          { "type": "Canvas", "sortingOrder": 0 },
+          { "type": "CanvasScaler" },
+          { "type": "GraphicRaycaster" }
+        ],
+        "children": [
+          { "name": "Panel_Background", "rect": { "anchor": "stretch", "offsets": [0,0,0,0] },
+            "components": [ { "type": "Image", "color": "#1A1A2E" } ] },
+          {
+            "name": "SafeArea",
+            "rect": { "anchor": "stretch", "offsets": [0,0,0,0] },
+            "components": [ { "type": "SafeAreaFitter" } ],
+            "children": [
+              {
+                "name": "Btn_Settings",
+                "rect": { "anchor": "top-right", "sizeDelta": [96, 96], "anchoredPos": [-32, -32] },
+                "components": [
+                  { "type": "Image", "skinKey": "btn_icon_settings", "color": "#FFFFFF26" },
+                  { "type": "Button", "onClick": "evt.title.openSettings" }
+                ]
+              },
+              {
+                "name": "Slot_Logo",
+                "rect": { "anchor": "top-center", "sizeDelta": [720, 480], "anchoredPos": [0, -360] },
+                "components": [
+                  { "type": "SpineGraphic", "skinKey": "spine_logo", "loopAnim": "idle" }
+                ]
+              },
+              {
+                "name": "Group_AuthButtons",
+                "rect": { "anchor": "middle-center", "sizeDelta": [720, 320], "anchoredPos": [0, -40] },
+                "components": [
+                  { "type": "VerticalLayoutGroup", "spacing": 24, "padding": [0,0,0,0],
+                    "childAlignment": "UpperCenter", "childForceExpand": [true, false], "childControlSize": [true, true] }
+                ],
+                "children": [
+                  {
+                    "name": "Btn_Google",
+                    "rect": { "anchor": "top-stretch", "sizeDelta": [0, 128] },
+                    "components": [
+                      { "type": "Image", "skinKey": "btn_secondary" },
+                      { "type": "Button", "onClick": "evt.title.oauth.providerA" },
+                      { "type": "AuthProviderButton", "fields": { "provider": "ProviderA", "stateBinding": "auth.providerA" } }
+                    ],
+                    "children": [
+                      { "name": "Group_Row", "rect": { "anchor": "stretch", "offsets": [32,0,32,0] },
+                        "components": [
+                          { "type": "HorizontalLayoutGroup", "spacing": 16, "childAlignment": "MiddleLeft",
+                            "childForceExpand": [false,true] }
+                        ],
+                        "children": [
+                          { "name": "Icon_Provider", "rect": { "anchor": "middle-left", "sizeDelta": [56,56] },
+                            "components": [ { "type": "Image", "skinKey": "slot_provider_google" } ] },
+                          { "name": "Txt_Label", "rect": { "anchor": "middle-center", "sizeDelta": [0,40] },
+                            "components": [ { "type": "TMP_Text", "stringKey": "title.continue_google",
+                              "font": "bold", "size": 28, "color": "#FFFFFF", "align": "MidlineLeft" } ] }
+                        ] },
+                      { "name": "Chip_AuthBadge", "active": false,
+                        "rect": { "anchor": "bottom-center", "sizeDelta": [560, 56], "anchoredPos": [0, -8] },
+                        "components": [
+                          { "type": "Image", "color": "#76FF0322", "skinKey": "slot_chip_success" },
+                          { "type": "TMP_Text", "bind": "auth.providerA.displayName", "size": 22, "color": "#76FF03", "align": "Center", "prefix": "✓ " }
+                        ] }
+                    ]
+                  },
+                  {
+                    "name": "Btn_Apple",
+                    "rect": { "anchor": "top-stretch", "sizeDelta": [0, 128] },
+                    "components": [
+                      { "type": "Image", "skinKey": "btn_secondary" },
+                      { "type": "Button", "onClick": "evt.title.oauth.providerB" },
+                      { "type": "AuthProviderButton", "fields": { "provider": "ProviderB", "stateBinding": "auth.providerB" } }
+                    ],
+                    "children": [
+                      { "name": "Group_Row", "rect": { "anchor": "stretch", "offsets": [32,0,32,0] },
+                        "components": [ { "type": "HorizontalLayoutGroup", "spacing": 16, "childAlignment": "MiddleLeft" } ],
+                        "children": [
+                          { "name": "Icon_Provider", "rect": { "anchor": "middle-left", "sizeDelta": [56,56] },
+                            "components": [ { "type": "Image", "skinKey": "slot_provider_apple" } ] },
+                          { "name": "Txt_Label", "rect": { "anchor": "middle-center", "sizeDelta": [0,40] },
+                            "components": [ { "type": "TMP_Text", "stringKey": "title.continue_apple", "font": "bold", "size": 28, "color": "#FFFFFF" } ] }
+                        ] }
+                    ]
+                  }
+                ]
+              },
+              {
+                "name": "Btn_TapToStart",
+                "rect": { "anchor": "bottom-center", "sizeDelta": [640, 144], "anchoredPos": [0, 320] },
+                "components": [
+                  { "type": "Image", "skinKey": "btn_primary" },
+                  { "type": "Button", "onClick": "evt.title.tapToStart" },
+                  { "type": "PulseAnim", "fields": { "scaleMin": 0.98, "scaleMax": 1.04, "period": 1.4 } }
+                ],
+                "children": [
+                  { "name": "Txt_Label", "rect": { "anchor": "stretch", "offsets": [0,0,0,0] },
+                    "components": [ { "type": "TMP_Text", "stringKey": "title.tap_to_start",
+                      "font": "bold", "size": 36, "color": "#FFFFFF", "align": "Center" } ] }
+                ]
+              },
+              {
+                "name": "Txt_Version",
+                "rect": { "anchor": "bottom-right", "sizeDelta": [240, 40], "anchoredPos": [-32, 32] },
+                "components": [
+                  { "type": "TMP_Text", "stringKey": "title.version_fmt", "args": { "version": "{app.version}" },
+                    "size": 22, "color": "#546E7A", "align": "MidlineRight" }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "states": [
+        { "id": "fresh",       "hide": ["Chip_AuthBadge"] },
+        { "id": "auth_a_done", "show": ["Btn_Google/Chip_AuthBadge"], "disable": ["Btn_Apple"] },
+        { "id": "auth_b_done", "show": ["Btn_Apple/Chip_AuthBadge"], "disable": ["Btn_Google"] }
+      ]
+    },
+
+    {
+      "id": "LobbyScene",
+      "unityScenePath": "Assets/Scenes/Lobby.unity",
+      "entryController": "Assets/Scripts/UI/LobbyController.cs",
+      "root": {
+        "name": "LobbyCanvas",
+        "rect": { "anchor": "stretch", "offsets": [0,0,0,0] },
+        "components": [
+          { "type": "Canvas", "sortingOrder": 0 },
+          { "type": "CanvasScaler" },
+          { "type": "GraphicRaycaster" }
+        ],
+        "children": [
+          { "name": "Panel_Background", "rect": { "anchor": "stretch", "offsets": [0,0,0,0] },
+            "components": [ { "type": "Image", "color": "#1A1A2E" } ] },
+          {
+            "name": "SafeArea",
+            "rect": { "anchor": "stretch", "offsets": [0,0,0,0] },
+            "components": [ { "type": "SafeAreaFitter" } ],
+            "children": [
+              {
+                "name": "HUD_Strip",
+                "rect": { "anchor": "top-stretch", "sizeDelta": [0, 240], "offsets": [0,0,0,0] },
+                "components": [
+                  { "type": "Image", "skinKey": "slot_hud_bg", "color": "#0E1430CC" },
+                  { "type": "VerticalLayoutGroup", "spacing": 8, "padding": [24,16,24,16], "childAlignment": "MiddleLeft", "childForceExpand": [true,false] }
+                ],
+                "children": [
+                  {
+                    "name": "Row_Profile",
+                    "rect": { "anchor": "top-stretch", "sizeDelta": [0, 100] },
+                    "components": [ { "type": "HorizontalLayoutGroup", "spacing": 16, "childAlignment": "MiddleLeft", "childControlSize": [false,true] } ],
+                    "children": [
+                      { "name": "Slot_Avatar", "rect": { "anchor": "middle-left", "sizeDelta": [88,88] },
+                        "components": [
+                          { "type": "Image", "skinKey": "slot_avatar" },
+                          { "type": "Mask" },
+                          { "type": "Button", "onClick": "evt.lobby.openAccount" }
+                        ],
+                        "children": [
+                          { "name": "Img_AvatarPhoto", "rect": { "anchor": "stretch", "offsets": [4,4,4,4] },
+                            "components": [ { "type": "RawImage", "bind": "user.avatarUrl" } ] }
+                        ]
+                      },
+                      { "name": "Txt_Nickname", "rect": { "anchor": "middle-center", "sizeDelta": [0,40] },
+                        "components": [
+                          { "type": "LayoutElement", "flexibleWidth": 1 },
+                          { "type": "TMP_Text", "bind": "user.nickname", "font": "bold", "size": 30, "color": "#FFFFFF", "align": "MidlineLeft" }
+                        ] },
+                      { "name": "Btn_Menu", "rect": { "anchor": "middle-right", "sizeDelta": [88,88] },
+                        "components": [
+                          { "type": "Image", "skinKey": "btn_icon_menu", "color": "#FFFFFF26" },
+                          { "type": "Button", "onClick": "evt.lobby.toggleMenu" }
+                        ] }
+                    ]
+                  },
+                  {
+                    "name": "Row_Stats",
+                    "rect": { "anchor": "top-stretch", "sizeDelta": [0, 80] },
+                    "components": [ { "type": "HorizontalLayoutGroup", "spacing": 24, "childAlignment": "MiddleLeft" } ],
+                    "children": [
+                      { "name": "Group_Stamina", "rect": { "anchor": "middle-left", "sizeDelta": [340,60] },
+                        "components": [ { "type": "HorizontalLayoutGroup", "spacing": 8, "childAlignment": "MiddleLeft" },
+                          { "type": "Button", "onClick": "evt.lobby.openEnergy" } ],
+                        "children": [
+                          { "name": "Icon_Stamina", "rect": { "anchor": "middle-left", "sizeDelta": [48,48] },
+                            "components": [ { "type": "Image", "skinKey": "slot_stamina_icon" } ] },
+                          { "name": "Txt_StaminaCount", "rect": { "anchor": "middle-center", "sizeDelta": [80,40] },
+                            "components": [ { "type": "TMP_Text", "stringKey": "hud.stamina_fmt",
+                              "args": { "cur": "{stamina.cur}", "max": "{stamina.max}" },
+                              "font": "mono", "size": 26, "color": "#FFFFFF" } ] },
+                          { "name": "Txt_StaminaTimer", "rect": { "anchor": "middle-center", "sizeDelta": [140,40] },
+                            "components": [ { "type": "TMP_Text", "stringKey": "hud.stamina_timer_fmt",
+                              "args": { "mm": "{stamina.mm}", "ss": "{stamina.ss}" },
+                              "font": "mono", "size": 22, "color": "#B0BEC5" } ] }
+                        ] },
+                      { "name": "Group_Currency", "rect": { "anchor": "middle-right", "sizeDelta": [200,60] },
+                        "components": [ { "type": "HorizontalLayoutGroup", "spacing": 8, "childAlignment": "MiddleRight" } ],
+                        "children": [
+                          { "name": "Icon_Currency", "rect": { "anchor": "middle-left", "sizeDelta": [48,48] },
+                            "components": [ { "type": "Image", "skinKey": "slot_currency_soft" } ] },
+                          { "name": "Txt_CurrencyCount", "rect": { "anchor": "middle-center", "sizeDelta": [120,40] },
+                            "components": [ { "type": "TMP_Text", "bind": "currency.soft", "font": "mono", "size": 26, "color": "#FFFFFF", "align": "MidlineRight" } ] }
+                        ] }
+                    ]
+                  }
+                ]
+              },
+
+              {
+                "name": "MenuDropdown",
+                "active": false,
+                "rect": { "anchor": "top-right", "sizeDelta": [360, 200], "anchoredPos": [-32, -240] },
+                "components": [
+                  { "type": "Image", "skinKey": "slot_popup_bg", "color": "#16213EEE" },
+                  { "type": "VerticalLayoutGroup", "spacing": 4, "padding": [12,12,12,12] },
+                  { "type": "DropdownAnim", "fields": { "originPivot": "top-right", "scaleFrom": 0.8 } }
+                ],
+                "children": [
+                  { "name": "Btn_Settings", "rect": { "anchor": "top-stretch", "sizeDelta": [0,80] },
+                    "components": [
+                      { "type": "Image", "color": "#FFFFFF11" },
+                      { "type": "Button", "onClick": "evt.lobby.openSettings" },
+                      { "type": "TMP_Text", "stringKey": "hud.settings", "size": 26, "color": "#FFFFFF", "align": "MidlineLeft", "padding": [16,0,16,0] }
+                    ] },
+                  { "name": "Btn_Language", "rect": { "anchor": "top-stretch", "sizeDelta": [0,80] },
+                    "components": [
+                      { "type": "Image", "color": "#FFFFFF11" },
+                      { "type": "Button", "onClick": "evt.lobby.openLanguage" },
+                      { "type": "TMP_Text", "stringKey": "hud.language", "size": 26, "color": "#FFFFFF", "align": "MidlineLeft", "padding": [16,0,16,0] }
+                    ] }
+                ]
+              },
+
+              {
+                "name": "Group_TabBodies",
+                "rect": { "anchor": "stretch", "offsets": [0, 240, 0, 128] },
+                "components": [
+                  { "type": "TabSwitcher", "fields": { "default": "home", "tabBar": "TabBar" } }
+                ],
+                "children": [
+
+                  {
+                    "name": "Tab_Home",
+                    "rect": { "anchor": "stretch", "offsets": [0,0,0,0] },
+                    "components": [ { "type": "CanvasGroup", "alpha": 1, "blocksRaycasts": true } ],
+                    "children": [
+                      {
+                        "name": "Carousel_Stages",
+                        "rect": { "anchor": "top-stretch", "sizeDelta": [0, 880], "anchoredPos": [0, -32] },
+                        "components": [
+                          { "type": "StageCarousel", "fields": { "centerScale": 1.0, "sideScale": 0.7, "sideAlpha": 0.6, "spacing": 80 } }
+                        ],
+                        "children": [
+                          { "name": "Btn_Prev", "rect": { "anchor": "middle-left", "sizeDelta": [96,96], "anchoredPos": [16,0] },
+                            "components": [ { "type": "Image", "skinKey": "btn_carousel_prev", "color": "#FFFFFF26" },
+                                            { "type": "Button", "onClick": "evt.carousel.prev" },
+                                            { "type": "LongPressRepeater", "fields": { "delay": 0.4, "interval": 0.12 } } ] },
+                          { "name": "Btn_Next", "rect": { "anchor": "middle-right", "sizeDelta": [96,96], "anchoredPos": [-16,0] },
+                            "components": [ { "type": "Image", "skinKey": "btn_carousel_next", "color": "#FFFFFF26" },
+                                            { "type": "Button", "onClick": "evt.carousel.next" },
+                                            { "type": "LongPressRepeater", "fields": { "delay": 0.4, "interval": 0.12 } } ] },
+                          { "name": "Group_Track", "rect": { "anchor": "stretch", "offsets": [120, 0, 120, 80] },
+                            "components": [ { "type": "HorizontalLayoutGroup", "spacing": 40, "childAlignment": "MiddleCenter" } ],
+                            "prefabChildren": [
+                              { "name": "StageNode (template)",
+                                "comment": "Instantiated by StageCarousel from prefab Assets/Prefabs/UI/StageNode.prefab",
+                                "prefab": "StageNode" }
+                            ] },
+                          { "name": "Btn_Play",
+                            "rect": { "anchor": "bottom-center", "sizeDelta": [400, 112], "anchoredPos": [0, 16] },
+                            "components": [
+                              { "type": "Image", "skinKey": "btn_primary" },
+                              { "type": "Button", "onClick": "evt.carousel.openCurrent" }
+                            ],
+                            "children": [
+                              { "name": "Txt_Label", "rect": { "anchor": "stretch", "offsets": [0,0,0,0] },
+                                "components": [ { "type": "TMP_Text", "stringKey": "home.stage_play", "font": "bold", "size": 32, "color": "#FFFFFF", "align": "Center" } ] }
+                            ] }
+                        ]
+                      },
+                      {
+                        "name": "Card_Daily",
+                        "rect": { "anchor": "bottom-stretch", "offsets": [32, 0, 32, 280], "sizeDelta": [0, 200] },
+                        "components": [
+                          { "type": "Image", "skinKey": "slot_daily_card", "color": "#16213E" },
+                          { "type": "Button", "onClick": "evt.lobby.openDaily" },
+                          { "type": "VerticalLayoutGroup", "spacing": 8, "padding": [24,16,24,16] }
+                        ],
+                        "children": [
+                          { "name": "Txt_Title", "rect": { "anchor": "top-stretch", "sizeDelta": [0,40] },
+                            "components": [ { "type": "TMP_Text", "stringKey": "home.daily_title", "font": "bold", "size": 26, "color": "#FFFFFF" } ] },
+                          { "name": "Row_Progress", "rect": { "anchor": "top-stretch", "sizeDelta": [0,48] },
+                            "components": [ { "type": "HorizontalLayoutGroup", "spacing": 16, "childAlignment": "MiddleLeft" } ],
+                            "children": [
+                              { "name": "Txt_Streak", "rect": { "anchor": "middle-left", "sizeDelta": [240,32] },
+                                "components": [ { "type": "TMP_Text", "stringKey": "home.daily_streak_fmt", "args": { "n": "{daily.streak}" }, "size": 22, "color": "#B0BEC5" } ] },
+                              { "name": "Bar_Progress", "rect": { "anchor": "middle-center", "sizeDelta": [320,16] },
+                                "components": [
+                                  { "type": "Image", "color": "#FFFFFF22" },
+                                  { "type": "Slider", "minValue": 0, "maxValue": 1, "bind": "daily.progress" }
+                                ] },
+                              { "name": "Txt_Frac", "rect": { "anchor": "middle-right", "sizeDelta": [80,32] },
+                                "components": [ { "type": "TMP_Text", "stringKey": "home.daily_progress_fmt", "args": { "cur": "{daily.cur}", "max": "{daily.max}" }, "font": "mono", "size": 22, "color": "#FFFFFF" } ] }
+                            ] }
+                        ]
+                      },
+                      {
+                        "name": "Card_Event",
+                        "active": "bind:event.active",
+                        "rect": { "anchor": "bottom-stretch", "offsets": [32, 0, 32, 32], "sizeDelta": [0, 220] },
+                        "components": [
+                          { "type": "Image", "skinKey": "slot_event_banner", "color": "#16213E" },
+                          { "type": "Button", "onClick": "evt.lobby.openEvent" }
+                        ],
+                        "children": [
+                          { "name": "Slot_Spine", "rect": { "anchor": "right-stretch", "sizeDelta": [240,0], "offsets": [0,16,16,16] },
+                            "components": [ { "type": "SpineGraphic", "skinKey": "spine_event_banner", "loopAnim": "idle" } ] },
+                          { "name": "Group_Info", "rect": { "anchor": "left-stretch", "offsets": [24,16,280,16] },
+                            "components": [ { "type": "VerticalLayoutGroup", "spacing": 8, "childAlignment": "MiddleLeft" } ],
+                            "children": [
+                              { "name": "Txt_Title", "rect": { "anchor": "top-stretch", "sizeDelta": [0,40] },
+                                "components": [ { "type": "TMP_Text", "stringKey": "home.event_title_fmt", "args": { "name": "{event.name}" }, "font": "bold", "size": 28, "color": "#FFFFFF" } ] },
+                              { "name": "Txt_Ends", "rect": { "anchor": "top-stretch", "sizeDelta": [0,32] },
+                                "components": [ { "type": "TMP_Text", "stringKey": "home.event_ends_fmt", "args": { "d": "{event.d}", "h": "{event.h}" }, "size": 22, "color": "#B0BEC5" } ] }
+                            ] }
+                        ]
+                      }
+                    ]
+                  },
+
+                  {
+                    "name": "Tab_Shop",
+                    "active": false,
+                    "rect": { "anchor": "stretch", "offsets": [0,0,0,0] },
+                    "components": [ { "type": "ScrollRect", "vertical": true, "horizontal": false } ],
+                    "children": [
+                      { "name": "Viewport", "rect": { "anchor": "stretch", "offsets": [16,16,16,16] },
+                        "components": [ { "type": "Image", "color": "#00000000" }, { "type": "Mask", "showMaskGraphic": false } ],
+                        "children": [
+                          { "name": "Content", "rect": { "anchor": "top-stretch", "sizeDelta": [0, 0] },
+                            "components": [
+                              { "type": "VerticalLayoutGroup", "spacing": 24, "padding": [8,8,8,8] },
+                              { "type": "ContentSizeFitter", "vertical": "PreferredSize" }
+                            ],
+                            "children": [
+                              { "name": "Header_Stamina", "rect": { "anchor": "top-stretch", "sizeDelta": [0,48] },
+                                "components": [ { "type": "TMP_Text", "stringKey": "shop.section_stamina", "font": "bold", "size": 22, "color": "#B0BEC5", "letterSpacing": 4 } ] },
+                              { "name": "Grid_Stamina", "rect": { "anchor": "top-stretch", "sizeDelta": [0, 360] },
+                                "components": [
+                                  { "type": "GridLayoutGroup", "cellSize": [480,360], "spacing": [24,24], "constraint": "FixedColumnCount", "constraintCount": 2 }
+                                ],
+                                "prefabChildren": [ { "name": "ShopProductCard", "prefab": "ShopProductCard" } ] },
+                              { "name": "Header_Items", "rect": { "anchor": "top-stretch", "sizeDelta": [0,48] },
+                                "components": [ { "type": "TMP_Text", "stringKey": "shop.section_items", "font": "bold", "size": 22, "color": "#B0BEC5", "letterSpacing": 4 } ] },
+                              { "name": "List_Items", "rect": { "anchor": "top-stretch", "sizeDelta": [0, 0] },
+                                "components": [ { "type": "VerticalLayoutGroup", "spacing": 16 }, { "type": "ContentSizeFitter", "vertical": "PreferredSize" } ],
+                                "prefabChildren": [ { "name": "ShopItemRow", "prefab": "ShopItemRow" } ] }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+
+                  {
+                    "name": "Tab_Ranking",
+                    "active": false,
+                    "rect": { "anchor": "stretch", "offsets": [0,0,0,0] },
+                    "children": [
+                      {
+                        "name": "Seg_Mode",
+                        "rect": { "anchor": "top-stretch", "sizeDelta": [0,80], "offsets": [80,0,80,0] },
+                        "components": [
+                          { "type": "Image", "color": "#FFFFFF11" },
+                          { "type": "SegmentedControl", "fields": { "options": ["clear","score"], "default": "clear" } },
+                          { "type": "HorizontalLayoutGroup", "spacing": 0, "childAlignment": "MiddleCenter", "childForceExpand": [true,true] }
+                        ],
+                        "children": [
+                          { "name": "Seg_Clear", "rect": { "anchor": "stretch", "offsets": [0,0,0,0] },
+                            "components": [ { "type": "Button" }, { "type": "TMP_Text", "stringKey": "rank.tab_clear", "size": 24, "color": "#FFFFFF", "align": "Center" } ] },
+                          { "name": "Seg_Score", "rect": { "anchor": "stretch", "offsets": [0,0,0,0] },
+                            "components": [ { "type": "Button" }, { "type": "TMP_Text", "stringKey": "rank.tab_score", "size": 24, "color": "#FFFFFF", "align": "Center" } ] }
+                        ]
+                      },
+                      {
+                        "name": "ScrollList",
+                        "rect": { "anchor": "stretch", "offsets": [16, 96, 16, 120] },
+                        "components": [ { "type": "ScrollRect", "vertical": true } ],
+                        "children": [
+                          { "name": "Viewport", "rect": { "anchor": "stretch", "offsets": [0,0,0,0] },
+                            "components": [ { "type": "Image", "color": "#00000000" }, { "type": "Mask", "showMaskGraphic": false } ],
+                            "children": [
+                              { "name": "Content", "rect": { "anchor": "top-stretch", "sizeDelta": [0,0] },
+                                "components": [ { "type": "VerticalLayoutGroup", "spacing": 8 }, { "type": "ContentSizeFitter", "vertical": "PreferredSize" } ],
+                                "prefabChildren": [ { "name": "RankRow", "prefab": "RankRow" } ] }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "name": "Row_MyRank_Pinned",
+                        "rect": { "anchor": "bottom-stretch", "sizeDelta": [0, 96], "offsets": [16,0,16,16] },
+                        "components": [
+                          { "type": "Image", "color": "#7B2FBE40", "skinKey": "slot_rank_self" },
+                          { "type": "HorizontalLayoutGroup", "spacing": 16, "padding": [16,8,16,8], "childAlignment": "MiddleLeft" }
+                        ],
+                        "children": [
+                          { "name": "Txt_Rank", "rect": { "anchor": "middle-left", "sizeDelta": [64,48] },
+                            "components": [ { "type": "TMP_Text", "bind": "rank.self.position", "font": "bold", "size": 28, "color": "#FFFFFF", "prefix": "#" } ] },
+                          { "name": "Slot_Avatar", "rect": { "anchor": "middle-left", "sizeDelta": [64,64] },
+                            "components": [ { "type": "Image", "skinKey": "slot_avatar" }, { "type": "Mask" } ] },
+                          { "name": "Txt_You", "rect": { "anchor": "middle-center", "sizeDelta": [0,48] },
+                            "components": [
+                              { "type": "LayoutElement", "flexibleWidth": 1 },
+                              { "type": "TMP_Text", "stringKey": "rank.you", "font": "bold", "size": 26, "color": "#E040FB", "align": "MidlineLeft" }
+                            ] },
+                          { "name": "Txt_Score", "rect": { "anchor": "middle-right", "sizeDelta": [140,48] },
+                            "components": [ { "type": "TMP_Text", "bind": "rank.self.score", "font": "mono", "size": 28, "color": "#FFFFFF", "align": "MidlineRight" } ] }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+
+              {
+                "name": "TabBar",
+                "rect": { "anchor": "bottom-stretch", "sizeDelta": [0, 128], "offsets": [0,0,0,0] },
+                "components": [
+                  { "type": "Image", "color": "#0E1430EE" },
+                  { "type": "HorizontalLayoutGroup", "spacing": 0, "childForceExpand": [true,true], "childAlignment": "MiddleCenter" }
+                ],
+                "children": [
+                  { "name": "Tab_Shop", "rect": { "anchor": "stretch", "offsets": [0,0,0,0] },
+                    "components": [ { "type": "Button", "onClick": "evt.tab.goShop" }, { "type": "TabButton", "fields": { "id": "shop" } }, { "type": "VerticalLayoutGroup", "childAlignment": "MiddleCenter" } ],
+                    "children": [
+                      { "name": "Icon", "rect": { "anchor": "top-center", "sizeDelta": [56,56], "anchoredPos": [0,-20] },
+                        "components": [ { "type": "Image", "skinKey": "btn_tab_shop", "color": "#B0BEC5" } ] },
+                      { "name": "Txt", "rect": { "anchor": "bottom-center", "sizeDelta": [120,32], "anchoredPos": [0,16] },
+                        "components": [ { "type": "TMP_Text", "stringKey": "tab.shop", "size": 22, "color": "#B0BEC5", "align": "Center" } ] },
+                      { "name": "Indicator", "active": false, "rect": { "anchor": "bottom-center", "sizeDelta": [56,8], "anchoredPos": [0,4] },
+                        "components": [ { "type": "Image", "skinKey": "slot_tab_indicator", "color": "#E040FB" } ] }
+                    ] },
+                  { "name": "Tab_Home", "rect": { "anchor": "stretch", "offsets": [0,0,0,0] },
+                    "components": [ { "type": "Button", "onClick": "evt.tab.goHome" }, { "type": "TabButton", "fields": { "id": "home", "default": true } }, { "type": "VerticalLayoutGroup", "childAlignment": "MiddleCenter" } ],
+                    "children": [
+                      { "name": "Icon", "rect": { "anchor": "top-center", "sizeDelta": [56,56], "anchoredPos": [0,-20] },
+                        "components": [ { "type": "Image", "skinKey": "btn_tab_home", "color": "#FFFFFF" } ] },
+                      { "name": "Txt", "rect": { "anchor": "bottom-center", "sizeDelta": [120,32], "anchoredPos": [0,16] },
+                        "components": [ { "type": "TMP_Text", "stringKey": "tab.home", "size": 22, "color": "#FFFFFF", "align": "Center" } ] },
+                      { "name": "Indicator", "rect": { "anchor": "bottom-center", "sizeDelta": [56,8], "anchoredPos": [0,4] },
+                        "components": [ { "type": "Image", "skinKey": "slot_tab_indicator", "color": "#E040FB" } ] }
+                    ] },
+                  { "name": "Tab_Ranking", "rect": { "anchor": "stretch", "offsets": [0,0,0,0] },
+                    "components": [ { "type": "Button", "onClick": "evt.tab.goRanking" }, { "type": "TabButton", "fields": { "id": "ranking" } }, { "type": "VerticalLayoutGroup", "childAlignment": "MiddleCenter" } ],
+                    "children": [
+                      { "name": "Icon", "rect": { "anchor": "top-center", "sizeDelta": [56,56], "anchoredPos": [0,-20] },
+                        "components": [ { "type": "Image", "skinKey": "btn_tab_ranking", "color": "#B0BEC5" } ] },
+                      { "name": "Txt", "rect": { "anchor": "bottom-center", "sizeDelta": [120,32], "anchoredPos": [0,16] },
+                        "components": [ { "type": "TMP_Text", "stringKey": "tab.ranking", "size": 22, "color": "#B0BEC5", "align": "Center" } ] },
+                      { "name": "Indicator", "active": false, "rect": { "anchor": "bottom-center", "sizeDelta": [56,8], "anchoredPos": [0,4] },
+                        "components": [ { "type": "Image", "skinKey": "slot_tab_indicator", "color": "#E040FB" } ] }
+                    ] }
+                ]
+              }
+            ]
+          },
+          { "name": "PopupLayer", "rect": { "anchor": "stretch", "offsets": [0,0,0,0] },
+            "components": [ { "type": "Canvas", "overrideSorting": true, "sortingOrder": 100 }, { "type": "GraphicRaycaster" } ] },
+          { "name": "ToastLayer", "rect": { "anchor": "stretch", "offsets": [0,0,0,0] },
+            "components": [ { "type": "Canvas", "overrideSorting": true, "sortingOrder": 200 }, { "type": "GraphicRaycaster" }, { "type": "ToastStack", "fields": { "maxVisible": 3, "autoDismissSec": 3 } } ] }
+        ]
+      },
+      "prefabs": {
+        "StageNode": {
+          "size": [400, 560],
+          "components": [
+            { "type": "Image", "skinKey": "slot_stage_node" },
+            { "type": "Button", "onClick": "evt.stageNode.tap" },
+            { "type": "StageNodeView" }
+          ],
+          "children": [
+            { "name": "Txt_StageNum", "rect": { "anchor": "top-center", "sizeDelta": [120,56], "anchoredPos": [0,-24] },
+              "components": [ { "type": "TMP_Text", "bind": "node.index", "font": "bold", "size": 36, "color": "#FFFFFF", "align": "Center", "prefix": "0" } ] },
+            { "name": "Slot_Spine", "rect": { "anchor": "middle-center", "sizeDelta": [320,320] },
+              "components": [ { "type": "SpineGraphic", "skinKey": "spine_stage_idle", "loopAnim": "idle" } ] },
+            { "name": "Group_Stars", "rect": { "anchor": "bottom-center", "sizeDelta": [240,56], "anchoredPos": [0,32] },
+              "components": [ { "type": "HorizontalLayoutGroup", "spacing": 8, "childAlignment": "MiddleCenter" } ],
+              "prefabChildren": [
+                { "name": "Star", "comment": "3 instances, each Image with skinKey slot_star_empty/filled by StageNodeView" }
+              ] },
+            { "name": "Overlay_Locked", "active": "bind:node.locked", "rect": { "anchor": "stretch", "offsets": [0,0,0,0] },
+              "components": [ { "type": "Image", "skinKey": "slot_stage_node_locked", "color": "#000000B3" } ] }
+          ]
+        },
+        "ShopProductCard": {
+          "size": [480, 360],
+          "components": [
+            { "type": "Image", "skinKey": "slot_popup_bg", "color": "#16213E" },
+            { "type": "Button", "onClick": "evt.shop.purchase" },
+            { "type": "VerticalLayoutGroup", "spacing": 8, "padding": [16,16,16,16] }
+          ],
+          "children": [
+            { "name": "Slot_Image", "rect": { "anchor": "top-center", "sizeDelta": [200,180] },
+              "components": [ { "type": "Image", "bind": "product.image" } ] },
+            { "name": "Txt_Name", "rect": { "anchor": "top-stretch", "sizeDelta": [0,40] },
+              "components": [ { "type": "TMP_Text", "bind": "product.name", "font": "bold", "size": 26, "color": "#FFFFFF", "align": "Center" } ] },
+            { "name": "Row_Price", "rect": { "anchor": "top-stretch", "sizeDelta": [0,40] },
+              "components": [ { "type": "HorizontalLayoutGroup", "spacing": 8, "childAlignment": "MiddleCenter" } ],
+              "children": [
+                { "name": "Icon", "rect": { "anchor": "middle-left", "sizeDelta": [32,32] },
+                  "components": [ { "type": "Image", "skinKey": "slot_currency_soft" } ] },
+                { "name": "Txt_Price", "rect": { "anchor": "middle-center", "sizeDelta": [120,32] },
+                  "components": [ { "type": "TMP_Text", "bind": "product.price", "font": "mono", "size": 24, "color": "#FFFFFF" } ] }
+              ] },
+            { "name": "Btn_Purchase", "rect": { "anchor": "bottom-stretch", "sizeDelta": [0,72] },
+              "components": [ { "type": "Image", "skinKey": "btn_primary" }, { "type": "Button" },
+                { "type": "TMP_Text", "stringKey": "common.purchase", "font": "bold", "size": 24, "color": "#FFFFFF", "align": "Center" } ] }
+          ]
+        },
+        "ShopItemRow": {
+          "size": [1000, 200],
+          "components": [
+            { "type": "Image", "skinKey": "slot_popup_bg", "color": "#16213E" },
+            { "type": "HorizontalLayoutGroup", "spacing": 16, "padding": [16,16,16,16], "childAlignment": "MiddleLeft" }
+          ],
+          "children": [
+            { "name": "Slot_Image", "rect": { "anchor": "middle-left", "sizeDelta": [160,160] },
+              "components": [ { "type": "Image", "bind": "product.image" } ] },
+            { "name": "Group_Info", "rect": { "anchor": "middle-center", "sizeDelta": [500,160] },
+              "components": [ { "type": "VerticalLayoutGroup", "spacing": 8 }, { "type": "LayoutElement", "flexibleWidth": 1 } ],
+              "children": [
+                { "name": "Txt_Name", "rect": { "anchor": "top-stretch", "sizeDelta": [0,40] },
+                  "components": [ { "type": "TMP_Text", "bind": "product.name", "font": "bold", "size": 28, "color": "#FFFFFF" } ] },
+                { "name": "Txt_Desc", "rect": { "anchor": "top-stretch", "sizeDelta": [0,32] },
+                  "components": [ { "type": "TMP_Text", "bind": "product.desc", "size": 22, "color": "#B0BEC5" } ] },
+                { "name": "Row_Price", "rect": { "anchor": "top-stretch", "sizeDelta": [0,40] },
+                  "components": [ { "type": "HorizontalLayoutGroup", "spacing": 8, "childAlignment": "MiddleLeft" } ],
+                  "children": [
+                    { "name": "Icon", "rect": { "anchor": "middle-left", "sizeDelta": [32,32] },
+                      "components": [ { "type": "Image", "skinKey": "slot_currency_soft" } ] },
+                    { "name": "Txt_Price", "rect": { "anchor": "middle-left", "sizeDelta": [120,32] },
+                      "components": [ { "type": "TMP_Text", "bind": "product.price", "font": "mono", "size": 24, "color": "#FFFFFF" } ] }
+                  ] }
+              ] },
+            { "name": "Btn_Purchase", "rect": { "anchor": "middle-right", "sizeDelta": [240,96] },
+              "components": [ { "type": "Image", "skinKey": "btn_primary" }, { "type": "Button" },
+                { "type": "TMP_Text", "stringKey": "common.purchase", "font": "bold", "size": 26, "color": "#FFFFFF", "align": "Center" } ] }
+          ]
+        },
+        "RankRow": {
+          "size": [1000, 120],
+          "components": [
+            { "type": "Image", "color": "#16213E80" },
+            { "type": "HorizontalLayoutGroup", "spacing": 16, "padding": [16,8,16,8], "childAlignment": "MiddleLeft" }
+          ],
+          "children": [
+            { "name": "Txt_Rank", "rect": { "anchor": "middle-left", "sizeDelta": [88,56] },
+              "components": [ { "type": "TMP_Text", "bind": "row.rank", "font": "bold", "size": 32, "color": "#FFFFFF" } ] },
+            { "name": "Slot_Avatar", "rect": { "anchor": "middle-left", "sizeDelta": [72,72] },
+              "components": [ { "type": "Image", "skinKey": "slot_avatar" }, { "type": "Mask" } ] },
+            { "name": "Txt_Name", "rect": { "anchor": "middle-center", "sizeDelta": [0,56] },
+              "components": [ { "type": "LayoutElement", "flexibleWidth": 1 },
+                              { "type": "TMP_Text", "bind": "row.name", "size": 26, "color": "#FFFFFF", "align": "MidlineLeft" } ] },
+            { "name": "Txt_Score", "rect": { "anchor": "middle-right", "sizeDelta": [180,56] },
+              "components": [ { "type": "TMP_Text", "bind": "row.score", "font": "mono", "size": 28, "color": "#FFFFFF", "align": "MidlineRight" } ] }
+          ]
+        }
+      }
+    },
+
+    {
+      "id": "GameScene",
+      "unityScenePath": "Assets/Scenes/Game.unity",
+      "entryController": "Assets/Scripts/UI/GameController.cs",
+      "root": {
+        "name": "GameCanvas",
+        "rect": { "anchor": "stretch", "offsets": [0,0,0,0] },
+        "components": [
+          { "type": "Canvas", "sortingOrder": 0 },
+          { "type": "CanvasScaler" },
+          { "type": "GraphicRaycaster" }
+        ],
+        "children": [
+          { "name": "Panel_Background", "rect": { "anchor": "stretch", "offsets": [0,0,0,0] },
+            "components": [ { "type": "Image", "color": "#1A1A2E" } ] },
+          {
+            "name": "SafeArea",
+            "rect": { "anchor": "stretch", "offsets": [0,0,0,0] },
+            "components": [ { "type": "SafeAreaFitter" } ],
+            "children": [
+              {
+                "name": "HUD_Top",
+                "rect": { "anchor": "top-stretch", "sizeDelta": [0, 180], "offsets": [0,0,0,0] },
+                "components": [
+                  { "type": "Image", "color": "#0E1430CC" },
+                  { "type": "VerticalLayoutGroup", "spacing": 12, "padding": [24,16,24,16] }
+                ],
+                "children": [
+                  {
+                    "name": "Row_TopBar",
+                    "rect": { "anchor": "top-stretch", "sizeDelta": [0,80] },
+                    "components": [ { "type": "HorizontalLayoutGroup", "spacing": 16, "childAlignment": "MiddleLeft" } ],
+                    "children": [
+                      { "name": "Btn_Pause", "rect": { "anchor": "middle-left", "sizeDelta": [80,80] },
+                        "components": [
+                          { "type": "Image", "skinKey": "btn_icon_pause", "color": "#FFFFFF26" },
+                          { "type": "Button", "onClick": "evt.game.pause" }
+                        ] },
+                      { "name": "Txt_Stage", "rect": { "anchor": "middle-center", "sizeDelta": [0,60] },
+                        "components": [
+                          { "type": "LayoutElement", "flexibleWidth": 1 },
+                          { "type": "TMP_Text", "stringKey": "game.stage_fmt", "args": { "n": "{stage.index}" }, "font": "bold", "size": 30, "color": "#FFFFFF", "align": "Center" }
+                        ] },
+                      { "name": "Txt_Timer", "rect": { "anchor": "middle-right", "sizeDelta": [160,60] },
+                        "components": [
+                          { "type": "TMP_Text", "stringKey": "game.timer_fmt", "args": { "mm": "{timer.mm}", "ss": "{timer.ss}" },
+                            "font": "mono", "size": 32, "color": "#FFFFFF", "align": "MidlineRight" }
+                        ] }
+                    ]
+                  },
+                  {
+                    "name": "Row_Objectives",
+                    "rect": { "anchor": "top-stretch", "sizeDelta": [0,56] },
+                    "components": [ { "type": "HorizontalLayoutGroup", "spacing": 16, "childAlignment": "MiddleLeft" } ],
+                    "children": [
+                      { "name": "Bar_Objective", "rect": { "anchor": "middle-center", "sizeDelta": [0,28] },
+                        "components": [
+                          { "type": "LayoutElement", "flexibleWidth": 1 },
+                          { "type": "ObjectiveBar", "fields": { "segmentImageSkin": "slot_objective_seg" } }
+                        ] },
+                      { "name": "Txt_Moves", "rect": { "anchor": "middle-right", "sizeDelta": [200,40] },
+                        "components": [
+                          { "type": "TMP_Text", "stringKey": "game.moves_fmt", "args": { "cur": "{moves.cur}", "max": "{moves.max}" },
+                            "font": "mono", "size": 24, "color": "#FFFFFF", "align": "MidlineRight" }
+                        ] }
+                    ]
+                  }
+                ]
+              },
+              {
+                "name": "Group_Board",
+                "rect": { "anchor": "stretch", "offsets": [40, 200, 40, 200] },
+                "components": [
+                  { "type": "AspectRatioFitter", "aspectMode": "FitInParent", "aspectRatio": 1.0 },
+                  { "type": "GameBoardView", "script": "Assets/Scripts/Game/GameBoardView.cs",
+                    "fields": { "cellPrefab": "BoardCell", "lineWidth": 16 } }
+                ],
+                "children": [
+                  { "name": "Bg_Board", "rect": { "anchor": "stretch", "offsets": [0,0,0,0] },
+                    "components": [ { "type": "Image", "color": "#16213EAA", "skinKey": "slot_board_bg" } ] },
+                  { "name": "Layer_Cells",  "rect": { "anchor": "stretch", "offsets": [0,0,0,0] } },
+                  { "name": "Layer_Lines",  "rect": { "anchor": "stretch", "offsets": [0,0,0,0] } },
+                  { "name": "Layer_Effects","rect": { "anchor": "stretch", "offsets": [0,0,0,0] } }
+                ]
+              },
+              {
+                "name": "Toolbar_Items",
+                "rect": { "anchor": "bottom-stretch", "sizeDelta": [0, 140], "offsets": [40,0,40,40] },
+                "components": [
+                  { "type": "HorizontalLayoutGroup", "spacing": 24, "childAlignment": "MiddleCenter", "childForceExpand": [true,true] }
+                ],
+                "prefabChildren": [
+                  { "name": "ItemSlot", "prefab": "ItemSlot", "comment": "3 instances: 🔧 / ⚡ / 🎯" }
+                ]
+              }
+            ]
+          },
+          { "name": "PopupLayer",  "rect": { "anchor": "stretch", "offsets": [0,0,0,0] },
+            "components": [ { "type": "Canvas", "overrideSorting": true, "sortingOrder": 100 }, { "type": "GraphicRaycaster" } ] },
+          { "name": "ToastLayer", "rect": { "anchor": "stretch", "offsets": [0,0,0,0] },
+            "components": [ { "type": "Canvas", "overrideSorting": true, "sortingOrder": 200 }, { "type": "GraphicRaycaster" } ] }
+        ]
+      },
+      "prefabs": {
+        "ItemSlot": {
+          "size": [200, 140],
+          "components": [
+            { "type": "Image", "color": "#16213EE0" },
+            { "type": "Button", "onClick": "evt.game.useItem" },
+            { "type": "ItemSlotView" }
+          ],
+          "children": [
+            { "name": "Icon", "rect": { "anchor": "middle-center", "sizeDelta": [80,80], "anchoredPos": [0, 8] },
+              "components": [ { "type": "Image", "bind": "item.icon" } ] },
+            { "name": "Badge_Count", "rect": { "anchor": "top-right", "sizeDelta": [48,48], "anchoredPos": [-8, -8] },
+              "components": [
+                { "type": "Image", "color": "#E040FB" },
+                { "type": "TMP_Text", "bind": "item.count", "font": "bold", "size": 22, "color": "#FFFFFF", "align": "Center" }
+              ] }
+          ]
+        },
+        "BoardCell": {
+          "size": [120, 120],
+          "components": [
+            { "type": "Image", "color": "#FFFFFF11" },
+            { "type": "BoardCellView" }
+          ]
+        }
+      }
+    }
+  ]
+}

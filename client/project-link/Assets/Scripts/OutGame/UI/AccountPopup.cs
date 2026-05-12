@@ -21,6 +21,7 @@ namespace ProjectLink.OutGame.UI
             _initialized = true;
 
             ResolveMissingReferences();
+            BindOverlayClose();
             BindClose(closeButton);
             UiServiceLocator.UiData.GetAccountMe(Apply);
         }

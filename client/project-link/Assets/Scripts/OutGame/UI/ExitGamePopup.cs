@@ -20,6 +20,7 @@ namespace ProjectLink.OutGame.UI
             _navigation = navigation;
 
             ResolveMissingReferences();
+            BindOverlayClose();
             BindClose(closeIconButton);
             BindClose(cancelButton);
             BindConfirm(confirmButton);

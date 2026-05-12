@@ -21,6 +21,7 @@ namespace ProjectLink.OutGame.UI
             _initialized = true;
 
             ResolveMissingReferences();
+            BindOverlayClose();
             BindClose(closeButton);
             BindClose(closeIconButton);
             BindClose(saveButton);
@@ -33,6 +34,10 @@ namespace ProjectLink.OutGame.UI
             closeIconButton ??= FindButton("CloseIconButton");
             saveButton ??= FindButton("SaveButton");
             accountStatusText ??= FindText("AccountStatusText");
+
+            var dropdown = GetComponentInChildren<TMP_Dropdown>(true);
+            if (dropdown != null && dropdown.GetComponent<LanguageSelector>() == null)
+                dropdown.gameObject.AddComponent<LanguageSelector>();
         }
 
         void RefreshAccount()

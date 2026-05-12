@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -7,12 +8,15 @@ namespace ProjectLink.Core
 {
     public class NetworkManager : MonoBehaviour
     {
+        const int LogBodyMaxLength = 300;
+
         public static NetworkManager Instance { get; private set; }
 
         [SerializeField] AppEnvironment environment = AppEnvironment.Dev;
         [SerializeField] string clientVersion = "1.0.0";
         [SerializeField] string protocolVersion = "1";
         [SerializeField] string metaHash = "";
+        [SerializeField] bool httpLogging = true;
 
         string _baseUrl;
         string _authBaseUrl;
@@ -36,7 +40,7 @@ namespace ProjectLink.Core
             Instance = this;
             DontDestroyOnLoad(gameObject);
             ApplyEnvironment();
-            _authService ??= new PlatformAuthService(this, _authBaseUrl, clientVersion, protocolVersion);
+            _authService ??= new PlatformAuthService(this, _authBaseUrl, clientVersion, protocolVersion, environment, httpLogging);
         }
 
         public void SetAuthToken(string accessToken) => _authService?.SetToken(accessToken);
@@ -76,19 +80,19 @@ namespace ProjectLink.Core
             using var req = UnityWebRequest.Get(BuildUrl(endpoint));
             ApplyHeaders(req);
             yield return req.SendWebRequest();
-            Complete(req, onComplete);
+            Complete(req, "GET", null, onComplete);
         }
 
         IEnumerator SendWithBody(string endpoint, string method, string jsonBody, Action<bool, string> onComplete)
         {
             using var req = new UnityWebRequest(BuildUrl(endpoint), method);
-            var bodyBytes = System.Text.Encoding.UTF8.GetBytes(string.IsNullOrEmpty(jsonBody) ? "{}" : jsonBody);
+            var bodyBytes = Encoding.UTF8.GetBytes(string.IsNullOrEmpty(jsonBody) ? "{}" : jsonBody);
             req.uploadHandler = new UploadHandlerRaw(bodyBytes);
             req.downloadHandler = new DownloadHandlerBuffer();
             req.SetRequestHeader("Content-Type", "application/json");
             ApplyHeaders(req);
             yield return req.SendWebRequest();
-            Complete(req, onComplete);
+            Complete(req, method, jsonBody, onComplete);
         }
 
         string BuildUrl(string endpoint)
@@ -111,23 +115,43 @@ namespace ProjectLink.Core
                 req.SetRequestHeader("Authorization", $"Bearer {token}");
         }
 
-        void Complete(UnityWebRequest req, Action<bool, string> onComplete)
+        void Complete(UnityWebRequest req, string method, string requestBody, Action<bool, string> onComplete)
         {
-            var body = req.downloadHandler?.text ?? "";
+            var responseBody = req.downloadHandler?.text ?? "";
             if (req.result == UnityWebRequest.Result.Success)
             {
-                onComplete?.Invoke(true, body);
+                if (httpLogging)
+                {
+                    var sb = new StringBuilder($"[HTTP] {method} {req.url} → {req.responseCode}");
+                    if (!string.IsNullOrEmpty(requestBody)) sb.Append($"\nreq: {Clip(requestBody)}");
+                    if (!string.IsNullOrEmpty(responseBody)) sb.Append($"\nres: {Clip(responseBody)}");
+                    Debug.Log(sb);
+                }
+                onComplete?.Invoke(true, responseBody);
                 return;
             }
 
             if (req.responseCode == 401)
             {
+                if (httpLogging) Debug.LogWarning($"[HTTP] {method} {req.url} → 401 SESSION_EXPIRED");
                 _authService?.ClearToken();
                 onComplete?.Invoke(false, "SESSION_EXPIRED");
                 return;
             }
 
-            onComplete?.Invoke(false, string.IsNullOrEmpty(body) ? req.error : body);
+            var status = req.responseCode > 0 ? req.responseCode.ToString() : req.result.ToString();
+            var error = string.IsNullOrEmpty(responseBody) ? req.error : responseBody;
+            if (httpLogging)
+            {
+                var sb = new StringBuilder($"[HTTP] {method} {req.url} → {status}");
+                if (!string.IsNullOrEmpty(requestBody)) sb.Append($"\nreq: {Clip(requestBody)}");
+                if (!string.IsNullOrEmpty(error)) sb.Append($"\nerr: {Clip(error)}");
+                if (req.responseCode >= 500 || req.responseCode == 0)
+                    Debug.LogError(sb);
+                else
+                    Debug.LogWarning(sb);
+            }
+            onComplete?.Invoke(false, error);
         }
 
         void ApplyEnvironment()
@@ -135,5 +159,8 @@ namespace ProjectLink.Core
             _baseUrl = environment == AppEnvironment.Prod ? AppConfig.ProdGameServerUrl : AppConfig.DevGameServerUrl;
             _authBaseUrl = environment == AppEnvironment.Prod ? AppConfig.ProdPlatformAuthUrl : AppConfig.DevPlatformAuthUrl;
         }
+
+        static string Clip(string s) =>
+            s.Length <= LogBodyMaxLength ? s : s[..LogBodyMaxLength] + $"…({s.Length})";
     }
 }

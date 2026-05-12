@@ -18,6 +18,7 @@ namespace ProjectLink.OutGame.UI
             _initialized = true;
 
             ResolveMissingReferences();
+            BindOverlayClose();
             BindClose(closeIconButton);
             BindClose(cancelButton);
             BindConfirm(confirmButton);

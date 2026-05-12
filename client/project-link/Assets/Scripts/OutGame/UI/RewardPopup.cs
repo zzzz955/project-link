@@ -26,6 +26,7 @@ namespace ProjectLink.OutGame.UI
             _rewardToken = rewardToken;
 
             ResolveMissingReferences();
+            BindOverlayClose();
             BindClose(closeButton);
             if (claimButton != null)
                 claimButton.onClick.AddListener(() => Claim(1));

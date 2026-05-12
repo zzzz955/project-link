@@ -4,7 +4,7 @@
 | file | class | role |
 |---|---|---|
 | `LocalizedText.cs` | `LocalizedText` | MonoBehaviour; auto-refreshes TMP text on LanguageChanged |
-| `LanguageSelector.cs` | `LanguageSelector` | TMP_Dropdown wired to LocalizationManager |
+| `LanguageSelector.cs` | `LanguageSelector` | TMP_Dropdown wired to LocalizationManager; builds dropdown template programmatically in Awake if not assigned |
 | `RuntimeNavigationButtons.cs` | `RuntimeNavigationButtons` | Scene navigation + popup trigger entry points |
 | `BootstrapWireframeController.cs` | `BootstrapWireframeController` | Bootstrap generated UI refs; renders `BootstrapViewModel` loading/version/force-update state |
 | `TitleWireframeController.cs` | `TitleWireframeController` | Title generated UI refs; renders `TitleViewModel` auth/version/maintenance state |
@@ -50,7 +50,7 @@
 | `SceneEscapeHandler.action` | field | `[SerializeField]` EscapeAction enum |
 | `ReturnTitlePopup.Init()` | method | binds close/cancel/confirm hotspots |
 | `ExitGamePopup.Init(RuntimeNavigationButtons)` | method | binds close/cancel/confirm hotspots |
-| `SettingPopup.Init()` | method | binds close/save hotspots |
+| `SettingPopup.Init()` | method | binds close/save hotspots; adds LanguageSelector to TMP_Dropdown child at runtime if missing |
 | `BuyItemPopup.Init()` | method | binds close/buy hotspots |
 | `EnergyPopup.Init()` | method | binds close/watch/refill hotspots |
 | `DailyChallengePopup.Init()` | method | fetches DailyChallengeResponse and renders streak/reward/play refs |

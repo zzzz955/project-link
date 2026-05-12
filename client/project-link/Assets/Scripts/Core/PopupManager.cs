@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 namespace ProjectLink.Core
 {
@@ -36,6 +37,18 @@ namespace ProjectLink.Core
     public abstract class PopupBase : MonoBehaviour
     {
         public virtual void OnBackPressed() => PopupManager.Instance.CloseTop();
+
+        protected void BindOverlayClose()
+        {
+            foreach (var button in GetComponentsInChildren<Button>(true))
+            {
+                if (button.name == "Overlay")
+                {
+                    button.onClick.AddListener(() => PopupManager.Instance?.CloseTop());
+                    return;
+                }
+            }
+        }
     }
 
     public class PopupManager : MonoBehaviour

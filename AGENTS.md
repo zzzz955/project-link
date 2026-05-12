@@ -52,19 +52,6 @@ This convention is enforced by AI agents; violations should be fixed before comm
 - Use `Layer.ClassName` notation; omit method unless needed for disambiguation
 - Place between `## Symbols` and `## Rules` in leaf files
 
-**Cross-repository refs**:
-- Project Link consumes platform-owned features through public contracts, OpenAPI operations, JWKS/OIDC metadata, and platform architecture docs.
-- Platform implementation internals are not game contracts.
-- For platform auth, read `docs/refs/platform-auth.md` first, then `platform:docs/refs/auth.md`.
-- Use `repo:path`, `repo:SymbolName`, and `service:METHOD /route` notation.
-- Game docs list `Depends on:` platform refs; platform docs list `Consumed by:` game refs.
-- Do not copy platform security rules into gameplay docs unless the local behavior depends on them; link the platform source of truth instead.
-
-## Agent Context Convention
-- `AGENTS.md` is the single source of truth for AI agent instructions
-- Edit only `AGENTS.md`; never edit `CLAUDE.md` directly
-- `CLAUDE.md` must remain a Claude Code compatibility wrapper: contents = `@AGENTS.md`
-
 ## New System Checklist
 When adding a cross-cutting system (touches ≥2 of: data / server / client):
 1. `shared/datas/[domain]/` — define CSV schema → update AGENTS.md Cross-refs (Gen output + Consumed by)
@@ -81,6 +68,18 @@ FILE (contracts): `[Domain]Requests.cs`          e.g. `StageRequests.cs`
 FILE (contracts): `[Domain]Responses.cs`         e.g. `StageResponses.cs`
 FILE (db):        `schema.json` (single file)
 FILE (gen):       auto-named from source filename
+
+## Search
+Check already-loaded AGENTS.md context first (free). Use `rg` only when the answer is absent or may be stale.
+
+| goal | first check | fallback |
+|------|-------------|---------|
+| file location / symbol | loaded `## Files` / `## Symbols` | `rg "ClassName" --type cs -l` |
+| all implementors / usages | loaded context | `rg "IInterface" --type cs -l` |
+| role / ownership / design | loaded `## Nav` / `## Rules` | read that dir's `AGENTS.md` |
+| scope to one service | — | `rg "pattern" services/auth -l` |
+
+Rule: pass `-l` when only file paths are needed; omit only when line context is required.
 
 ## Output
 - No narration before tool calls - execute immediately, no "Let me read X" preamble

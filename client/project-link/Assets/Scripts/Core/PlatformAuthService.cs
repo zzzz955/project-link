@@ -19,18 +19,22 @@ namespace ProjectLink.Core
         readonly string _clientVersion;
         readonly string _protocolVersion;
         readonly string _clientId;
+        readonly ITokenStorage _storage;
+        readonly bool _httpLogging;
 
         string _accessToken;
         string _refreshToken;
         DateTimeOffset _accessExpiresAt;
         string _provider;
 
-        public PlatformAuthService(MonoBehaviour runner, string baseUrl, string clientVersion, string protocolVersion)
+        public PlatformAuthService(MonoBehaviour runner, string baseUrl, string clientVersion, string protocolVersion, AppEnvironment env = AppEnvironment.Dev, bool httpLogging = true)
         {
             _runner = runner;
             _baseUrl = string.IsNullOrEmpty(baseUrl) ? AppConfig.DevPlatformAuthUrl : baseUrl.TrimEnd('/');
             _clientVersion = clientVersion ?? "";
             _protocolVersion = protocolVersion ?? "";
+            _storage = env == AppEnvironment.Prod ? (ITokenStorage)new SecureTokenStorage() : new PlayerPrefsTokenStorage();
+            _httpLogging = httpLogging;
             _clientId = LoadOrCreateClientId();
             LoadSession();
         }
@@ -130,8 +134,8 @@ namespace ProjectLink.Core
         public void SetToken(string token)
         {
             _accessToken = token ?? "";
-            PlayerPrefs.SetString(AccessTokenKey, _accessToken);
-            PlayerPrefs.Save();
+            _storage.Set(AccessTokenKey, _accessToken);
+            _storage.Save();
         }
 
         public void ClearToken()
@@ -140,11 +144,11 @@ namespace ProjectLink.Core
             _refreshToken = "";
             _accessExpiresAt = default;
             _provider = "";
-            PlayerPrefs.DeleteKey(AccessTokenKey);
-            PlayerPrefs.DeleteKey(RefreshTokenKey);
-            PlayerPrefs.DeleteKey(AccessExpiresAtKey);
-            PlayerPrefs.DeleteKey(ProviderKey);
-            PlayerPrefs.Save();
+            _storage.Delete(AccessTokenKey);
+            _storage.Delete(RefreshTokenKey);
+            _storage.Delete(AccessExpiresAtKey);
+            _storage.Delete(ProviderKey);
+            _storage.Save();
             UiEventBus.Publish(new AuthStateChanged(false, ""));
         }
 
@@ -161,11 +165,11 @@ namespace ProjectLink.Core
             _accessExpiresAt = ParseTime(session.Tokens.AccessTokenExpiresAt);
             _provider = provider ?? "";
 
-            PlayerPrefs.SetString(AccessTokenKey, _accessToken);
-            PlayerPrefs.SetString(RefreshTokenKey, _refreshToken);
-            PlayerPrefs.SetString(AccessExpiresAtKey, _accessExpiresAt.ToString("O"));
-            PlayerPrefs.SetString(ProviderKey, _provider);
-            PlayerPrefs.Save();
+            _storage.Set(AccessTokenKey, _accessToken);
+            _storage.Set(RefreshTokenKey, _refreshToken);
+            _storage.Set(AccessExpiresAtKey, _accessExpiresAt.ToString("O"));
+            _storage.Set(ProviderKey, _provider);
+            _storage.Save();
             UiEventBus.Publish(new AuthStateChanged(!string.IsNullOrEmpty(_accessToken), _provider));
             onComplete?.Invoke(true, "");
         }
@@ -183,7 +187,8 @@ namespace ProjectLink.Core
 
         IEnumerator SendRoutine<TRequest, TResponse>(string endpoint, TRequest body, Action<bool, string, TResponse> onComplete)
         {
-            using var req = new UnityWebRequest($"{_baseUrl}/{endpoint.TrimStart('/')}", "POST");
+            var url = $"{_baseUrl}/{endpoint.TrimStart('/')}";
+            using var req = new UnityWebRequest(url, "POST");
             var payload = JsonConvert.SerializeObject(body);
             req.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(payload));
             req.downloadHandler = new DownloadHandlerBuffer();
@@ -196,6 +201,12 @@ namespace ProjectLink.Core
             string response = req.downloadHandler?.text ?? "";
             if (req.result == UnityWebRequest.Result.Success)
             {
+                if (_httpLogging)
+                {
+                    var sb = $"[AUTH] POST {url} → {req.responseCode}\nreq: {Clip(payload)}";
+                    if (!string.IsNullOrEmpty(response)) sb += $"\nres: {Clip(response)}";
+                    Debug.Log(sb);
+                }
                 if (req.responseCode == 204 || string.IsNullOrWhiteSpace(response))
                 {
                     onComplete?.Invoke(true, "", default);
@@ -213,15 +224,29 @@ namespace ProjectLink.Core
                 yield break;
             }
 
-            onComplete?.Invoke(false, ParseError(response, req.responseCode), default);
+            var errorCode = ParseError(response, req.responseCode);
+            var status = req.responseCode > 0 ? req.responseCode.ToString() : req.result.ToString();
+            if (_httpLogging)
+            {
+                var sb = $"[AUTH] POST {url} → {status} [{errorCode}]\nreq: {Clip(payload)}";
+                if (!string.IsNullOrEmpty(response)) sb += $"\nerr: {Clip(response)}";
+                if (req.responseCode >= 500 || req.responseCode == 0)
+                    Debug.LogError(sb);
+                else
+                    Debug.LogWarning(sb);
+            }
+            onComplete?.Invoke(false, errorCode, default);
         }
+
+        static string Clip(string s, int max = 300) =>
+            s.Length <= max ? s : s[..max] + $"…({s.Length})";
 
         void LoadSession()
         {
-            _accessToken = PlayerPrefs.GetString(AccessTokenKey, "");
-            _refreshToken = PlayerPrefs.GetString(RefreshTokenKey, "");
-            _provider = PlayerPrefs.GetString(ProviderKey, "");
-            _accessExpiresAt = ParseTime(PlayerPrefs.GetString(AccessExpiresAtKey, ""));
+            _accessToken = _storage.Get(AccessTokenKey);
+            _refreshToken = _storage.Get(RefreshTokenKey);
+            _provider = _storage.Get(ProviderKey);
+            _accessExpiresAt = ParseTime(_storage.Get(AccessExpiresAtKey));
         }
 
         bool HasUsableAccessToken()
@@ -230,14 +255,14 @@ namespace ProjectLink.Core
                 && (_accessExpiresAt == default || _accessExpiresAt > DateTimeOffset.UtcNow.AddMinutes(1));
         }
 
-        static string LoadOrCreateClientId()
+        string LoadOrCreateClientId()
         {
-            var id = PlayerPrefs.GetString(ClientIdKey, "");
+            var id = _storage.Get(ClientIdKey);
             if (!string.IsNullOrEmpty(id)) return id;
 
             id = $"project-link:{Guid.NewGuid():N}";
-            PlayerPrefs.SetString(ClientIdKey, id);
-            PlayerPrefs.Save();
+            _storage.Set(ClientIdKey, id);
+            _storage.Save();
             return id;
         }
 

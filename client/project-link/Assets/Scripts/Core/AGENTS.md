@@ -16,7 +16,10 @@
 | `HapticManager.cs` | `HapticManager` | Platform haptic feedback (static helpers) |
 | `AppEnvironment.cs` | `AppEnvironment`, `AppConfig` | Env enum (Dev/Prod) + game/auth URL constants |
 | `IAuthService.cs` | `IAuthService` | Auth abstraction: guest/social login, refresh, logout, token persistence |
-| `PlatformAuthService.cs` | `PlatformAuthService` | Real platform auth HTTP adapter for guest/google/refresh/logout + PlayerPrefs token storage |
+| `ITokenStorage.cs` | `ITokenStorage` | Token persistence abstraction; Dev=PlayerPrefs, Prod=AES-encrypted PlayerPrefs |
+| `PlayerPrefsTokenStorage.cs` | `PlayerPrefsTokenStorage` | Dev token storage backed by PlayerPrefs |
+| `SecureTokenStorage.cs` | `SecureTokenStorage` | Prod token storage: AES-encrypted PlayerPrefs using device ID as key |
+| `PlatformAuthService.cs` | `PlatformAuthService` | Real platform auth HTTP adapter for guest/google/refresh/logout; uses ITokenStorage |
 | `UiEventBus.cs` | `UiEventBus` | Typed event bus for UI busy/error/viewmodel/auth events |
 | `ToastPresenter.cs` | `ToastPresenter` | Global top-stack toast renderer subscribed to `UiErrorRaised` |
 | `NetworkManager.cs` | `NetworkManager` | HTTP GET/POST/PATCH coroutines with client/protocol/auth headers; delegates auth to IAuthService; clears token on 401 |
@@ -39,6 +42,7 @@
 | `PopupManager.Request(PopupId,object)` | method | static event-driven popup request entry point |
 | `PopupManager.Open<T>()` | method | code-instantiates legacy popup T on Popup layer, pushes stack |
 | `PopupManager.CloseTop()` | method | destroys top popup, re-shows previous |
+| `PopupBase.BindOverlayClose()` | method | binds the first child Button named "Overlay" to CloseTop; call from each prefab popup Init() |
 | `AppEnvironment` | enum | `Dev` / `Prod` |
 | `AppConfig.DevGameServerUrl` | const | `http://localhost:20101` |
 | `AppConfig.DevPlatformAuthUrl` | const | `http://localhost:20001` |
@@ -49,6 +53,8 @@
 | `IAuthService.Logout(Action<bool,string>)` | method | revokes local platform refresh session |
 | `PlatformAuthService.HasStoredSession` | prop | true when a platform refresh token is stored locally |
 | `PlatformAuthService.Provider` | prop | last successful provider (`guest`, `google`, or refresh fallback) |
+| `SecureTokenStorage` | class | AES-256 encrypts values before writing to PlayerPrefs; key = SHA-256(deviceUniqueIdentifier + ":project-link") |
+| `PlatformAuthService.httpLogging` | field | ctor param `bool httpLogging`; toggles `[AUTH]` console logs for platform-auth requests; Info=2xx, Warn=4xx, Error=5xx/connection |
 | `UiEventBus.Publish<T>(T)` | method | publishes typed UI/auth events to scene controllers |
 | `UiBusyChanged` | struct | event payload for async API/loading state |
 | `UiErrorRaised` | struct | event payload for localized toast/popup error rendering |
@@ -63,6 +69,7 @@
 | `NetworkManager.Get(string,Action<bool,string>)` | method | sends GET with required version/protocol/auth headers |
 | `NetworkManager.Post(string,string,Action<bool,string>)` | method | sends JSON POST with required version/protocol/auth headers |
 | `NetworkManager.Patch(string,string,Action<bool,string>)` | method | sends JSON PATCH with required version/protocol/auth headers |
+| `NetworkManager.httpLogging` | field | `[SerializeField] bool`; toggles `[HTTP]` console logs for game-server requests; Info=2xx, Warn=4xx, Error=5xx/connection |
 | `LocalizationManager.Get(string)` | method | static stringId -> localized string (EN fallback) |
 | `LocalizationManager.GetError(string)` | method | static errorCode -> localized error message (EN fallback) |
 | `LocalizationManager.SetLanguage(LanguageCode)` | method | persists + fires LanguageChanged |

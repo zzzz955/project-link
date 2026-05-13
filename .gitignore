@@ -41,3 +41,4 @@ Thumbs.db
 .idea/
 *.suo
 *.user
+client/project-link/.claude/settings.local.json

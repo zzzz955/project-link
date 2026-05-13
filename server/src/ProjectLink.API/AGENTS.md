@@ -9,7 +9,7 @@
 | `ProjectLinkConfiguration.cs` | Strict env/config loader for deploy/runtime values |
 | `MockAuthenticationHandler.cs` | Development/mock auth scheme for local guest tokens |
 | `ShortSourceContextEnricher.cs` | Serilog enricher that shortens SourceContext values to class names |
-| `appsettings.Development.json` | Development Serilog level overrides (EF Core DB commands at Debug) |
+| `appsettings.Development.json` | Development Serilog level overrides (inherits env log level and adjusts EF Core DB command verbosity) |
 | `appsettings.Production.json` | Production Serilog level and WARN+ file sink settings |
 
 ## Symbols

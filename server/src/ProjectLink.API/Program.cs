@@ -37,7 +37,11 @@ var config    = builder.Configuration;
 var appConfig = ProjectLinkConfiguration.Load(config);
 
 if (Enum.TryParse<LogEventLevel>(appConfig.LogLevel, ignoreCase: true, out var minLevel))
+{
     config["Serilog:MinimumLevel:Default"] = minLevel.ToString();
+    config["Serilog:MinimumLevel:Override:Microsoft.EntityFrameworkCore.Database.Command"] =
+        minLevel <= LogEventLevel.Debug ? "Information" : "Warning";
+}
 
 builder.Host.UseSerilog((context, services, loggerConfiguration) => loggerConfiguration
     .ReadFrom.Configuration(context.Configuration)

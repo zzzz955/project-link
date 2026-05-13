@@ -2,72 +2,72 @@ stringId,EN,KO,ZH_CN,ZH_TW,TH
 C,C,C,C,C,C
 string(64),string(512),string(512),string(512),string(512),string(512)
 PK,NN,NN,NN,NN,NN
-common.retry,Retry,Retry,Retry,Retry,Retry
-common.confirm,Confirm,Confirm,Confirm,Confirm,Confirm
-common.cancel,Cancel,Cancel,Cancel,Cancel,Cancel
-common.save,Save,Save,Save,Save,Save
-common.play,Play,Play,Play,Play,Play
-common.complete,Complete,Complete,Complete,Complete,Complete
-common.claim,Claim,Claim,Claim,Claim,Claim
-common.lobby,Lobby,Lobby,Lobby,Lobby,Lobby
-common.next,Next,Next,Next,Next,Next
-common.resume,Resume,Resume,Resume,Resume,Resume
-bootstrap.loading,Loading...,Loading...,Loading...,Loading...,Loading...
-bootstrap.ready,Ready,Ready,Ready,Ready,Ready
-bootstrap.network_error,Network error. Please try again.,Network error. Please try again.,Network error. Please try again.,Network error. Please try again.,Network error. Please try again.
-title.tap_to_start,TAP TO START,TAP TO START,TAP TO START,TAP TO START,TAP TO START
-title.continue_google,Continue with Google,Continue with Google,Continue with Google,Continue with Google,Continue with Google
-title.continue_apple,Continue with Apple,Continue with Apple,Continue with Apple,Continue with Apple,Continue with Apple
-hud.settings,Settings,Settings,Settings,Settings,Settings
-hud.language,Language,Language,Language,Language,Language
-status.energy_empty,Energy 0,Energy 0,Energy 0,Energy 0,Energy 0
-tab.shop,Shop,Shop,Shop,Shop,Shop
-tab.home,Home,Home,Home,Home,Home
-tab.ranking,Ranking,Ranking,Ranking,Ranking,Ranking
-home.stage_play,Play Stage,Play Stage,Play Stage,Play Stage,Play Stage
-home.daily_title,Daily Challenge,Daily Challenge,Daily Challenge,Daily Challenge,Daily Challenge
-home.daily_streak_fmt,Daily streak,Daily streak,Daily streak,Daily streak,Daily streak
-shop.balance_label,Balance,Balance,Balance,Balance,Balance
-shop.section_stamina,Stamina,Stamina,Stamina,Stamina,Stamina
-rank.tab_clear,Stages Cleared,Stages Cleared,Stages Cleared,Stages Cleared,Stages Cleared
-rank.tab_score,Total Score,Total Score,Total Score,Total Score,Total Score
-rank.you,You,You,You,You,You
-popup.force_update.title,Update Required,Update Required,Update Required,Update Required,Update Required
-popup.force_update.body,A new version is required to continue.,A new version is required to continue.,A new version is required to continue.,A new version is required to continue.,A new version is required to continue.
-popup.force_update.cta,Update Now,Update Now,Update Now,Update Now,Update Now
-popup.maintenance.title,Maintenance,Maintenance,Maintenance,Maintenance,Maintenance
-popup.maintenance.body,The service is currently under maintenance.,The service is currently under maintenance.,The service is currently under maintenance.,The service is currently under maintenance.,The service is currently under maintenance.
-popup.auth_internal_error.body,Authentication service is temporarily unavailable. Please try again.,Authentication service is temporarily unavailable. Please try again.,Authentication service is temporarily unavailable. Please try again.,Authentication service is temporarily unavailable. Please try again.,Authentication service is temporarily unavailable. Please try again.
-popup.session.title,Session Expired,Session Expired,Session Expired,Session Expired,Session Expired
-popup.session.body,Please return to the title screen and sign in again.,Please return to the title screen and sign in again.,Please return to the title screen and sign in again.,Please return to the title screen and sign in again.,Please return to the title screen and sign in again.
-popup.settings.title,Settings,Settings,Settings,Settings,Settings
-popup.settings.bgm,BGM,BGM,BGM,BGM,BGM
-popup.settings.sfx,SFX,SFX,SFX,SFX,SFX
-popup.settings.haptics,Haptics,Haptics,Haptics,Haptics,Haptics
-popup.settings.notif,Notifications,Notifications,Notifications,Notifications,Notifications
-popup.energy.title,Energy,Energy,Energy,Energy,Energy
-popup.energy.full_in_fmt,Full recharge soon,Full recharge soon,Full recharge soon,Full recharge soon,Full recharge soon
-popup.energy.watch_ad_fmt,Watch Ad,Watch Ad,Watch Ad,Watch Ad,Watch Ad
-popup.energy.refill_fmt,Refill,Refill,Refill,Refill,Refill
-popup.stage.title_fmt,Stage Detail,Stage Detail,Stage Detail,Stage Detail,Stage Detail
-popup.stage.best_fmt,Best Score,Best Score,Best Score,Best Score,Best Score
-popup.stage.my_rank_fmt,My Rank,My Rank,My Rank,My Rank,My Rank
-popup.daily.title,Daily Challenge,Daily Challenge,Daily Challenge,Daily Challenge,Daily Challenge
-popup.daily.today_fmt,Today's progress,Today's progress,Today's progress,Today's progress,Today's progress
-popup.daily.reward_fmt,Reward,Reward,Reward,Reward,Reward
-popup.reward.title,Reward,Reward,Reward,Reward,Reward
-popup.reward.x2,Claim x2,Claim x2,Claim x2,Claim x2,Claim x2
-popup.account.title,Account,Account,Account,Account,Account
-popup.account.joined_fmt,Joined,Joined,Joined,Joined,Joined
-popup.clear.title,Stage Clear,Stage Clear,Stage Clear,Stage Clear,Stage Clear
-popup.clear.retry,Retry,Retry,Retry,Retry,Retry
-popup.pause.title,Paused,Paused,Paused,Paused,Paused
-popup.pause.retry,Retry,Retry,Retry,Retry,Retry
-popup.timeout.title,Time's Up,Time's Up,Time's Up,Time's Up,Time's Up
-popup.return_title.title,Return to Title,Return to Title,Return to Title,Return to Title,Return to Title
-popup.return_title.body,Go back to the title screen?,Go back to the title screen?,Go back to the title screen?,Go back to the title screen?,Go back to the title screen?
-popup.exit_game.title,Exit Game,Exit Game,Exit Game,Exit Game,Exit Game
-popup.exit_game.body,Close Project Link?,Close Project Link?,Close Project Link?,Close Project Link?,Close Project Link?
+common.retry,Retry,다시 시도,重试,重試,ลองใหม่
+common.confirm,Confirm,확인,确认,確認,ยืนยัน
+common.cancel,Cancel,취소,取消,取消,ยกเลิก
+common.save,Save,저장,保存,儲存,บันทึก
+common.play,Play,플레이,开始,開始,เล่น
+common.complete,Complete,완료,完成,完成,เสร็จสิ้น
+common.claim,Claim,받기,领取,領取,รับ
+common.lobby,Lobby,로비,大厅,大廳,ล็อบบี้
+common.next,Next,다음,下一步,下一步,ถัดไป
+common.resume,Resume,계속,继续,繼續,เล่นต่อ
+bootstrap.loading,Loading...,로딩 중...,加载中...,載入中...,กำลังโหลด...
+bootstrap.ready,Ready,준비 완료,准备就绪,準備就緒,พร้อม
+bootstrap.network_error,Network error. Please try again.,네트워크 오류입니다. 다시 시도해 주세요.,网络错误。请重试。,網路錯誤。請重試。,เกิดข้อผิดพลาดของเครือข่าย โปรดลองอีกครั้ง
+title.tap_to_start,TAP TO START,탭해서 시작,点击开始,點擊開始,แตะเพื่อเริ่ม
+title.continue_google,Continue with Google,Google로 계속하기,使用 Google 继续,使用 Google 繼續,ดำเนินการต่อด้วย Google
+title.continue_apple,Continue with Apple,Apple로 계속하기,使用 Apple 继续,使用 Apple 繼續,ดำเนินการต่อด้วย Apple
+hud.settings,Settings,설정,设置,設定,การตั้งค่า
+hud.language,Language,언어,语言,語言,ภาษา
+status.energy_empty,Energy 0,에너지 0,能量 0,能量 0,พลังงาน 0
+tab.shop,Shop,상점,商店,商店,ร้านค้า
+tab.home,Home,홈,主页,首頁,หน้าแรก
+tab.ranking,Ranking,랭킹,排行榜,排行榜,อันดับ
+home.stage_play,Play Stage,스테이지 플레이,开始关卡,開始關卡,เล่นด่าน
+home.daily_title,Daily Challenge,일일 챌린지,每日挑战,每日挑戰,ชาเลนจ์รายวัน
+home.daily_streak_fmt,Daily streak,일일 연속 기록,每日连续记录,每日連續紀錄,สถิติรายวันต่อเนื่อง
+shop.balance_label,Balance,보유량,余额,餘額,ยอดคงเหลือ
+shop.section_stamina,Stamina,스태미나,体力,體力,สตามินา
+rank.tab_clear,Stages Cleared,클리어한 스테이지,已通关关卡,已通關關卡,ด่านที่ผ่านแล้ว
+rank.tab_score,Total Score,총점,总分,總分,คะแนนรวม
+rank.you,You,나,你,你,คุณ
+popup.force_update.title,Update Required,업데이트 필요,需要更新,需要更新,จำเป็นต้องอัปเดต
+popup.force_update.body,A new version is required to continue.,계속하려면 새 버전이 필요합니다.,需要新版本才能继续。,需要新版本才能繼續。,ต้องใช้เวอร์ชันใหม่เพื่อดำเนินการต่อ
+popup.force_update.cta,Update Now,지금 업데이트,立即更新,立即更新,อัปเดตตอนนี้
+popup.maintenance.title,Maintenance,점검 중,维护中,維護中,ปิดปรับปรุง
+popup.maintenance.body,The service is currently under maintenance.,현재 서비스 점검 중입니다.,服务当前正在维护。,服務目前正在維護。,ขณะนี้บริการอยู่ระหว่างการปิดปรับปรุง
+popup.auth_internal_error.body,Authentication service is temporarily unavailable. Please try again.,인증 서비스를 일시적으로 사용할 수 없습니다. 다시 시도해 주세요.,认证服务暂时不可用。请重试。,驗證服務暫時無法使用。請重試。,บริการยืนยันตัวตนไม่พร้อมใช้งานชั่วคราว โปรดลองอีกครั้ง
+popup.session.title,Session Expired,세션 만료,会话已过期,工作階段已過期,เซสชันหมดอายุ
+popup.session.body,Please return to the title screen and sign in again.,타이틀 화면으로 돌아가 다시 로그인해 주세요.,请返回标题画面并重新登录。,請返回標題畫面並重新登入。,กรุณากลับไปที่หน้าแรกแล้วลงชื่อเข้าใช้อีกครั้ง
+popup.settings.title,Settings,설정,设置,設定,การตั้งค่า
+popup.settings.bgm,BGM,배경음악,背景音乐,背景音樂,เพลงพื้นหลัง
+popup.settings.sfx,SFX,효과음,音效,音效,เอฟเฟกต์เสียง
+popup.settings.haptics,Haptics,햅틱,触觉反馈,觸覺回饋,การสั่นตอบสนอง
+popup.settings.notif,Notifications,알림,通知,通知,การแจ้งเตือน
+popup.energy.title,Energy,에너지,能量,能量,พลังงาน
+popup.energy.full_in_fmt,Full recharge soon,곧 완전히 충전됩니다,即将充满,即將充滿,จะชาร์จเต็มเร็วๆ นี้
+popup.energy.watch_ad_fmt,Watch Ad,광고 보기,观看广告,觀看廣告,ดูโฆษณา
+popup.energy.refill_fmt,Refill,충전,补充,補充,เติม
+popup.stage.title_fmt,Stage Detail,스테이지 상세,关卡详情,關卡詳情,รายละเอียดด่าน
+popup.stage.best_fmt,Best Score,최고 점수,最高分,最高分,คะแนนสูงสุด
+popup.stage.my_rank_fmt,My Rank,내 순위,我的排名,我的排名,อันดับของฉัน
+popup.daily.title,Daily Challenge,일일 챌린지,每日挑战,每日挑戰,ชาเลนจ์รายวัน
+popup.daily.today_fmt,Today's progress,오늘의 진행도,今日进度,今日進度,ความคืบหน้าวันนี้
+popup.daily.reward_fmt,Reward,보상,奖励,獎勵,รางวัล
+popup.reward.title,Reward,보상,奖励,獎勵,รางวัล
+popup.reward.x2,Claim x2,2배로 받기,领取 x2,領取 x2,รับ x2
+popup.account.title,Account,계정,账号,帳號,บัญชี
+popup.account.joined_fmt,Joined,가입일,加入时间,加入時間,เข้าร่วมเมื่อ
+popup.clear.title,Stage Clear,스테이지 클리어,关卡完成,關卡完成,ผ่านด่านแล้ว
+popup.clear.retry,Retry,다시하기,重试,重試,ลองใหม่
+popup.pause.title,Paused,일시정지,暂停,暫停,หยุดชั่วคราว
+popup.pause.retry,Retry,다시하기,重试,重試,ลองใหม่
+popup.timeout.title,Time's Up,시간 초과,时间到,時間到,หมดเวลา
+popup.return_title.title,Return to Title,타이틀로 돌아가기,返回标题,返回標題,กลับหน้าแรก
+popup.return_title.body,Go back to the title screen?,타이틀 화면으로 돌아갈까요?,返回标题画面?,返回標題畫面?,กลับไปหน้าแรก?
+popup.exit_game.title,Exit Game,게임 종료,退出游戏,結束遊戲,ออกจากเกม
+popup.exit_game.body,Close Project Link?,Project Link를 닫을까요?,关闭 Project Link?,關閉 Project Link?,ปิด Project Link?
 app_title,PROJECT LINK,프로젝트 링크,项目连接,專案連線,โปรเจกต์ลิงก์
 bootstrap_syncing_puzzle_data,SYNCING PUZZLE DATA,퍼즐 데이터 동기화 중,正在同步拼图数据,正在同步拼圖資料,กำลังซิงก์ข้อมูลปริศนา
 status_data,DATA,데이터,数据,資料,ข้อมูล
@@ -119,34 +119,34 @@ country_kr,KR,KR,KR,KR,KR
 country_cn,CN,CN,CN,CN,CN
 country_tw,TW,TW,TW,TW,TW
 country_th,TH,TH,TH,TH,TH
-ui_color,Color,Color,Color,Color,Color
-ui_paths,Paths,Paths,Paths,Paths,Paths
-ui_start,Start,Start,Start,Start,Start
-ui_play,Play,Play,Play,Play,Play
-ui_buy,Buy,Buy,Buy,Buy,Buy
-ui_close,Close,Close,Close,Close,Close
-ui_save,Save,Save,Save,Save,Save
-bootstrap_loading,Loading...,Loading...,Loading...,Loading...,Loading...
-settings_bgm,BGM,BGM,BGM,BGM,BGM
-settings_sfx,SFX,SFX,SFX,SFX,SFX
-settings_haptics,Haptics,Haptics,Haptics,Haptics,Haptics
-settings_notifications,Notifications,Notifications,Notifications,Notifications,Notifications
-settings_language,Language,Language,Language,Language,Language
-settings_account,Account,Account,Account,Account,Account
-settings_not_linked,Not linked,Not linked,Not linked,Not linked,Not linked
-settings_link,Link,Link,Link,Link,Link
-popup_buy_item_title,Buy Item,Buy Item,Buy Item,Buy Item,Buy Item
-popup_buy_item_hint_desc,Reveal a path when stuck!,Reveal a path when stuck!,Reveal a path when stuck!,Reveal a path when stuck!,Reveal a path when stuck!
-popup_refill,Refill,Refill,Refill,Refill,Refill
-popup_energy_empty,You're out of energy! Refill to keep playing.,You're out of energy! Refill to keep playing.,You're out of energy! Refill to keep playing.,You're out of energy! Refill to keep playing.,You're out of energy! Refill to keep playing.
-popup_watch_ad,Watch Ad,Watch Ad,Watch Ad,Watch Ad,Watch Ad
-lobby_daily_challenge,Daily Challenge,Daily Challenge,Daily Challenge,Daily Challenge,Daily Challenge
-lobby_color_cup,Color Cup,Color Cup,Color Cup,Color Cup,Color Cup
-lobby_current_stage,Current Stage,Current Stage,Current Stage,Current Stage,Current Stage
-nav_ranking,Ranking,Ranking,Ranking,Ranking,Ranking
-game_level,Level,Level,Level,Level,Level
-game_hint,Hint,Hint,Hint,Hint,Hint
-game_undo,Undo,Undo,Undo,Undo,Undo
-item_paint,Paint,Paint,Paint,Paint,Paint
-item_shuffle,Shuffle,Shuffle,Shuffle,Shuffle,Shuffle
-item_hammer,Hammer,Hammer,Hammer,Hammer,Hammer
+ui_color,Color,색상,颜色,顏色,สี
+ui_paths,Paths,경로,路径,路徑,เส้นทาง
+ui_start,Start,시작,开始,開始,เริ่ม
+ui_play,Play,플레이,开始,開始,เล่น
+ui_buy,Buy,구매,购买,購買,ซื้อ
+ui_close,Close,닫기,关闭,關閉,ปิด
+ui_save,Save,저장,保存,儲存,บันทึก
+bootstrap_loading,Loading...,로딩 중...,加载中...,載入中...,กำลังโหลด...
+settings_bgm,BGM,배경음악,背景音乐,背景音樂,เพลงพื้นหลัง
+settings_sfx,SFX,효과음,音效,音效,เอฟเฟกต์เสียง
+settings_haptics,Haptics,햅틱,触觉反馈,觸覺回饋,การสั่นตอบสนอง
+settings_notifications,Notifications,알림,通知,通知,การแจ้งเตือน
+settings_language,Language,언어,语言,語言,ภาษา
+settings_account,Account,계정,账号,帳號,บัญชี
+settings_not_linked,Not linked,연동되지 않음,未绑定,未連結,ยังไม่ได้เชื่อมต่อ
+settings_link,Link,연동,绑定,連結,เชื่อมต่อ
+popup_buy_item_title,Buy Item,아이템 구매,购买道具,購買道具,ซื้อไอเทม
+popup_buy_item_hint_desc,Reveal a path when stuck!,막혔을 때 경로를 보여줍니다!,卡住时显示路径！,卡住時顯示路徑！,แสดงเส้นทางเมื่อคุณติดขัด!
+popup_refill,Refill,충전,补充,補充,เติม
+popup_energy_empty,You're out of energy! Refill to keep playing.,에너지가 부족합니다! 계속 플레이하려면 충전하세요.,能量不足！补充后继续游戏。,能量不足！補充後繼續遊戲。,พลังงานหมดแล้ว! เติมเพื่อเล่นต่อ
+popup_watch_ad,Watch Ad,광고 보기,观看广告,觀看廣告,ดูโฆษณา
+lobby_daily_challenge,Daily Challenge,일일 챌린지,每日挑战,每日挑戰,ชาเลนจ์รายวัน
+lobby_color_cup,Color Cup,컬러 컵,色彩杯,色彩盃,คัลเลอร์คัพ
+lobby_current_stage,Current Stage,현재 스테이지,当前关卡,目前關卡,ด่านปัจจุบัน
+nav_ranking,Ranking,랭킹,排行榜,排行榜,อันดับ
+game_level,Level,레벨,等级,等級,เลเวล
+game_hint,Hint,힌트,提示,提示,คำใบ้
+game_undo,Undo,되돌리기,撤销,復原,ย้อนกลับ
+item_paint,Paint,페인트,颜料,顏料,สีทา
+item_shuffle,Shuffle,셔플,洗牌,洗牌,สับเปลี่ยน
+item_hammer,Hammer,망치,锤子,錘子,ค้อน

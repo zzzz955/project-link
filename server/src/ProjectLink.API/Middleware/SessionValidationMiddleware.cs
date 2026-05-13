@@ -45,7 +45,7 @@ public class SessionValidationMiddleware
         }
 
         // Upsert user_profiles on every authenticated request (Redis-cached after first insert)
-        var displayName = ctx.User.FindFirstValue("name") ?? "";
+        var displayName = ctx.User.FindFirstValue("name") ?? "guest_" + userId;
         await userProfileService.EnsureProfileAsync(userId, displayName, ctx.RequestAborted);
 
         await _next(ctx);

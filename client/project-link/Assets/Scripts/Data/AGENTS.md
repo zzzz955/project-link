@@ -16,6 +16,7 @@
 | `StageData.NodeMap` | field | `int[,]`; decoded nodeMap; 0=empty, 1-20=groupId |
 | `StageData.CellMap` | field | `int[,]`; decoded cellMap; 0=empty, 1=obstacle, 2+=gimmick |
 | `StageData.NodeColors` | field | `Dictionary<int,Color>`; nodeGroupId to Unity Color |
+| `StageLoader.MaxStageId` | prop | max implemented stage id from `ingame_stage.csv` |
 | `StageLoader.Load(int)` | method | static; returns StageData or null (logs error if not found) |
 | `OutgameDataLoader.GetEnabledShopProducts(string)` | method | returns enabled shop products sorted by `sortOrder`, optional category filter |
 | `OutgameDataLoader.FindItem(int)` | method | resolves item display metadata from `ingame_item.csv` |
@@ -26,6 +27,8 @@
 - Gen output: `client/Assets/Resources/Data/` (runtime CSVs read by loaders via CsvLoader)
 - Consumed by: client `Core.InGameController` (calls StageLoader.Load at scene start)
 - Consumed by: client `Core.GameContext` (holds selected stageId used by StageLoader)
+- Consumed by: client `OutGame.UI.LobbyWireframeController` (catalog max stage for carousel bounds)
+- Consumed by: client `InGame.UI.ClearPopup` (catalog max stage for Next button)
 - Consumed by: client `Services.StaticCatalogService` (outgame UI catalog/config facade)
 - Depends on: `client/Assets/Scripts/Data/Generated/` classes
 

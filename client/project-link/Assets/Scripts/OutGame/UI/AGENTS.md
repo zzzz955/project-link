@@ -8,8 +8,8 @@
 | `RuntimeNavigationButtons.cs` | `RuntimeNavigationButtons` | Scene navigation + popup trigger entry points |
 | `BootstrapWireframeController.cs` | `BootstrapWireframeController` | Bootstrap generated UI refs; renders `BootstrapViewModel` loading/version/force-update state |
 | `TitleWireframeController.cs` | `TitleWireframeController` | Title generated UI refs; renders `TitleViewModel` auth/version/maintenance state |
-| `LobbyTabController.cs` | `LobbyTabController` | Lobby Shop/Home/Ranking tab switcher with Inspector-assignable refs |
-| `LobbyWireframeController.cs` | `LobbyWireframeController` | Binds generated lobby wireframe refs to `LobbyViewModel` state |
+| `LobbyTabController.cs` | `LobbyTabController` | Lobby Shop/Home/Ranking tab switcher with Inspector-assignable refs and selected-tab visual state |
+| `LobbyWireframeController.cs` | `LobbyWireframeController` | Binds generated lobby wireframe refs to `LobbyViewModel` state and server progress |
 | `SceneEscapeHandler.cs` | `SceneEscapeHandler` | Escape key EscapeAction (None/ReturnToTitle/ExitGame/OpenPauseMenu) |
 | `SafeAreaFitter.cs` | `SafeAreaFitter` | Adjusts RectTransform anchors to device safe area in Awake |
 | `ModernUI.cs` | `ModernUI` | Shared code-created glossy UI helper methods/colors |
@@ -46,8 +46,8 @@
 | `TitleWireframeController.Start()` | method | creates `TitleViewModel`, owns auth button listeners |
 | `TitleWireframeController.Render()` | method | renders auth loading state and opens ForceUpdate/Maintenance/Lobby after scene transition is idle |
 | `LobbyTabController.Configure(...)` | method | assigns tab buttons and tab panels from generated UI builder |
-| `LobbyWireframeController.RefreshRanking(string)` | method | requests ranking segment through `LobbyViewModel` |
-| `LobbyWireframeController.Render()` | method | renders Lobby/Shop/Ranking viewmodel state and localized errors |
+| `LobbyWireframeController.RefreshRanking(string)` | method | clears current ranking rows and requests selected ranking segment through `LobbyViewModel` |
+| `LobbyWireframeController.Render()` | method | renders Lobby/Shop/Ranking viewmodel state and localized errors; stage carousel initial selection comes from Lobby API, bounds from CSV catalog, play/stars from server progress |
 | `RepeatButton.Repeated` | event | fires after long-press delay at repeat interval while button remains pressed |
 | `ConfirmPopupBase.Build(...)` | method | legacy title/message/confirmLabel/accent/onConfirm builder |
 | `LobbyStageMapView.Build()` | method | instantiates/pools all stage node buttons |

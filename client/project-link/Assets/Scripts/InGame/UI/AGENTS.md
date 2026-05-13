@@ -7,6 +7,7 @@
 | `GameWireframeController.cs` | `GameWireframeController` | Game generated UI refs; Inspector-assignable shell buttons/labels |
 | `CircularGauge.cs` | `CircularGauge` | LineRenderer arc progress indicator (erase mode) |
 | `ClearPopup.cs` | `ClearPopup`, `StageClearPopupModel` | Prefab-compatible stage-clear overlay with server reward/progress fields |
+| `ClearNextStageConfirmPopup.cs` | `ClearNextStageConfirmPopup`, `ClearNextStageConfirmModel` | Confirm overlay for replaying an already-cleared next stage |
 | `PausePopup.cs` | `PausePopup` | Pause overlay: Resume/Retry/Lobby |
 | `TimeoutPopup.cs` | `TimeoutPopup` | Time-expired overlay: Retry/Lobby; no back-press dismiss |
 | `HapticManager.cs` | `HapticManager` | Thin shim forwarding calls to `Core.HapticManager` |
@@ -22,7 +23,8 @@
 | `CircularGauge.Show(Vector3,Color)` | method | positions at world pos, sets arc color, enables |
 | `CircularGauge.SetProgress(float)` | method | t in [0,1] draws arc (0=empty, 1=full circle) |
 | `CircularGauge.Hide()` | method | disables gauge |
-| `ClearPopup.Init(StageClearPopupModel)` | method | server-backed stage clear model; binds Next/Retry/Lobby buttons |
+| `ClearPopup.Init(StageClearPopupModel)` | method | server-backed stage clear model; binds Next/Retry/Lobby buttons; validates next-stage progress before replay navigation |
+| `ClearNextStageConfirmPopup.Init(ClearNextStageConfirmModel)` | method | confirm -> challenge next stage; cancel/back/overlay -> Lobby |
 | `PausePopup.Init(Action)` | method | onResume callback; back-press resumes; Retry/Lobby abandon current stage before navigation |
 | `TimeoutPopup.Init(int)` | method | stageId only; Retry/Lobby abandon current stage before navigation; OnBackPressed() is no-op |
 

@@ -108,6 +108,7 @@ namespace ProjectLink.EditorTools
                 "popup.return_title.title", "popup.return_title.body");
             BuildConfirmPopupPrefab<ExitGamePopup>("ExitGamePopup",
                 "popup.exit_game.title", "popup.exit_game.body");
+            BuildClearNextStageConfirmPopup();
 
             // Standard popups from popups.json
             BuildForceUpdatePopup();
@@ -540,11 +541,6 @@ namespace ProjectLink.EditorTools
             var carouselBg = carousel.gameObject.AddComponent<Image>();
             carouselBg.color = new Color(0, 0, 0, 0);
 
-            var prevBtn = MakeIconButton(carousel, "Btn_Prev", "btn_carousel_prev",
-                new Vector2(96, 96), new Vector2(16, 0), AnchorPreset.MiddleLeft);
-            var nextBtn = MakeIconButton(carousel, "Btn_Next", "btn_carousel_next",
-                new Vector2(96, 96), new Vector2(-16, 0), AnchorPreset.MiddleRight);
-
             // Group_Track (stage node area)
             var track = MakeChild(carousel, "Group_Track");
             SetAnchor(track, Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f));
@@ -570,6 +566,11 @@ namespace ProjectLink.EditorTools
             var starsTmp = starsLbl.gameObject.AddComponent<TextMeshProUGUI>();
             starsTmp.text = "0"; starsTmp.fontSize = 26; starsTmp.color = TextMuted;
             starsTmp.alignment = TextAlignmentOptions.Center;
+
+            var prevBtn = MakeIconButton(carousel, "Btn_Prev", "btn_carousel_prev",
+                new Vector2(96, 96), new Vector2(16, 0), AnchorPreset.MiddleLeft);
+            var nextBtn = MakeIconButton(carousel, "Btn_Next", "btn_carousel_next",
+                new Vector2(96, 96), new Vector2(-16, 0), AnchorPreset.MiddleRight);
 
             // Btn_Play
             var play = MakeButton(carousel, "Btn_Play", "home.stage_play",
@@ -739,7 +740,7 @@ namespace ProjectLink.EditorTools
 
             var viewport = MakeChild(scrollList, "Viewport");
             Stretch(viewport);
-            viewport.gameObject.AddComponent<Image>().color = new Color(0, 0, 0, 0);
+            viewport.gameObject.AddComponent<Image>().color = new Color(0, 0, 0, 255);
             viewport.gameObject.AddComponent<Mask>().showMaskGraphic = false;
 
             var content = MakeChild(viewport, "Content");
@@ -1172,6 +1173,23 @@ namespace ProjectLink.EditorTools
             Assign(popup, "rewardText",  rewardTxt.GetComponent<TextMeshProUGUI>());
             Assign(popup, "starRow",     starRow);
             SavePopupPrefab(root, "ClearPopup");
+        }
+
+        static void BuildClearNextStageConfirmPopup()
+        {
+            var (root, panel, content, footer) = CreatePopupShell<ClearNextStageConfirmPopup>(
+                "ClearNextStageConfirmPopup", "popup.clear.title", dismissible: true);
+            AddPopupIcon(panel, Warning);
+            var bodyTxt = MakeText(content, "Txt_Body", "", 26, TextMuted, TextAlignmentOptions.Center);
+            bodyTxt.gameObject.AddComponent<LayoutElement>().preferredHeight = 120;
+            AddFooterButton(footer, "Btn_Cancel", "common.cancel", "btn_secondary");
+            AddFooterButton(footer, "Btn_Confirm", "common.confirm", "btn_primary", isPrimary: true);
+            var popup = root.GetComponent<ClearNextStageConfirmPopup>();
+            Assign(popup, "closeIconButton", FindButtonInChildren(root, "Btn_Close"));
+            Assign(popup, "cancelButton", FindButtonInChildren(root, "Btn_Cancel"));
+            Assign(popup, "confirmButton", FindButtonInChildren(root, "Btn_Confirm"));
+            Assign(popup, "bodyText", bodyTxt.GetComponent<TextMeshProUGUI>());
+            SavePopupPrefab(root, "ClearNextStageConfirmPopup");
         }
 
         static void BuildPausePopup()

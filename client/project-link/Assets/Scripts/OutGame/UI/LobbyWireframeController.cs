@@ -1,8 +1,11 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Globalization;
+using ProjectLink.Contracts.Progress;
 using ProjectLink.Contracts.Ranking;
 using ProjectLink.Core;
+using ProjectLink.Data;
 using ProjectLink.Services;
 using TMPro;
 using UnityEngine;
@@ -33,23 +36,37 @@ namespace ProjectLink.OutGame.UI
         [SerializeField] Button previousStageButton;
         [SerializeField] Button nextStageButton;
 
+        const string DefaultRankingCategory = "global_stages";
+        const string ScoreRankingCategory = "global_score";
+
         IStaticCatalogService _catalog;
         IUiDataService _uiData;
         LobbyViewModel _viewModel;
         int _selectedStageId;
         int _maxSelectableStageId = 1;
+        readonly Dictionary<int, int> _stageStars = new();
+        readonly HashSet<int> _unlockedStages = new();
+        bool _progressLoaded;
         DateTimeOffset? _nextRechargeAt;
         float _nextTimerRefreshAt;
         RectTransform _centerStageNode;
         RectTransform _previousStageNode;
         RectTransform _nextStageNode;
+        TextMeshProUGUI _previousStageStarsText;
+        TextMeshProUGUI _nextStageStarsText;
         Coroutine _stageAnimation;
+        bool _stageSelectionInitialized;
+        Button _rankingStagesButton;
+        Button _rankingScoreButton;
+        TextMeshProUGUI _pinnedRankText;
+        TextMeshProUGUI _pinnedScoreText;
 
         void Awake()
         {
             ResolveMissingReferences();
             _catalog = UiServiceLocator.Catalog;
             _uiData = UiServiceLocator.UiData;
+            _maxSelectableStageId = Mathf.Max(1, StageLoader.MaxStageId);
             _viewModel = new LobbyViewModel(_uiData, _catalog);
             _viewModel.Changed += Render;
             BindStageNavigation();
@@ -58,8 +75,9 @@ namespace ProjectLink.OutGame.UI
         void Start()
         {
             _viewModel.LoadLobby();
+            _uiData.GetProgress(ApplyProgress);
             _viewModel.LoadShop();
-            _viewModel.LoadRanking("global_stages");
+            _viewModel.LoadRanking(DefaultRankingCategory);
         }
 
         void OnDestroy()
@@ -103,8 +121,8 @@ namespace ProjectLink.OutGame.UI
 
         void ApplyShop(ShopScreenModel model)
         {
-            ClearChildren(shopContent);
             SetText(shopBalanceText, FormatNumber(model.SoftBalance));
+            ClearRows(shopContent, "Product_");
 
             foreach (var product in model.Products)
             {
@@ -119,10 +137,13 @@ namespace ProjectLink.OutGame.UI
             int currentStageId = Mathf.Max(1, lobby.NextUnlockedStageId);
             if (lobby.HighestStageId > 0)
                 currentStageId = Mathf.Max(currentStageId, lobby.HighestStageId + 1);
+            currentStageId = Mathf.Clamp(currentStageId, 1, _maxSelectableStageId);
 
-            _maxSelectableStageId = currentStageId;
-            if (_selectedStageId <= 0 || _selectedStageId > _maxSelectableStageId)
+            if (!_stageSelectionInitialized)
+            {
                 _selectedStageId = currentStageId;
+                _stageSelectionInitialized = true;
+            }
             _selectedStageId = Mathf.Clamp(_selectedStageId, 1, _maxSelectableStageId);
             GameContext.SelectedStageId = _selectedStageId;
             _nextRechargeAt = ParseDateTime(lobby.NextRechargeAt);
@@ -132,20 +153,39 @@ namespace ProjectLink.OutGame.UI
             RefreshStaminaTimer();
             SetText(coinText, FormatNumber(lobby.SoftCurrency));
             RefreshStageCarousel();
-            SetText(starsText, lobby.TotalStarsEarned.ToString(CultureInfo.InvariantCulture));
             SetText(dailyProgressText, $"{lobby.DailyChallenge.PlayCountToday}/{lobby.DailyChallenge.PlayCountTarget}");
             SetText(colorCupTimerText, lobby.SeasonEvent?.EndAt ?? "");
 
-            if (playButton != null)
-                playButton.interactable = lobby.CanPlay && _selectedStageId <= _maxSelectableStageId;
             if (refillButton != null)
                 refillButton.gameObject.SetActive(!lobby.CanPlay);
-            SetText(playDisabledReasonText, lobby.CanPlay ? "" : LocalizationManager.Get("status.energy_empty"));
+            RefreshPlayState(lobby);
+        }
+
+        void ApplyProgress(ServiceResult<ProgressResponse> result)
+        {
+            if (!result.IsSuccess || result.Value == null)
+                return;
+
+            _progressLoaded = true;
+            _stageStars.Clear();
+            _unlockedStages.Clear();
+
+            for (int i = 0; i < result.Value.Stages.Count; i++)
+            {
+                var entry = result.Value.Stages[i];
+                _stageStars[entry.StageId] = Mathf.Clamp(entry.Stars, 0, 3);
+                if (entry.IsUnlocked)
+                    _unlockedStages.Add(entry.StageId);
+            }
+
+            RefreshStageCarousel();
         }
 
         void ApplyRanking(RankingListResponse ranking)
         {
+            ClearRows(rankingContent, "TopRankCard", "Rank_", "MyRankPin");
             SetText(rankingMetricText, ranking.MetricLabel);
+            RefreshRankingSegmentState(ranking.Category);
 
             if (ranking.Entries.Count > 0)
             {
@@ -160,7 +200,16 @@ namespace ProjectLink.OutGame.UI
             }
 
             if (ranking.MyRank != null)
+            {
                 AddRow(rankingContent, "MyRankPin", $"#{ranking.MyRank.Rank} {ranking.MyRank.DisplayName}", FormatNumber(ranking.MyRank.Value), true);
+                SetText(_pinnedRankText, $"#{ranking.MyRank.Rank}");
+                SetText(_pinnedScoreText, FormatNumber(ranking.MyRank.Value));
+            }
+            else
+            {
+                SetText(_pinnedRankText, "#--");
+                SetText(_pinnedScoreText, "0");
+            }
         }
 
         void ResolveMissingReferences()
@@ -174,15 +223,19 @@ namespace ProjectLink.OutGame.UI
             dailyProgressText ??= FindText("Txt_Frac");
             colorCupTimerText ??= FindText("Txt_Ends");
             playDisabledReasonText ??= FindText("Txt_PlayDisabled");
-            shopBalanceText ??= FindText("Txt_Balance");
+            shopBalanceText ??= FindTextInParent("Row_Balance", "Txt_Balance") ?? FindText("Txt_Balance");
             rankingMetricText ??= FindText("Txt_Score");
             rankingErrorText ??= FindText("Txt_RankError");
-            shopContent ??= FindRect("Content");
-            rankingContent ??= FindRect("Content");
+            shopContent ??= FindRectInPanel("Tab_Shop", "Content") ?? FindRect("Content");
+            rankingContent ??= FindRectInPanel("Tab_Ranking", "Content") ?? FindRect("Content");
             playButton ??= FindButton("Btn_Play");
             refillButton ??= FindButton("Btn_Refill");
             previousStageButton ??= FindButton("Btn_Prev");
             nextStageButton ??= FindButton("Btn_Next");
+            _rankingStagesButton ??= FindButton("Seg_Clear");
+            _rankingScoreButton ??= FindButton("Seg_Score");
+            _pinnedRankText ??= FindTextInParent("Row_MyRank_Pinned", "Txt_Rank");
+            _pinnedScoreText ??= FindTextInParent("Row_MyRank_Pinned", "Txt_Score");
             EnsureSideStageNodes();
         }
 
@@ -199,11 +252,17 @@ namespace ProjectLink.OutGame.UI
                 nextStageButton.onClick.AddListener(SelectNextStage);
                 AddRepeat(nextStageButton).Repeated.AddListener(SelectNextStage);
             }
+
+            if (_rankingStagesButton != null)
+                _rankingStagesButton.onClick.AddListener(() => RefreshRanking(DefaultRankingCategory));
+            if (_rankingScoreButton != null)
+                _rankingScoreButton.onClick.AddListener(() => RefreshRanking(ScoreRankingCategory));
         }
 
         void SelectPreviousStage()
         {
             if (_selectedStageId <= 1) return;
+            _stageSelectionInitialized = true;
             _selectedStageId--;
             RefreshStageCarousel();
         }
@@ -211,6 +270,7 @@ namespace ProjectLink.OutGame.UI
         void SelectNextStage()
         {
             if (_selectedStageId >= _maxSelectableStageId) return;
+            _stageSelectionInitialized = true;
             _selectedStageId++;
             RefreshStageCarousel();
         }
@@ -226,6 +286,9 @@ namespace ProjectLink.OutGame.UI
 
             SetText(previousStageNumberText, hasPrev ? (_selectedStageId - 1).ToString(CultureInfo.InvariantCulture) : "");
             SetText(nextStageNumberText,     hasNext ? (_selectedStageId + 1).ToString(CultureInfo.InvariantCulture) : "");
+            SetText(starsText, FormatStageStars(_selectedStageId));
+            SetText(_previousStageStarsText, hasPrev ? FormatStageStars(_selectedStageId - 1) : "");
+            SetText(_nextStageStarsText, hasNext ? FormatStageStars(_selectedStageId + 1) : "");
 
             if (previousStageButton != null)
                 previousStageButton.interactable = hasPrev;
@@ -237,7 +300,47 @@ namespace ProjectLink.OutGame.UI
             if (_nextStageNode != null)
                 _nextStageNode.gameObject.SetActive(hasNext);
 
+            RefreshPlayState(_viewModel?.Lobby);
             StartStageSwitchAnimation();
+        }
+
+        void RefreshRankingSegmentState(string category)
+        {
+            bool scoreSelected = string.Equals(category, "GLOBAL_SCORE", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(_viewModel?.RankingCategory, ScoreRankingCategory, StringComparison.OrdinalIgnoreCase);
+            SetSegmentSelected(_rankingStagesButton, !scoreSelected);
+            SetSegmentSelected(_rankingScoreButton, scoreSelected);
+        }
+
+        void RefreshPlayState(LobbyScreenModel lobby)
+        {
+            if (lobby == null)
+                return;
+
+            bool unlocked = IsStageUnlocked(_selectedStageId, lobby);
+            bool canPlay = lobby.CanPlay && unlocked;
+            if (playButton != null)
+                playButton.interactable = canPlay;
+
+            if (!lobby.CanPlay)
+                SetText(playDisabledReasonText, LocalizationManager.Get("status.energy_empty"));
+            else
+                SetText(playDisabledReasonText, "");
+        }
+
+        bool IsStageUnlocked(int stageId, LobbyScreenModel lobby)
+        {
+            if (_progressLoaded)
+                return _unlockedStages.Contains(stageId);
+
+            return stageId == 1 || stageId <= Mathf.Max(lobby.NextUnlockedStageId, lobby.HighestStageId);
+        }
+
+        string FormatStageStars(int stageId)
+        {
+            return _stageStars.TryGetValue(stageId, out var stars)
+                ? stars.ToString(CultureInfo.InvariantCulture)
+                : "0";
         }
 
         void RefreshStaminaTimer()
@@ -293,6 +396,9 @@ namespace ProjectLink.OutGame.UI
             _nextStageNode = next;
             previousStageNumberText ??= prev?.transform.Find("Txt_StageNum")?.GetComponent<TextMeshProUGUI>();
             nextStageNumberText ??= next?.transform.Find("Txt_StageNum")?.GetComponent<TextMeshProUGUI>();
+            starsText = center.transform.Find("Txt_Stars")?.GetComponent<TextMeshProUGUI>() ?? starsText;
+            _previousStageStarsText = prev?.transform.Find("Txt_Stars")?.GetComponent<TextMeshProUGUI>();
+            _nextStageStarsText = next?.transform.Find("Txt_Stars")?.GetComponent<TextMeshProUGUI>();
         }
 
         void StartStageSwitchAnimation()
@@ -387,12 +493,43 @@ namespace ProjectLink.OutGame.UI
             return null;
         }
 
+        RectTransform FindRectInPanel(string panelName, string childName)
+        {
+            foreach (var rect in GetComponentsInChildren<RectTransform>(true))
+            {
+                if (rect.name != panelName || rect.GetComponent<Button>() != null)
+                    continue;
+
+                foreach (var child in rect.GetComponentsInChildren<RectTransform>(true))
+                {
+                    if (child.name == childName)
+                        return child;
+                }
+            }
+
+            return null;
+        }
+
         Button FindButton(string childName)
         {
             foreach (var button in GetComponentsInChildren<Button>(true))
             {
                 if (button.name == childName)
                     return button;
+            }
+
+            return null;
+        }
+
+        TextMeshProUGUI FindTextInParent(string parentName, string childName)
+        {
+            foreach (var rect in GetComponentsInChildren<RectTransform>(true))
+            {
+                if (rect.name != parentName)
+                    continue;
+
+                var child = rect.Find(childName);
+                return child != null ? child.GetComponent<TextMeshProUGUI>() : null;
             }
 
             return null;
@@ -441,6 +578,33 @@ namespace ProjectLink.OutGame.UI
 
             for (int i = parent.childCount - 1; i >= 0; i--)
                 Destroy(parent.GetChild(i).gameObject);
+        }
+
+        static void ClearRows(RectTransform parent, params string[] prefixes)
+        {
+            if (parent == null || prefixes == null) return;
+
+            for (int i = parent.childCount - 1; i >= 0; i--)
+            {
+                var child = parent.GetChild(i);
+                for (int p = 0; p < prefixes.Length; p++)
+                {
+                    if (!child.name.StartsWith(prefixes[p], StringComparison.Ordinal))
+                        continue;
+
+                    Destroy(child.gameObject);
+                    break;
+                }
+            }
+        }
+
+        static void SetSegmentSelected(Button button, bool selected)
+        {
+            if (button == null) return;
+
+            var image = button.targetGraphic as Image;
+            if (image != null)
+                image.color = selected ? new Color(0.12f, 0.46f, 0.9f, 0.42f) : new Color(0, 0, 0, 0);
         }
 
         static void SetText(TextMeshProUGUI label, string value)

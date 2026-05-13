@@ -45,7 +45,7 @@
 | `InGameController.AbandonStageAndLoad(string)` | method | submits stage fail with active session token, clears context, then loads target scene |
 | `InGameController.HandleStageStarted(...)` | method | enables gameplay only after server stage-start success; insufficient stamina opens Energy popup and returns Lobby |
 | `UIManager.GetLayer(UILayer)` | method | returns canvas Transform for named layer |
-| `PopupId` | enum | popup ids: ReturnTitle, ExitGame, Settings, BuyItem, Energy, DailyChallenge, Account, Reward, StageClear, SessionExpired, Pause, ForceUpdate, Maintenance, StageDetail |
+| `PopupId` | enum | popup ids: ReturnTitle, ExitGame, Settings, BuyItem, Energy, DailyChallenge, Account, Reward, StageClear, SessionExpired, Pause, ForceUpdate, Maintenance, StageDetail, ClearNextStageConfirm |
 | `PopupManager.Request(PopupId,object)` | method | static event-driven popup request entry point |
 | `PopupManager.Open<T>()` | method | code-instantiates legacy popup T on Popup layer, pushes stack |
 | `PopupManager.CloseTop()` | method | destroys top popup, re-shows previous |

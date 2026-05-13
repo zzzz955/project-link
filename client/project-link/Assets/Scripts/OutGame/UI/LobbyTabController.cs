@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 namespace ProjectLink.OutGame.UI
 {
@@ -39,12 +40,12 @@ namespace ProjectLink.OutGame.UI
 
         void ResolveMissingReferences()
         {
-            shopTabButton ??= FindButton("ShopTabButton");
-            homeTabButton ??= FindButton("HomeTabButton");
-            rankingTabButton ??= FindButton("RankingTabButton");
-            shopPanel ??= FindChild("ShopPanel");
-            homePanel ??= FindChild("HomePanel");
-            rankingPanel ??= FindChild("RankingPanel");
+            shopTabButton ??= FindButton("ShopTabButton") ?? FindButton("Tab_Shop");
+            homeTabButton ??= FindButton("HomeTabButton") ?? FindButton("Tab_Home");
+            rankingTabButton ??= FindButton("RankingTabButton") ?? FindButton("Tab_Ranking");
+            shopPanel ??= FindPanel("Tab_Shop") ?? FindChild("ShopPanel");
+            homePanel ??= FindPanel("Tab_Home") ?? FindChild("HomePanel");
+            rankingPanel ??= FindPanel("Tab_Ranking") ?? FindChild("RankingPanel");
         }
 
         void Bind()
@@ -65,6 +66,9 @@ namespace ProjectLink.OutGame.UI
             SetInteractable(shopTabButton, tab != LobbyTab.Shop);
             SetInteractable(homeTabButton, tab != LobbyTab.Home);
             SetInteractable(rankingTabButton, tab != LobbyTab.Ranking);
+            SetTabVisual(shopTabButton, tab == LobbyTab.Shop);
+            SetTabVisual(homeTabButton, tab == LobbyTab.Home);
+            SetTabVisual(rankingTabButton, tab == LobbyTab.Ranking);
         }
 
         Button FindButton(string childName)
@@ -89,6 +93,20 @@ namespace ProjectLink.OutGame.UI
             return null;
         }
 
+        GameObject FindPanel(string childName)
+        {
+            foreach (var rect in GetComponentsInChildren<RectTransform>(true))
+            {
+                if (rect.name != "Group_TabBodies")
+                    continue;
+
+                var child = rect.Find(childName);
+                return child != null ? child.gameObject : null;
+            }
+
+            return null;
+        }
+
         static void SetActive(GameObject target, bool active)
         {
             if (target != null)
@@ -99,6 +117,33 @@ namespace ProjectLink.OutGame.UI
         {
             if (button != null)
                 button.interactable = interactable;
+        }
+
+        static void SetTabVisual(Button button, bool selected)
+        {
+            if (button == null) return;
+
+            var buttonImage = button.targetGraphic as Image;
+            if (buttonImage != null)
+                buttonImage.color = selected ? new Color(1f, 1f, 1f, 0.08f) : new Color(0f, 0f, 0f, 0f);
+
+            var icon = FindChildComponent<Image>(button.transform, "Icon");
+            if (icon != null)
+                icon.color = selected ? Color.white : new Color(0.63f, 0.68f, 0.76f, 1f);
+
+            var label = FindChildComponent<TextMeshProUGUI>(button.transform, "Txt");
+            if (label != null)
+                label.color = selected ? Color.white : new Color(0.63f, 0.68f, 0.76f, 1f);
+
+            var indicator = button.transform.Find("Indicator");
+            if (indicator != null)
+                indicator.gameObject.SetActive(selected);
+        }
+
+        static T FindChildComponent<T>(Transform parent, string childName) where T : Component
+        {
+            var child = parent.Find(childName);
+            return child != null ? child.GetComponent<T>() : null;
         }
     }
 }

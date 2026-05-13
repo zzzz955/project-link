@@ -10,6 +10,7 @@
 | `AccountPopup.prefab` | `AccountPopup` | Generated account/profile popup |
 | `RewardPopup.prefab` | `RewardPopup` | Generated reward claim popup |
 | `ClearPopup.prefab` | `ClearPopup` | Generated stage-clear result popup |
+| `ClearNextStageConfirmPopup.prefab` | `ClearNextStageConfirmPopup` | Stage-clear next confirmation popup; runtime fills fallback shell if generated refs are absent |
 | `PausePopup.prefab` | `PausePopup` | Generated in-game pause popup |
 | `TimeoutPopup.prefab` | `TimeoutPopup` | Generated non-dismissible timeout popup |
 | `ReturnTitlePopup.prefab` | `ReturnTitlePopup` | Generated title-return confirmation popup |
@@ -29,6 +30,7 @@
 | `Prefabs/UI/AccountPopup` | Resources path | loaded by `PopupManager` for `PopupId.Account` |
 | `Prefabs/UI/RewardPopup` | Resources path | loaded by `PopupManager` for `PopupId.Reward` |
 | `Prefabs/UI/ClearPopup` | Resources path | loaded by `PopupManager` for `PopupId.StageClear` |
+| `Prefabs/UI/ClearNextStageConfirmPopup` | Resources path | loaded by `PopupManager` for `PopupId.ClearNextStageConfirm` |
 | `Prefabs/UI/PausePopup` | Resources path | loaded by `PopupManager` for `PopupId.Pause` |
 | `Prefabs/UI/SessionExpiredPopup` | Resources path | generated session-expired prefab; current fallback may build code-only popup |
 | `Prefabs/UI/ForceUpdatePopup` | Resources path | loaded by `PopupManager` for `PopupId.ForceUpdate` |

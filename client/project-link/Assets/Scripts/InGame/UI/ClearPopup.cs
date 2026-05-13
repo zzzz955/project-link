@@ -1,5 +1,8 @@
+using ProjectLink.Contracts.Progress;
 using ProjectLink.Core;
+using ProjectLink.Data;
 using ProjectLink.OutGame.UI;
+using ProjectLink.Services;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -49,6 +52,9 @@ namespace ProjectLink.InGame.UI
 
         bool _initialized;
         StageClearPopupModel _model;
+        bool _progressLoaded;
+        bool _nextStageUnlocked;
+        bool _nextStageCleared;
 
         public void Init(int stageId, int stars)
         {
@@ -67,6 +73,7 @@ namespace ProjectLink.InGame.UI
 
             Apply();
             BindButtons();
+            RefreshNextStageProgress();
         }
 
         public override void OnBackPressed() { }
@@ -82,8 +89,7 @@ namespace ProjectLink.InGame.UI
             for (int i = 0; i < Mathf.Clamp(_model.Stars, 0, 3); i++)
                 AddStar(i);
 
-            if (nextButton != null)
-                nextButton.interactable = _model.NextStageUnlocked;
+            RefreshNextButton();
         }
 
         void BindButtons()
@@ -98,10 +104,43 @@ namespace ProjectLink.InGame.UI
 
         void LoadNext()
         {
+            if (!_progressLoaded)
+            {
+                if (nextButton != null)
+                    nextButton.interactable = false;
+                UiServiceLocator.UiData.GetProgress(result =>
+                {
+                    ApplyProgress(result);
+                    if (_nextStageCleared)
+                        OpenClearedNextConfirm();
+                    else
+                        LoadNextConfirmed();
+                    RefreshNextButton();
+                });
+                return;
+            }
+
+            if (_nextStageCleared)
+            {
+                OpenClearedNextConfirm();
+                return;
+            }
+
+            LoadNextConfirmed();
+        }
+
+        void LoadNextConfirmed()
+        {
             PopupManager.Instance.CloseAll();
             if (GameContext.IsDailyChallengeStage)
                 GameContext.AdvanceDailyChallengeStage(_model.NextStageId);
             RuntimeNavigationButtons.EnterStage(_model.NextStageId);
+        }
+
+        void OpenClearedNextConfirm()
+        {
+            PopupManager.Request(PopupId.ClearNextStageConfirm,
+                new ClearNextStageConfirmModel(_model.NextStageId, LoadNextConfirmed, LoadLobby));
         }
 
         void Retry()
@@ -115,6 +154,51 @@ namespace ProjectLink.InGame.UI
             PopupManager.Instance.CloseAll();
             GameContext.ClearDailyChallengeRun();
             SceneLoader.Instance.LoadScene("Lobby");
+        }
+
+        void RefreshNextStageProgress()
+        {
+            _nextStageUnlocked = _model.NextStageUnlocked;
+            _nextStageCleared = false;
+            RefreshNextButton();
+            UiServiceLocator.UiData.GetProgress(ApplyProgress);
+        }
+
+        void ApplyProgress(ServiceResult<ProgressResponse> result)
+        {
+            if (!result.IsSuccess || result.Value == null)
+            {
+                _progressLoaded = false;
+                _nextStageUnlocked = _model.NextStageUnlocked;
+                _nextStageCleared = false;
+                RefreshNextButton();
+                return;
+            }
+
+            _progressLoaded = true;
+            _nextStageUnlocked = false;
+            _nextStageCleared = false;
+
+            for (int i = 0; i < result.Value.Stages.Count; i++)
+            {
+                var entry = result.Value.Stages[i];
+                if (entry.StageId != _model.NextStageId)
+                    continue;
+
+                _nextStageUnlocked = entry.IsUnlocked;
+                _nextStageCleared = entry.Stars > 0 || !string.IsNullOrEmpty(entry.ClearedAt);
+                break;
+            }
+
+            RefreshNextButton();
+        }
+
+        void RefreshNextButton()
+        {
+            if (nextButton != null)
+                nextButton.interactable = _model.NextStageId > 0
+                    && _model.NextStageId <= StageLoader.MaxStageId
+                    && (_nextStageUnlocked || _model.NextStageUnlocked);
         }
 
         void ResolveMissingReferences()

@@ -5,6 +5,7 @@
 |---|---|---|
 | `ProjectLinkUIBuilder.cs` | `ProjectLinkUIBuilder` | [MenuItem] wireframe scene UI, popup prefab builder, AssetResource import/slicing setup; applies UIButtonSkin sprites when present |
 | `ProjectLinkUIImageResourceExtractor.cs` | `ProjectLinkUIImageResourceExtractor` | [MenuItem] batch-loads transparent UI images in a scrollable editor window, parses alpha-connected resource elements, previews them, saves numbered PNG sprites |
+| `ClearPlayerPrefs.cs` | `PlayerPrefsResetMenu` | [MenuItem] clears all PlayerPrefs for local reset/debug |
 | `UIButtonSkin.cs` | `UIButtonSkin` | ScriptableObject; maps element names → Sprite for buttons and image slots; asset lives at `Assets/Editor/UIButtonSkin.asset` |
 
 ## Symbols
@@ -13,7 +14,7 @@
 | `ProjectLinkUIBuilder.BuildCurrentSceneUI()` | method | [MenuItem] rebuilds active scene UI matching `scenes.json` spec |
 | `ProjectLinkUIBuilder.BuildAllSceneUI()` | method | [MenuItem] rebuilds all scenes + popup prefabs matching design spec |
 | `ProjectLinkUIBuilder.BuildAllSceneUIBatch()` | method | CI/batch variant; no dialogs |
-| `ProjectLinkUIBuilder.BuildPopupPrefabs()` | method | [MenuItem] creates all popup prefabs under `Assets/Resources/Prefabs/UI/` using standard popup shell (Overlay/Panel/Header/Content/Footer) |
+| `ProjectLinkUIBuilder.BuildPopupPrefabs()` | method | [MenuItem] creates all popup prefabs under `Assets/Resources/Prefabs/UI/` using standard popup shell (Overlay/Panel/Header/Content/Footer), including clear-next confirmation |
 | `ProjectLinkUIBuilder.CreateUIButtonSkin()` | method | [MenuItem] creates `Assets/Editor/UIButtonSkin.asset` if absent |
 | `ProjectLinkUIBuilder.ConfigureUiTextureImports()` | method | configures AssetResource sheets as Multiple sprites via SpriteDataProvider |
 | `ProjectLinkUIBuilder.CreatePopupShell<T>(...)` | method | creates standard popup shell: Overlay + Panel(Header+Divider+Content+Divider+Footer); dismissible controls Overlay button and Btn_Close presence |
@@ -26,6 +27,7 @@
 | `ProjectLinkUIBuilder.ApplySlotSkin(image, key)` | method | assigns sprite from UIButtonSkin.imageSlots by skin-key; sets color white when matched |
 | `ProjectLinkUIBuilder.FindTmpInChildren(root, name)` | method | linear search; returns first TextMeshProUGUI whose name matches |
 | `ProjectLinkUIBuilder.FindRectInChildren(root, name)` | method | linear search; returns first RectTransform whose name matches |
+| `PlayerPrefsResetMenu.ResetPrefs()` | method | [MenuItem] deletes all PlayerPrefs and saves immediately |
 | `UIButtonSkin.GetButton(name)` | method | linear search over buttons entries; returns null if not found |
 | `UIButtonSkin.GetSlot(name)` | method | linear search over imageSlots entries; returns null if not found |
 | `ProjectLinkUIImageResourceExtractor.Open()` | method | [MenuItem] opens the UI resource extraction editor window |

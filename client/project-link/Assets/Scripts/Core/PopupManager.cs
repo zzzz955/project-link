@@ -20,7 +20,8 @@ namespace ProjectLink.Core
         Pause,
         ForceUpdate,
         Maintenance,
-        StageDetail
+        StageDetail,
+        ClearNextStageConfirm
     }
 
     public readonly struct PopupRequest
@@ -184,15 +185,24 @@ namespace ProjectLink.Core
                     var stageId = request.Payload is int id ? id : GameContext.SelectedStageId;
                     OpenPrefab<ProjectLink.OutGame.UI.StageDetailPopup>("Prefabs/UI/StageDetailPopup")?.Init(stageId);
                     break;
+                case PopupId.ClearNextStageConfirm:
+                    var confirmModel = request.Payload as ProjectLink.InGame.UI.ClearNextStageConfirmModel;
+                    var confirmPopup = OpenPrefab<ProjectLink.InGame.UI.ClearNextStageConfirmPopup>("Prefabs/UI/ClearNextStageConfirmPopup", false);
+                    if (confirmPopup != null)
+                        confirmPopup.Init(confirmModel);
+                    else
+                        Open<ProjectLink.InGame.UI.ClearNextStageConfirmPopup>().Init(confirmModel);
+                    break;
             }
         }
 
-        T OpenPrefab<T>(string resourcePath) where T : PopupBase
+        T OpenPrefab<T>(string resourcePath, bool logError = true) where T : PopupBase
         {
             var prefab = Resources.Load<T>(resourcePath);
             if (prefab == null)
             {
-                Debug.LogError($"Popup prefab not found: Resources/{resourcePath}");
+                if (logError)
+                    Debug.LogError($"Popup prefab not found: Resources/{resourcePath}");
                 return null;
             }
 

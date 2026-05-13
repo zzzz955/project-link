@@ -11,6 +11,19 @@ namespace ProjectLink.Data
         static IngameStage[]      _stages;
         static IngameNodeColors[] _nodeColors;
 
+        public static int MaxStageId
+        {
+            get
+            {
+                EnsureLoaded();
+                int maxStageId = 0;
+                for (int i = 0; i < _stages.Length; i++)
+                    if (_stages[i].stageId > maxStageId)
+                        maxStageId = _stages[i].stageId;
+                return maxStageId;
+            }
+        }
+
         public static StageData Load(int stageId)
         {
             EnsureLoaded();

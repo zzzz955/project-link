@@ -38,7 +38,14 @@ namespace ProjectLink.Utils
                 for (int c = 0; c < fields.Length; c++)
                 {
                     if (fields[c] == null || c >= values.Length) continue;
-                    fields[c].SetValue(obj, ConvertValue(values[c], fields[c].FieldType));
+                    try
+                    {
+                        fields[c].SetValue(obj, ConvertValue(values[c], fields[c].FieldType));
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new FormatException($"CSV parse failed: {type.Name}.{fields[c].Name} at row {r + 1}, value '{values[c]}'", ex);
+                    }
                 }
                 results.Add(obj);
             }
@@ -83,6 +90,7 @@ namespace ProjectLink.Utils
 
         static object ConvertValue(string raw, Type type)
         {
+            if (type == typeof(string)) return raw ?? "";
             if (string.IsNullOrEmpty(raw)) return Activator.CreateInstance(type);
             if (type == typeof(int))    return int.Parse(raw);
             if (type == typeof(uint))   return uint.Parse(raw);

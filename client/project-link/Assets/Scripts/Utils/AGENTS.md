@@ -11,6 +11,7 @@
 | symbol | kind | note |
 |---|---|---|
 | `CsvLoader.Load<T>(string)` | method | static; Resources path → T[]; row 1 = field names mapped to public fields |
+| `CsvLoader.ConvertValue(string,Type)` | method | converts CSV cells to primitive field values; empty string fields stay `""` |
 | `GridUtils.CellToWorld(int,int,int,int,float)` | method | static; (x,y,width,height,cellSize) → centered Vector2; board origin at world (0,0) |
 | `ColorPalette.Init(Dictionary<int,Color>)` | method | static; populates color map from StageData.NodeColors; must be called before Get() |
 | `ColorPalette.Get(int)` | method | static; nodeGroupId → Color; returns magenta for unknown IDs |

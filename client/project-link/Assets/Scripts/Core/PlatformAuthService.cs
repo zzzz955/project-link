@@ -203,9 +203,7 @@ namespace ProjectLink.Core
             {
                 if (_httpLogging)
                 {
-                    var sb = $"[AUTH] POST {url} → {req.responseCode}\nreq: {Clip(payload)}";
-                    if (!string.IsNullOrEmpty(response)) sb += $"\nres: {Clip(response)}";
-                    Debug.Log(sb);
+                    Debug.Log($"[AUTH] POST {url} → {req.responseCode}\nrequest: <payload hidden>\nresponse: <payload hidden>");
                 }
                 if (req.responseCode == 204 || string.IsNullOrWhiteSpace(response))
                 {
@@ -228,8 +226,7 @@ namespace ProjectLink.Core
             var status = req.responseCode > 0 ? req.responseCode.ToString() : req.result.ToString();
             if (_httpLogging)
             {
-                var sb = $"[AUTH] POST {url} → {status} [{errorCode}]\nreq: {Clip(payload)}";
-                if (!string.IsNullOrEmpty(response)) sb += $"\nerr: {Clip(response)}";
+                var sb = $"[AUTH] POST {url} → {status} [{errorCode}]\nrequest: {payload}\nresponse: {response}";
                 if (req.responseCode >= 500 || req.responseCode == 0)
                     Debug.LogError(sb);
                 else
@@ -237,9 +234,6 @@ namespace ProjectLink.Core
             }
             onComplete?.Invoke(false, errorCode, default);
         }
-
-        static string Clip(string s, int max = 300) =>
-            s.Length <= max ? s : s[..max] + $"…({s.Length})";
 
         void LoadSession()
         {

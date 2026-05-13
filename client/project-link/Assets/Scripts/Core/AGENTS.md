@@ -3,7 +3,7 @@
 ## Files
 | file | class | role |
 |---|---|---|
-| `BootstrapEntry.cs` | `BootstrapEntry` | App entry; instantiates manager singletons before Bootstrap UI drives scene transition |
+| `BootstrapEntry.cs` | `BootstrapEntry` | App entry; disables info-log stack traces and instantiates manager singletons before Bootstrap UI drives scene transition |
 | `GameContext.cs` | `GameContext` | Static cross-scene state (selected stage ID and active stage session) |
 | `GameState.cs` | `GameState` | Enum: Idle, Drawing, Completed |
 | `GameStateMachine.cs` | `GameStateMachine` | Pure FSM with validated transitions + change event |
@@ -61,7 +61,7 @@
 | `PlatformAuthService.HasStoredSession` | prop | true when a platform refresh token is stored locally |
 | `PlatformAuthService.Provider` | prop | last successful provider (`guest`, `google`, or refresh fallback) |
 | `SecureTokenStorage` | class | AES-256 encrypts values before writing to PlayerPrefs; key = SHA-256(deviceUniqueIdentifier + ":project-link") |
-| `PlatformAuthService.httpLogging` | field | ctor param `bool httpLogging`; toggles `[AUTH]` console logs for platform-auth requests; Info=2xx, Warn=4xx, Error=5xx/connection |
+| `PlatformAuthService.httpLogging` | field | ctor param `bool httpLogging`; toggles `[AUTH]` console logs; all levels include request/response fields, Info hides payload values |
 | `UiEventBus.Publish<T>(T)` | method | publishes typed UI/auth events to scene controllers |
 | `UiBusyChanged` | struct | event payload for async API/loading state |
 | `UiErrorRaised` | struct | event payload for localized toast/popup error rendering |
@@ -76,7 +76,7 @@
 | `NetworkManager.Get(string,Action<bool,string>)` | method | sends GET with required version/protocol/auth headers |
 | `NetworkManager.Post(string,string,Action<bool,string>)` | method | sends JSON POST with required version/protocol/auth headers |
 | `NetworkManager.Patch(string,string,Action<bool,string>)` | method | sends JSON PATCH with required version/protocol/auth headers |
-| `NetworkManager.httpLogging` | field | `[SerializeField] bool`; toggles `[HTTP]` console logs for game-server requests; Info=2xx, Warn=4xx, Error=5xx/connection |
+| `NetworkManager.httpLogging` | field | `[SerializeField] bool`; toggles `[HTTP]` console logs; all levels include request/response fields, Info hides payload values |
 | `LocalizationManager.Get(string)` | method | static stringId -> localized string (EN fallback) |
 | `LocalizationManager.GetError(string)` | method | static errorCode -> localized error message (EN fallback) |
 | `LocalizationManager.SetLanguage(LanguageCode)` | method | persists + fires LanguageChanged |

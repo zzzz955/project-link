@@ -26,6 +26,7 @@ namespace ProjectLink.Services
         static readonly JsonSerializerSettings JsonSettings = new()
         {
             DateParseHandling = DateParseHandling.None,
+            ContractResolver = new Newtonsoft.Json.Serialization.DefaultContractResolver(),
         };
 
         readonly Dictionary<string, CacheEntry> _cache = new();
@@ -205,19 +206,11 @@ namespace ProjectLink.Services
             }
             catch (Exception ex)
             {
-                Debug.LogWarning($"UI data deserialize failed for {cacheKey ?? "<uncached>"}: {ex.Message}\npayload: {Clip(payload)}");
+                Debug.LogWarning($"UI data deserialize failed for {cacheKey ?? "<uncached>"}: {ex.Message}\npayload: {payload}");
                 var result = new ServiceResult<T>("DESERIALIZE_FAILED", ex.Message);
                 UiEventBus.Publish(new UiErrorRaised(cacheKey ?? "", result.ErrorCode, result.ErrorMessage));
                 onComplete?.Invoke(result);
             }
-        }
-
-        static string Clip(string value)
-        {
-            if (string.IsNullOrEmpty(value))
-                return "";
-
-            return value.Length <= 300 ? value : value[..300] + $"...({value.Length})";
         }
 
         static ServiceResult<T> ParseError<T>(string payload)

@@ -8,8 +8,6 @@ namespace ProjectLink.Core
 {
     public class NetworkManager : MonoBehaviour
     {
-        const int LogBodyMaxLength = 300;
-
         public static NetworkManager Instance { get; private set; }
 
         [SerializeField] AppEnvironment environment = AppEnvironment.Dev;
@@ -123,8 +121,8 @@ namespace ProjectLink.Core
                 if (httpLogging)
                 {
                     var sb = new StringBuilder($"[HTTP] {method} {req.url} → {req.responseCode}");
-                    if (!string.IsNullOrEmpty(requestBody)) sb.Append($"\nreq: {Clip(requestBody)}");
-                    if (!string.IsNullOrEmpty(responseBody)) sb.Append($"\nres: {Clip(responseBody)}");
+                    sb.Append("\nrequest: <payload hidden>");
+                    sb.Append("\nresponse: <payload hidden>");
                     Debug.Log(sb);
                 }
                 onComplete?.Invoke(true, responseBody);
@@ -133,7 +131,13 @@ namespace ProjectLink.Core
 
             if (req.responseCode == 401)
             {
-                if (httpLogging) Debug.LogWarning($"[HTTP] {method} {req.url} → 401 SESSION_EXPIRED");
+                if (httpLogging)
+                {
+                    var sb = new StringBuilder($"[HTTP] {method} {req.url} → 401 SESSION_EXPIRED");
+                    sb.Append($"\nrequest: {requestBody ?? ""}");
+                    sb.Append($"\nresponse: {responseBody}");
+                    Debug.LogWarning(sb);
+                }
                 _authService?.ClearToken();
                 onComplete?.Invoke(false, "SESSION_EXPIRED");
                 return;
@@ -144,8 +148,8 @@ namespace ProjectLink.Core
             if (httpLogging)
             {
                 var sb = new StringBuilder($"[HTTP] {method} {req.url} → {status}");
-                if (!string.IsNullOrEmpty(requestBody)) sb.Append($"\nreq: {Clip(requestBody)}");
-                if (!string.IsNullOrEmpty(error)) sb.Append($"\nerr: {Clip(error)}");
+                sb.Append($"\nrequest: {requestBody ?? ""}");
+                sb.Append($"\nresponse: {error ?? ""}");
                 if (req.responseCode >= 500 || req.responseCode == 0)
                     Debug.LogError(sb);
                 else
@@ -160,7 +164,5 @@ namespace ProjectLink.Core
             _authBaseUrl = environment == AppEnvironment.Prod ? AppConfig.ProdPlatformAuthUrl : AppConfig.DevPlatformAuthUrl;
         }
 
-        static string Clip(string s) =>
-            s.Length <= LogBodyMaxLength ? s : s[..LogBodyMaxLength] + $"…({s.Length})";
     }
 }

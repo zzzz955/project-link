@@ -6,6 +6,7 @@ namespace ProjectLink.Core
     {
         void Start()
         {
+            Application.SetStackTraceLogType(LogType.Log, StackTraceLogType.None);
             CreateManager<DataManager>("DataManager");
             CreateManager<LocalizationManager>("LocalizationManager");
             CreateManager<SoundManager>("SoundManager");

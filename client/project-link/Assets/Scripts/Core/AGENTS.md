@@ -10,7 +10,7 @@
 | `InGameController.cs` | `InGameController` | Singleton; orchestrates board/input/paths/HUD/timer |
 | `UIManager.cs` | `UIManager` | Canvas layer resolver (Background/HUD/Popup/System) |
 | `PopupManager.cs` | `PopupManager` | Event-driven popup request router + stack lifecycle; back-press aware |
-| `SceneLoader.cs` | `SceneLoader` | Faded async scene transitions |
+| `SceneLoader.cs` | `SceneLoader` | Faded async scene transitions; supports overlay hold via HoldForReady/NotifyReady |
 | `DataManager.cs` | `DataManager` | PlayerPrefs persistence: progress, settings |
 | `SoundManager.cs` | `SoundManager` | BGM + SFX AudioSource management |
 | `HapticManager.cs` | `HapticManager` | Platform haptic feedback (static helpers) |
@@ -73,6 +73,8 @@
 | `NetworkManager.LoginGoogle(string,string,Action<bool,string>)` | method | delegates Google token exchange to IAuthService |
 | `NetworkManager.RefreshAuth(Action<bool,string>)` | method | delegates refresh to IAuthService |
 | `NetworkManager.EnsureGuestAuth(Action<bool,string>)` | method | delegates to IAuthService.EnsureAuth |
+| `SceneLoader.HoldForReady()` | method | prevents FadeIn until NotifyReady() called; call from Awake of scenes that need data before reveal |
+| `SceneLoader.NotifyReady()` | method | releases overlay hold set by HoldForReady |
 | `NetworkManager.Get(string,Action<bool,string>)` | method | sends GET with required version/protocol/auth headers |
 | `NetworkManager.Post(string,string,Action<bool,string>)` | method | sends JSON POST with required version/protocol/auth headers |
 | `NetworkManager.Patch(string,string,Action<bool,string>)` | method | sends JSON PATCH with required version/protocol/auth headers |

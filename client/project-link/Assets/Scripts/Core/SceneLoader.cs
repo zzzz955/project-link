@@ -13,6 +13,11 @@ namespace ProjectLink.Core
 
         public bool IsLoading { get; private set; }
 
+        bool _readyToFadeIn = true;
+
+        public void HoldForReady() => _readyToFadeIn = false;
+        public void NotifyReady() => _readyToFadeIn = true;
+
         private Image _overlay;
         private TextMeshProUGUI _loadingText;
 
@@ -107,6 +112,7 @@ namespace ProjectLink.Core
 
         private IEnumerator LoadSceneRoutine(string sceneName, Action onComplete)
         {
+            _readyToFadeIn = true;
             IsLoading = true;
             yield return FadeOut(0.3f);
             _loadingText.gameObject.SetActive(true);
@@ -121,6 +127,7 @@ namespace ProjectLink.Core
             _loadingText.gameObject.SetActive(false);
             op.allowSceneActivation = true;
             yield return new WaitUntil(() => op.isDone);
+            yield return new WaitUntil(() => _readyToFadeIn);
             yield return FadeIn(0.3f);
             IsLoading = false;
             onComplete?.Invoke();
@@ -128,6 +135,7 @@ namespace ProjectLink.Core
 
         private IEnumerator LoadSceneRoutine(int buildIndex, Action onComplete)
         {
+            _readyToFadeIn = true;
             IsLoading = true;
             yield return FadeOut(0.3f);
             _loadingText.gameObject.SetActive(true);
@@ -142,6 +150,7 @@ namespace ProjectLink.Core
             _loadingText.gameObject.SetActive(false);
             op.allowSceneActivation = true;
             yield return new WaitUntil(() => op.isDone);
+            yield return new WaitUntil(() => _readyToFadeIn);
             yield return FadeIn(0.3f);
             IsLoading = false;
             onComplete?.Invoke();

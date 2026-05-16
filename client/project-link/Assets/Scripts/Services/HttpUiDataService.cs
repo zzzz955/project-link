@@ -183,11 +183,18 @@ namespace ProjectLink.Services
             return false;
         }
 
+        bool _sessionExpiredPopupRequested;
+
         void Complete<T>(bool ok, string payload, Action<ServiceResult<T>> onComplete, string cacheKey = null)
         {
             if (!ok)
             {
                 var result = ParseError<T>(payload);
+                if (result.ErrorCode == "SESSION_EXPIRED" && !_sessionExpiredPopupRequested)
+                {
+                    _sessionExpiredPopupRequested = true;
+                    PopupManager.Request(PopupId.SessionExpired);
+                }
                 UiEventBus.Publish(new UiErrorRaised(cacheKey ?? "", result.ErrorCode, result.ErrorMessage));
                 onComplete?.Invoke(result);
                 return;

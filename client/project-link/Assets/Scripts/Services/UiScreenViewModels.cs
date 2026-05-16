@@ -259,7 +259,7 @@ namespace ProjectLink.Services
         public RankingListResponse Ranking { get; private set; }
         public string RankingCategory { get; private set; } = "global_stages";
 
-        public void LoadLobby()
+        public void LoadLobby(Action onDone = null)
         {
             SetLoading(true);
             _uiData.GetLobbyState(result =>
@@ -268,16 +268,18 @@ namespace ProjectLink.Services
                 if (!result.IsSuccess)
                 {
                     SetError(result.ErrorCode, result.ErrorMessage);
+                    onDone?.Invoke();
                     return;
                 }
 
                 Lobby = UiViewModelMapper.ToLobbyScreen(result.Value, _catalog);
                 ClearError();
                 NotifyChanged();
+                onDone?.Invoke();
             });
         }
 
-        public void LoadShop()
+        public void LoadShop(Action onDone = null)
         {
             SetLoading(true);
             _uiData.GetShopCatalog(result =>
@@ -286,16 +288,18 @@ namespace ProjectLink.Services
                 if (!result.IsSuccess)
                 {
                     SetError(result.ErrorCode, result.ErrorMessage);
+                    onDone?.Invoke();
                     return;
                 }
 
                 Shop = UiViewModelMapper.ToShopScreen(result.Value, _catalog);
                 ClearError();
                 NotifyChanged();
+                onDone?.Invoke();
             });
         }
 
-        public void LoadRanking(string category)
+        public void LoadRanking(string category, Action onDone = null)
         {
             RankingCategory = string.IsNullOrEmpty(category) ? "global_stages" : category;
             SetLoading(true);
@@ -305,12 +309,14 @@ namespace ProjectLink.Services
                 if (!result.IsSuccess)
                 {
                     SetError(result.ErrorCode, result.ErrorMessage);
+                    onDone?.Invoke();
                     return;
                 }
 
                 Ranking = result.Value;
                 ClearError();
                 NotifyChanged();
+                onDone?.Invoke();
             });
         }
     }

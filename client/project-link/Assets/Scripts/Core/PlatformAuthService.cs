@@ -26,6 +26,8 @@ namespace ProjectLink.Core
         string _refreshToken;
         DateTimeOffset _accessExpiresAt;
         string _provider;
+        bool _refreshInFlight;
+        System.Collections.Generic.List<Action<bool, string>> _refreshWaiters;
 
         public PlatformAuthService(MonoBehaviour runner, string baseUrl, string clientVersion, string protocolVersion, AppEnvironment env = AppEnvironment.Dev, bool httpLogging = true)
         {
@@ -50,13 +52,29 @@ namespace ProjectLink.Core
                 return;
             }
 
-            if (!string.IsNullOrEmpty(_refreshToken))
+            if (string.IsNullOrEmpty(_refreshToken))
             {
-                Refresh(onComplete);
+                LoginGuest(onComplete);
                 return;
             }
 
-            LoginGuest(onComplete);
+            if (_refreshInFlight)
+            {
+                (_refreshWaiters ??= new System.Collections.Generic.List<Action<bool, string>>()).Add(onComplete);
+                return;
+            }
+
+            _refreshInFlight = true;
+            Refresh((ok, error) =>
+            {
+                _refreshInFlight = false;
+                var waiters = _refreshWaiters;
+                _refreshWaiters = null;
+                onComplete?.Invoke(ok, error);
+                if (waiters != null)
+                    foreach (var w in waiters)
+                        w?.Invoke(ok, error);
+            });
         }
 
         public void LoginGuest(Action<bool, string> onComplete)

@@ -63,6 +63,7 @@ namespace ProjectLink.OutGame.UI
 
         void Awake()
         {
+            SceneLoader.Instance?.HoldForReady();
             ResolveMissingReferences();
             _catalog = UiServiceLocator.Catalog;
             _uiData = UiServiceLocator.UiData;
@@ -74,10 +75,17 @@ namespace ProjectLink.OutGame.UI
 
         void Start()
         {
-            _viewModel.LoadLobby();
-            _uiData.GetProgress(ApplyProgress);
-            _viewModel.LoadShop();
-            _viewModel.LoadRanking(DefaultRankingCategory);
+            int pending = 4;
+            void OnLoadDone()
+            {
+                if (--pending == 0)
+                    SceneLoader.Instance?.NotifyReady();
+            }
+
+            _viewModel.LoadLobby(OnLoadDone);
+            _uiData.GetProgress(result => { ApplyProgress(result); OnLoadDone(); });
+            _viewModel.LoadShop(OnLoadDone);
+            _viewModel.LoadRanking(DefaultRankingCategory, OnLoadDone);
         }
 
         void OnDestroy()

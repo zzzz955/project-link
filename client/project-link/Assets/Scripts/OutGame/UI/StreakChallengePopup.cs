@@ -294,27 +294,27 @@ namespace ProjectLink.OutGame.UI
             if (state.AvailableActions.Contains("ACTIVATE"))
             {
                 Show(true);
-                SetLabel("시작하기");
+                SetLabel(LocalizationManager.Get("streak.activate"));
                 activateButton.onClick.AddListener(OnActivateAndStart);
             }
             else if (state.AvailableActions.Contains("START_LEVEL"))
             {
                 int lvl = GetLevelIndexByStatus(state, "READY");
                 Show(true);
-                SetLabel($"레벨 {lvl + 1} 시작하기");
+                SetLabel(string.Format(LocalizationManager.Get("streak.start_level"), lvl + 1));
                 activateButton.onClick.AddListener(() => OnStartLevel(lvl));
             }
             else if (state.AvailableActions.Contains("CLAIM_REWARD"))
             {
                 int lvl = GetLevelIndexByReward(state, "PENDING");
                 Show(true);
-                SetLabel("수령하기");
+                SetLabel(LocalizationManager.Get("streak.claim"));
                 activateButton.onClick.AddListener(() => OnClaimReward(lvl));
             }
             else if (state.AvailableActions.Contains("CONTINUE_LEVEL"))
             {
                 Show(false);
-                SetLabel("수령하기");
+                SetLabel(LocalizationManager.Get("streak.claim"));
             }
             else if (state.AvailableActions.Contains("VIEW_COMPLETED"))
             {

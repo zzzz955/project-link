@@ -9,6 +9,7 @@
 | `StreakChallengePopup.prefab` | `StreakChallengePopup` | Generated 24H streak challenge popup |
 | `AccountPopup.prefab` | `AccountPopup` | Generated account/profile popup |
 | `RewardPopup.prefab` | `RewardPopup` | Generated reward claim popup |
+| `DailyReward.prefab` | `DailyRewardPopup` | Generated daily reward popup; static reward data-backed wireframe |
 | `ClearPopup.prefab` | `ClearPopup` | Generated stage-clear result popup |
 | `ClearNextStageConfirmPopup.prefab` | `ClearNextStageConfirmPopup` | Stage-clear next confirmation popup; runtime fills fallback shell if generated refs are absent |
 | `PausePopup.prefab` | `PausePopup` | Generated in-game pause popup |
@@ -29,6 +30,7 @@
 | `Prefabs/UI/StreakChallengePopup` | Resources path | loaded by `PopupManager` for `PopupId.StreakChallenge` |
 | `Prefabs/UI/AccountPopup` | Resources path | loaded by `PopupManager` for `PopupId.Account` |
 | `Prefabs/UI/RewardPopup` | Resources path | loaded by `PopupManager` for `PopupId.Reward` |
+| `Prefabs/UI/DailyReward` | Resources path | loaded by `PopupManager` for `PopupId.DailyReward` |
 | `Prefabs/UI/ClearPopup` | Resources path | loaded by `PopupManager` for `PopupId.StageClear` |
 | `Prefabs/UI/ClearNextStageConfirmPopup` | Resources path | loaded by `PopupManager` for `PopupId.ClearNextStageConfirm` |
 | `Prefabs/UI/PausePopup` | Resources path | loaded by `PopupManager` for `PopupId.Pause` |

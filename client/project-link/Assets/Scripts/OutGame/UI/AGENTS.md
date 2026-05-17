@@ -28,7 +28,8 @@
 | `SessionExpiredPopup.cs` | `SessionExpiredPopup` | Code-only popup; auth expiry confirm -> Title |
 | `ForceUpdatePopup.cs` | `ForceUpdatePopup` | Prefab popup; non-dismissible; single store CTA |
 | `MaintenancePopup.cs` | `MaintenancePopup` | Prefab popup; non-dismissible; displays server maintenance message in Txt_Body |
-| `StageDetailPopup.cs` | `StageDetailPopup` | Prefab popup; dismissible; shows stage stars/best score/rank; Btn_Play -> Game scene |
+| `StageDetailPopup.cs` | `StageDetailPopup` | Prefab popup; dismissible; shows stage title (popup.stage.title_n_fmt) + stars + top-10 ranking; Btn_Play -> Game scene; no Txt_Best/Txt_MyRank |
+| `StreakRewardConfirmPopup.cs` | `StreakRewardConfirmPopup`, `StreakRewardConfirmModel` | Code popup; confirms whether to go Lobby (claim streak reward) or continue to next stage after OPEN_REWARD_POPUP directive |
 
 ## Symbols
 | symbol | kind | note |
@@ -49,13 +50,19 @@
 | `LobbyTabController.Configure(...)` | method | assigns tab buttons and tab panels from generated UI builder |
 | `LobbyWireframeController.RefreshRanking(string)` | method | clears current ranking rows and requests selected ranking segment through `LobbyViewModel` |
 | `LobbyWireframeController.Render()` | method | renders Lobby/Shop/Ranking viewmodel state and localized errors; stage carousel initial selection comes from Lobby API, bounds from CSV catalog, play/stars from server progress |
+| `LobbyWireframeController.RefreshStaminaTimer()` | method | shows "Full" (status.stamina_full) when `_staminaFull`; else "MM:SS" countdown to next recharge |
+| `LobbyWireframeController.RenderCenterStarImages(int)` | method | updates Img_Star_0/1/2 in Group_Stars under StageNode_Center using starOnSprite/starOffSprite; fallback to yellow/dim color when sprites null |
+| `LobbyWireframeController._staminaFull` | field | bool; set in ApplyLobby when StaminaCurrent >= StaminaMax; drives RefreshStaminaTimer display |
+| `LobbyWireframeController.AnimateCount(label,target,duration,formatter)` | coroutine | SmoothStep count-up from 0 → target over duration (unscaled time); used for stamina/coin on first lobby load |
 | `RepeatButton.Repeated` | event | fires after long-press delay at repeat interval while button remains pressed |
 | `ConfirmPopupBase.Build(...)` | method | legacy title/message/confirmLabel/accent/onConfirm builder |
 | `LobbyStageMapView.Build()` | method | instantiates/pools all stage node buttons |
 | `SceneEscapeHandler.action` | field | `[SerializeField]` EscapeAction enum |
 | `ReturnTitlePopup.Init()` | method | binds close/cancel/confirm hotspots |
 | `ExitGamePopup.Init(RuntimeNavigationButtons)` | method | binds close/cancel/confirm hotspots |
-| `SettingPopup.Init()` | method | binds close/save hotspots; adds LanguageSelector to TMP_Dropdown child at runtime if missing |
+| `SettingPopup.Init()` | method | binds close/save hotspots; loads player settings; adds LanguageSelector to TMP_Dropdown child at runtime if missing; starts coroutine-based toggle animations on change |
+| `SettingPopup.AnimateToggleVisual(toggle,isOn)` | method | stops any running animation for the toggle, starts `ToggleAnim` coroutine |
+| `SettingPopup.ToggleAnim(toggle,isOn)` | coroutine | scale-compress (0.82) → swap Img_Off/Img_On alpha → bounce-overshoot (1.10→1.0) over 0.25 s |
 | `BuyItemPopup.Init()` | method | binds close/buy hotspots |
 | `EnergyPopup.Init()` | method | binds close/watch/refill hotspots |
 | `StreakChallengePopup.Init()` | method | fetches `StreakChallengeStateResponse` and renders level list; idempotent |
@@ -65,7 +72,8 @@
 | `SessionExpiredPopup.Init()` | method | confirm -> Title |
 | `ForceUpdatePopup.Init()` | method | binds Btn_OpenStore click -> platform app store URL |
 | `MaintenancePopup.Init(string)` | method | sets Txt_Body text from server maintenance message |
-| `StageDetailPopup.Init(int)` | method | binds Btn_Close/Btn_Play, renders stars and top-10 stage ranking (score, descending); adds MyRankPanel below scroll showing `#{rank} {score}` or `-` |
+| `StageDetailPopup.Init(int)` | method | binds Btn_Close/Btn_Play; sets dynamic title via `popup.stage.title_n_fmt`; renders stars and top-10 stage ranking (score, descending); no MyRankPanel, no Txt_Best/Txt_MyRank |
+| `StreakRewardConfirmPopup.Init(StreakRewardConfirmModel)` | method | Btn_Lobby: sets `ShouldOpenStreakPopupOnLobby=true` + CloseAll + LoadScene("Lobby"); Btn_Continue: CloseAll + EnterStage if unlocked, else Lobby |
 
 ## Cross-refs
 - Consumed by: client `Core.PopupManager`
@@ -75,4 +83,10 @@
 - Namespace: `ProjectLink.OutGame.UI`.
 - Scene navigation uses `SceneLoader.LoadScene`; shared state uses `GameContext`.
 - Popup and lobby controllers expose serialized refs for Inspector assignment and fallback-find by child name.
-- Visible runtime-created strings must use `LocalizedText` and client string IDs unless they are numeric state or icon glyphs.
+- Visible runtime-created strings must use `LocalizedText` or `LocalizationManager.Get(key)` with client string IDs; never hardcode user-facing Korean/EN text. Dynamic labels (e.g. streak button) use `LocalizationManager.Get` directly; static labels use `LocalizedText` component.
+- StreakChallengePopup dynamic button labels: `streak.activate`, `streak.start_level` (format arg: level 1-based int), `streak.claim`.
+- Stamina timer text: `status.stamina_full` when full; else "MM:SS" countdown. Key added to clientstring.csv.
+- StageDetailPopup title: dynamic via `popup.stage.title_n_fmt` (format arg: stageId int). LocalizedText component disabled on Txt_Title before setting text.
+- "Guest" display name: use `LocalizationManager.Get("popup.account.guest")` (AccountPopup, SettingPopup, StageDetailPopup ranking display name fallback).
+- Toggle visuals: `Img_Off` (alpha 1 = off) and `Img_On` (alpha 1 = on) children of the Toggle transform; no `Handle` child.
+- LobbyTabController.SetTabVisual: Indicator find is null-safe; Indicator no longer exists in generated TabBar.

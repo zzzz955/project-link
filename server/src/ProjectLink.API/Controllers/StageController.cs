@@ -44,8 +44,8 @@ public class StageController : ControllerBase
     [HttpPost("extend")]
     public async Task<IActionResult> Extend(int stageId, [FromBody] StageEndRequest req, CancellationToken ct)
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-        await _stage.ExtendAsync(userId, stageId, req.SessionToken, ct);
-        return NoContent();
+        var userId        = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+        var correlationId = HttpContext.Items["CorrelationId"] as string ?? HttpContext.TraceIdentifier;
+        return Ok(await _stage.ExtendAsync(userId, stageId, req.SessionToken, correlationId, ct));
     }
 }

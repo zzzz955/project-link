@@ -13,6 +13,7 @@
 | `StreakChallengeRewardItemData.cs` | `StreakChallengeRewardItemData` | Individual reward items (itemType, amount, weight) per group |
 | `OutgameShopCatalogData.cs` | `OutgameShopCatalogData` | Shop product catalog rows |
 | `OutgameSeasonEventData.cs` | `OutgameSeasonEventData` | Season event definitions |
+| `OutgameTimeExtendConfigData.cs` | `OutgameTimeExtendConfigData` | Time-extend cost/seconds per extension count |
 
 ## Symbols
 | symbol | kind | note |

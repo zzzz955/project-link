@@ -12,14 +12,13 @@ namespace ProjectLink.OutGame.UI
     {
         [SerializeField] Button btnClose;
         [SerializeField] Button btnPlay;
-        [SerializeField] TextMeshProUGUI txtBest;
-        [SerializeField] TextMeshProUGUI txtMyRank;
         [SerializeField] RectTransform starRow;
         [SerializeField] RectTransform rankContent;
+        [SerializeField] Sprite starOnSprite;
+        [SerializeField] Sprite starOffSprite;
 
         int _stageId;
         bool _initialized;
-        RectTransform _myRankPanel;
 
         public void Init(int stageId = 0)
         {
@@ -27,23 +26,29 @@ namespace ProjectLink.OutGame.UI
             _initialized = true;
             _stageId = Mathf.Max(1, stageId > 0 ? stageId : GameContext.SelectedStageId);
             btnClose ??= FindButton("Btn_Close");
-            btnPlay ??= FindButton("Btn_Play");
-            txtBest ??= FindText("Txt_Best");
-            txtMyRank ??= FindText("Txt_MyRank");
-            starRow ??= FindRect("Group_Stars");
+            btnPlay  ??= FindButton("Btn_Play");
+            starRow  ??= FindRect("Group_Stars");
             rankContent ??= FindRect("RankContent");
             EnsureRankingContent();
             BindOverlayClose();
+            SetDynamicTitle();
 
             if (btnClose != null)
                 btnClose.onClick.AddListener(() => PopupManager.Instance.CloseTop());
             if (btnPlay != null)
                 btnPlay.onClick.AddListener(OnPlay);
 
-            SetText(txtBest, $"Stage {_stageId}");
-            SetText(txtMyRank, "My Ranking");
             UiServiceLocator.UiData.GetProgress(ApplyProgress);
             UiServiceLocator.UiData.GetRanking($"stage:{_stageId}", ApplyRanking);
+        }
+
+        void SetDynamicTitle()
+        {
+            var titleTmp = FindText("Txt_Title");
+            if (titleTmp == null) return;
+            var lt = titleTmp.GetComponent<LocalizedText>();
+            if (lt != null) lt.enabled = false;
+            titleTmp.text = string.Format(LocalizationManager.Get("popup.stage.title_n_fmt"), _stageId);
         }
 
         void OnPlay()
@@ -66,136 +71,105 @@ namespace ProjectLink.OutGame.UI
                 }
             }
 
-            ClearChildren(starRow);
-            for (int i = 0; i < 3; i++)
-                AddStar(i < stars);
-            SetText(txtBest, $"Stage {_stageId}   {stars}/3");
+            RenderStars(stars, starRow);
         }
 
         void ApplyRanking(ServiceResult<RankingListResponse> result)
         {
             ClearChildren(rankContent);
-            ClearChildren(_myRankPanel);
 
             if (!result.IsSuccess || result.Value == null)
-            {
-                AddMyRankRow(null, result.ErrorCode);
                 return;
-            }
 
             var ranking = result.Value;
-
             int count = Mathf.Min(10, ranking.Entries.Count);
             for (int i = 0; i < count; i++)
             {
                 var entry = ranking.Entries[i];
-                AddRankRow($"#{entry.Rank}", string.IsNullOrEmpty(entry.DisplayName) ? "Guest" : entry.DisplayName,
+                AddRankRow($"#{entry.Rank}",
+                    string.IsNullOrEmpty(entry.DisplayName)
+                        ? LocalizationManager.Get("popup.account.guest")
+                        : entry.DisplayName,
                     FormatScore(entry.Value), entry.IsMe);
             }
-
-            AddMyRankRow(ranking.MyRank, null);
-        }
-
-        void AddMyRankRow(RankingEntry myRank, string errorText)
-        {
-            if (_myRankPanel == null) return;
-
-            string rankStr, scoreStr;
-            bool hasRank;
-
-            if (!string.IsNullOrEmpty(errorText))
-            {
-                rankStr = errorText;
-                scoreStr = "";
-                hasRank = false;
-            }
-            else if (myRank != null)
-            {
-                rankStr = $"#{myRank.Rank}";
-                scoreStr = FormatScore(myRank.Value);
-                hasRank = true;
-            }
-            else
-            {
-                rankStr = "-";
-                scoreStr = "-";
-                hasRank = false;
-            }
-
-            var row = new GameObject("MyRankRow", typeof(RectTransform), typeof(Image), typeof(HorizontalLayoutGroup), typeof(LayoutElement));
-            row.transform.SetParent(_myRankPanel, false);
-            row.GetComponent<Image>().color = hasRank
-                ? new Color(0.12f, 0.45f, 0.9f, 0.85f)
-                : new Color(1f, 1f, 1f, 0.06f);
-            row.GetComponent<LayoutElement>().preferredHeight = 60f;
-            var layout = row.GetComponent<HorizontalLayoutGroup>();
-            layout.padding = new RectOffset(14, 14, 8, 8);
-            layout.spacing = 12f;
-            layout.childControlWidth = true;
-            layout.childControlHeight = true;
-
-            AddLabel(row.transform, rankStr, 0.35f, TextAlignmentOptions.MidlineLeft);
-            if (!string.IsNullOrEmpty(scoreStr))
-                AddLabel(row.transform, scoreStr, 1f, TextAlignmentOptions.MidlineRight);
         }
 
         void EnsureRankingContent()
         {
-            if (rankContent != null || txtMyRank == null)
-                return;
+            RectTransform parent = transform as RectTransform;
 
-            var parent = txtMyRank.transform.parent as RectTransform;
-            if (parent == null)
-                return;
+            foreach (var rect in GetComponentsInChildren<RectTransform>(true))
+            {
+                if (rect.name == "Content") { parent = rect; break; }
+            }
 
-            var scroll = new GameObject("RankScroll", typeof(RectTransform), typeof(Image), typeof(Mask), typeof(ScrollRect), typeof(LayoutElement));
-            scroll.transform.SetParent(parent, false);
-            scroll.GetComponent<Image>().color = new Color(1f, 1f, 1f, 0.06f);
-            scroll.GetComponent<Mask>().showMaskGraphic = false;
-            scroll.GetComponent<LayoutElement>().preferredHeight = 320f;
+            if (rankContent == null)
+            {
+                var scroll = new GameObject("RankScroll",
+                    typeof(RectTransform), typeof(Image), typeof(Mask), typeof(ScrollRect), typeof(LayoutElement));
+                scroll.transform.SetParent(parent, false);
+                scroll.GetComponent<Image>().color = new Color(1f, 1f, 1f, 0.06f);
+                scroll.GetComponent<Mask>().showMaskGraphic = false;
+                scroll.GetComponent<LayoutElement>().preferredHeight = 360f;
 
-            var content = new GameObject("RankContent", typeof(RectTransform), typeof(VerticalLayoutGroup), typeof(ContentSizeFitter));
-            content.transform.SetParent(scroll.transform, false);
-            rankContent = content.GetComponent<RectTransform>();
-            rankContent.anchorMin = new Vector2(0f, 1f);
-            rankContent.anchorMax = new Vector2(1f, 1f);
-            rankContent.pivot = new Vector2(0.5f, 1f);
-            rankContent.offsetMin = Vector2.zero;
-            rankContent.offsetMax = Vector2.zero;
+                var content = new GameObject("RankContent",
+                    typeof(RectTransform), typeof(VerticalLayoutGroup), typeof(ContentSizeFitter));
+                content.transform.SetParent(scroll.transform, false);
+                rankContent = content.GetComponent<RectTransform>();
+                rankContent.anchorMin = new Vector2(0f, 1f);
+                rankContent.anchorMax = new Vector2(1f, 1f);
+                rankContent.pivot = new Vector2(0.5f, 1f);
+                rankContent.offsetMin = Vector2.zero;
+                rankContent.offsetMax = Vector2.zero;
 
-            var layout = content.GetComponent<VerticalLayoutGroup>();
-            layout.padding = new RectOffset(18, 18, 12, 12);
-            layout.spacing = 8f;
-            layout.childControlWidth = true;
-            layout.childControlHeight = true;
+                var layout = content.GetComponent<VerticalLayoutGroup>();
+                layout.padding = new RectOffset(18, 18, 12, 12);
+                layout.spacing = 8f;
+                layout.childControlWidth = true;
+                layout.childControlHeight = true;
 
-            var fitter = content.GetComponent<ContentSizeFitter>();
-            fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+                var fitter = content.GetComponent<ContentSizeFitter>();
+                fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
-            var scrollRect = scroll.GetComponent<ScrollRect>();
-            scrollRect.viewport = scroll.GetComponent<RectTransform>();
-            scrollRect.content = rankContent;
-            scrollRect.movementType = ScrollRect.MovementType.Clamped;
-            scrollRect.horizontal = false;
-
-            // MyRank panel below the scroll
-            var myRankContainer = new GameObject("MyRankPanel", typeof(RectTransform), typeof(VerticalLayoutGroup), typeof(LayoutElement));
-            myRankContainer.transform.SetParent(parent, false);
-            myRankContainer.GetComponent<LayoutElement>().minHeight = 64f;
-            var myLayout = myRankContainer.GetComponent<VerticalLayoutGroup>();
-            myLayout.padding = new RectOffset(0, 0, 4, 0);
-            myLayout.childControlWidth = true;
-            myLayout.childControlHeight = true;
-            _myRankPanel = myRankContainer.GetComponent<RectTransform>();
+                var scrollRect = scroll.GetComponent<ScrollRect>();
+                scrollRect.viewport = scroll.GetComponent<RectTransform>();
+                scrollRect.content = rankContent;
+                scrollRect.movementType = ScrollRect.MovementType.Clamped;
+                scrollRect.horizontal = false;
+            }
         }
 
-        void AddStar(bool filled)
+        void RenderStars(int earnedStars, RectTransform parent)
         {
-            if (starRow == null) return;
+            if (parent == null) return;
+            if (parent.Find("Img_Star_0") != null)
+            {
+                for (int i = 0; i < 3; i++)
+                {
+                    var slot = parent.Find($"Img_Star_{i}");
+                    if (slot == null) continue;
+                    var img = slot.GetComponent<Image>();
+                    if (img == null) continue;
+                    bool filled = i < earnedStars;
+                    var sprite = filled ? starOnSprite : starOffSprite;
+                    if (sprite != null) { img.sprite = sprite; img.color = Color.white; img.preserveAspect = true; }
+                    else img.color = filled ? new Color(1f, 0.82f, 0.15f, 1f) : new Color(1f, 1f, 1f, 0.18f);
+                }
+                return;
+            }
+            ClearChildren(parent);
+            for (int i = 0; i < 3; i++)
+                AddStarSlot(parent, i < earnedStars);
+        }
 
+        void AddStarSlot(RectTransform parent, bool filled)
+        {
             var go = new GameObject("Star", typeof(RectTransform), typeof(Image), typeof(LayoutElement));
-            go.transform.SetParent(starRow, false);
-            go.GetComponent<Image>().color = filled ? new Color(1f, 0.82f, 0.15f, 1f) : new Color(1f, 1f, 1f, 0.18f);
+            go.transform.SetParent(parent, false);
+            var img = go.GetComponent<Image>();
+            var sprite = filled ? starOnSprite : starOffSprite;
+            if (sprite != null) { img.sprite = sprite; img.color = Color.white; img.preserveAspect = true; }
+            else img.color = filled ? new Color(1f, 0.82f, 0.15f, 1f) : new Color(1f, 1f, 1f, 0.18f);
             var layout = go.GetComponent<LayoutElement>();
             layout.preferredWidth = 64f;
             layout.preferredHeight = 64f;
@@ -204,10 +178,12 @@ namespace ProjectLink.OutGame.UI
         void AddRankRow(string rank, string name, string value, bool isMe)
         {
             if (rankContent == null) return;
-
-            var row = new GameObject($"Rank_{rank}", typeof(RectTransform), typeof(Image), typeof(HorizontalLayoutGroup), typeof(LayoutElement));
+            var row = new GameObject($"Rank_{rank}",
+                typeof(RectTransform), typeof(Image), typeof(HorizontalLayoutGroup), typeof(LayoutElement));
             row.transform.SetParent(rankContent, false);
-            row.GetComponent<Image>().color = isMe ? new Color(0.12f, 0.45f, 0.9f, 0.75f) : new Color(1f, 1f, 1f, 0.08f);
+            row.GetComponent<Image>().color = isMe
+                ? new Color(0.12f, 0.45f, 0.9f, 0.75f)
+                : new Color(1f, 1f, 1f, 0.08f);
             row.GetComponent<LayoutElement>().preferredHeight = 54f;
             var layout = row.GetComponent<HorizontalLayoutGroup>();
             layout.padding = new RectOffset(14, 14, 6, 6);
@@ -221,7 +197,8 @@ namespace ProjectLink.OutGame.UI
 
         static void AddLabel(Transform parent, string text, float flexibleWidth, TextAlignmentOptions alignment)
         {
-            var label = new GameObject("Text", typeof(RectTransform), typeof(TextMeshProUGUI), typeof(LayoutElement));
+            var label = new GameObject("Text",
+                typeof(RectTransform), typeof(TextMeshProUGUI), typeof(LayoutElement));
             label.transform.SetParent(parent, false);
             var tmp = label.GetComponent<TextMeshProUGUI>();
             tmp.text = text;
@@ -232,6 +209,18 @@ namespace ProjectLink.OutGame.UI
             tmp.color = Color.white;
             tmp.alignment = alignment;
             label.GetComponent<LayoutElement>().flexibleWidth = flexibleWidth;
+        }
+
+        static string FormatScore(long value) =>
+            value >= 1_000_000 ? $"{value / 1_000_000.0:F1}M"
+            : value >= 1_000 ? $"{value / 1_000.0:F1}K"
+            : value.ToString(CultureInfo.InvariantCulture);
+
+        static void ClearChildren(RectTransform parent)
+        {
+            if (parent == null) return;
+            for (int i = parent.childCount - 1; i >= 0; i--)
+                Destroy(parent.GetChild(i).gameObject);
         }
 
         Button FindButton(string childName)
@@ -250,25 +239,9 @@ namespace ProjectLink.OutGame.UI
 
         RectTransform FindRect(string childName)
         {
-            foreach (var rect in GetComponentsInChildren<RectTransform>(true))
-                if (rect.name == childName) return rect;
+            foreach (var r in GetComponentsInChildren<RectTransform>(true))
+                if (r.name == childName) return r;
             return null;
         }
-
-        static void SetText(TextMeshProUGUI label, string value)
-        {
-            if (label != null)
-                label.text = value ?? "";
-        }
-
-        static void ClearChildren(RectTransform parent)
-        {
-            if (parent == null) return;
-            for (int i = parent.childCount - 1; i >= 0; i--)
-                Destroy(parent.GetChild(i).gameObject);
-        }
-
-        static string FormatScore(long value)
-            => value.ToString("N0", CultureInfo.InvariantCulture);
     }
 }

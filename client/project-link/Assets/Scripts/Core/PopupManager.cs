@@ -21,7 +21,10 @@ namespace ProjectLink.Core
         ForceUpdate,
         Maintenance,
         StageDetail,
-        ClearNextStageConfirm
+        ClearNextStageConfirm,
+        DailyReward,
+        Timeout,
+        StreakRewardConfirm
     }
 
     public readonly struct PopupRequest
@@ -192,6 +195,25 @@ namespace ProjectLink.Core
                         confirmPopup.Init(confirmModel);
                     else
                         Open<ProjectLink.InGame.UI.ClearNextStageConfirmPopup>().Init(confirmModel);
+                    break;
+                case PopupId.DailyReward:
+                    OpenPrefab<ProjectLink.OutGame.UI.DailyRewardPopup>("Prefabs/UI/DailyReward")?.Init();
+                    break;
+                case PopupId.Timeout:
+                    var timeoutStageId = request.Payload is int tid ? tid : GameContext.SelectedStageId;
+                    var timeoutPopup = OpenPrefab<ProjectLink.InGame.UI.TimeoutPopup>("Prefabs/UI/TimeoutPopup");
+                    if (timeoutPopup != null)
+                        timeoutPopup.Init(timeoutStageId);
+                    else
+                        Open<ProjectLink.InGame.UI.TimeoutPopup>().Init(timeoutStageId);
+                    break;
+                case PopupId.StreakRewardConfirm:
+                    var streakModel = request.Payload as ProjectLink.OutGame.UI.StreakRewardConfirmModel;
+                    var streakConfirmPopup = OpenPrefab<ProjectLink.OutGame.UI.StreakRewardConfirmPopup>("Prefabs/UI/StreakRewardConfirmPopup", false);
+                    if (streakConfirmPopup != null)
+                        streakConfirmPopup.Init(streakModel);
+                    else
+                        Open<ProjectLink.OutGame.UI.StreakRewardConfirmPopup>().Init(streakModel);
                     break;
             }
         }

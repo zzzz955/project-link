@@ -24,6 +24,13 @@ namespace ProjectLink.Data
             }
         }
 
+        public static int GetDifficulty(int stageId)
+        {
+            EnsureLoaded();
+            var stage = Array.Find(_stages, s => s.stageId == stageId);
+            return stage != null ? stage.difficulty : 1;
+        }
+
         public static StageData Load(int stageId)
         {
             EnsureLoaded();

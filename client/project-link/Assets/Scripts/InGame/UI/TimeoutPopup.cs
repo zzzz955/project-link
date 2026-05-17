@@ -1,5 +1,7 @@
 using ProjectLink.Core;
-using ProjectLink.OutGame.UI;
+using ProjectLink.Data.Generated;
+using ProjectLink.Services;
+using ProjectLink.Utils;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -8,80 +10,110 @@ namespace ProjectLink.InGame.UI
 {
     public class TimeoutPopup : PopupBase
     {
+        [SerializeField] Button btnRetry;
+        [SerializeField] Button btnLobby;
+        [SerializeField] Button btnExtend;
+        [SerializeField] TextMeshProUGUI txtExtendDesc;
+        [SerializeField] TextMeshProUGUI txtExtendCost;
+
+        int _stageId;
+        int _extensionCount;
+        IUiDataService _uiData;
+
         public void Init(int stageId)
         {
-            var overlay = gameObject.AddComponent<Image>();
-            overlay.color = new Color(0f, 0f, 0f, 0.7f);
+            _stageId = stageId;
+            _extensionCount = 0;
+            _uiData = UiServiceLocator.UiData;
 
-            var panelGo   = new GameObject("Panel");
-            panelGo.transform.SetParent(transform, false);
-            var panelRect = panelGo.AddComponent<RectTransform>();
-            panelRect.anchorMin        = new Vector2(0.5f, 0.5f);
-            panelRect.anchorMax        = new Vector2(0.5f, 0.5f);
-            panelRect.pivot            = new Vector2(0.5f, 0.5f);
-            panelRect.sizeDelta        = new Vector2(600f, 480f);
-            panelRect.anchoredPosition = Vector2.zero;
-            panelGo.AddComponent<Image>().color = new Color(0.1f, 0.1f, 0.15f, 1f);
+            btnRetry  ??= FindButtonInChildren("Btn_Retry");
+            btnLobby  ??= FindButtonInChildren("Btn_Lobby");
+            btnExtend ??= FindButtonInChildren("Btn_Extend");
+            txtExtendDesc ??= FindTextInChildren("Txt_ExtendDesc");
+            txtExtendCost ??= FindTextInChildren("Txt_ExtendCost");
 
-            AddLocalizedLabel(panelGo.transform, "game_time_up", 72, new Color(1f, 0.45f, 0.42f, 1f),
-                new Vector2(0f, 150f), new Vector2(560f, 100f));
+            BindOverlayClose();
+            RefreshExtendButton();
 
-            var retryBtn = AddLocalizedButton(panelGo.transform, "game_retry", new Vector2(0f, 20f));
-            var lobbyBtn = AddLocalizedButton(panelGo.transform, "game_lobby", new Vector2(0f, -90f));
+            if (btnRetry != null)
+                btnRetry.onClick.AddListener(() =>
+                {
+                    PopupManager.Instance.CloseAll();
+                    if (InGameController.Instance != null)
+                        InGameController.Instance.AbandonStageAndLoad("Game");
+                    else
+                        SceneLoader.Instance.LoadScene("Game");
+                });
 
-            retryBtn.onClick.AddListener(() =>
-            {
-                PopupManager.Instance.CloseAll();
-                if (InGameController.Instance != null)
-                    InGameController.Instance.AbandonStageAndLoad("Game");
-                else
-                    SceneLoader.Instance.LoadScene("Game");
-            });
+            if (btnLobby != null)
+                btnLobby.onClick.AddListener(() =>
+                {
+                    PopupManager.Instance.CloseAll();
+                    if (InGameController.Instance != null)
+                        InGameController.Instance.AbandonStageAndLoad("Lobby");
+                    else
+                        SceneLoader.Instance.LoadScene("Lobby");
+                });
 
-            lobbyBtn.onClick.AddListener(() =>
-            {
-                PopupManager.Instance.CloseAll();
-                if (InGameController.Instance != null)
-                    InGameController.Instance.AbandonStageAndLoad("Lobby");
-                else
-                    SceneLoader.Instance.LoadScene("Lobby");
-            });
+            if (btnExtend != null)
+                btnExtend.onClick.AddListener(OnExtendClicked);
         }
 
         public override void OnBackPressed() { }
 
-        Button AddLocalizedButton(Transform parent, string stringId, Vector2 anchoredPos)
+        void RefreshExtendButton()
         {
-            var go = new GameObject(stringId + "Btn");
-            go.transform.SetParent(parent, false);
-            var rect = go.AddComponent<RectTransform>();
-            rect.anchorMin        = new Vector2(0.5f, 0.5f);
-            rect.anchorMax        = new Vector2(0.5f, 0.5f);
-            rect.pivot            = new Vector2(0.5f, 0.5f);
-            rect.sizeDelta        = new Vector2(400f, 90f);
-            rect.anchoredPosition = anchoredPos;
-            go.AddComponent<Image>().color = new Color(0.2f, 0.5f, 0.9f, 1f);
-            var btn = go.AddComponent<Button>();
-            AddLocalizedLabel(go.transform, stringId, 44, Color.white, Vector2.zero, new Vector2(400f, 90f));
-            return btn;
+            if (btnExtend == null) return;
+            var nextCount = _extensionCount + 1;
+            var config    = GetExtendConfig(nextCount);
+            btnExtend.gameObject.SetActive(config != null);
+            if (config == null) return;
+
+            if (txtExtendDesc != null)
+                txtExtendDesc.text = LocalizationManager.Get("popup.timeout.extend_desc");
+            if (txtExtendCost != null)
+                txtExtendCost.text = config.costSoft.ToString();
         }
 
-        void AddLocalizedLabel(Transform parent, string stringId, float fontSize, Color color, Vector2 anchoredPos, Vector2 size)
+        void OnExtendClicked()
         {
-            var go = new GameObject("Label");
-            go.transform.SetParent(parent, false);
-            var rect = go.AddComponent<RectTransform>();
-            rect.anchorMin        = new Vector2(0.5f, 0.5f);
-            rect.anchorMax        = new Vector2(0.5f, 0.5f);
-            rect.pivot            = new Vector2(0.5f, 0.5f);
-            rect.sizeDelta        = size;
-            rect.anchoredPosition = anchoredPos;
-            var tmp = go.AddComponent<TextMeshProUGUI>();
-            tmp.fontSize  = fontSize;
-            tmp.alignment = TextAlignmentOptions.Center;
-            tmp.color     = color;
-            tmp.raycastTarget = false;
-            go.AddComponent<LocalizedText>().SetStringId(stringId);
+            if (btnExtend != null) btnExtend.interactable = false;
+            _uiData.ExtendStageTime(_stageId, result =>
+            {
+                if (!result.IsSuccess)
+                {
+                    if (btnExtend != null) btnExtend.interactable = true;
+                    UiEventBus.Publish(new UiErrorRaised("extend_time", result.ErrorCode, result.ErrorMessage));
+                    return;
+                }
+
+                _extensionCount++;
+                if (InGameController.Instance != null)
+                    InGameController.Instance.ExtendTime(result.Value.ExtendedSeconds);
+            });
+        }
+
+        static OutgameTimeExtendConfig GetExtendConfig(int extensionCount)
+        {
+            var rows = CsvLoader.Load<OutgameTimeExtendConfig>(OutgameTimeExtendConfig.ResourcePath);
+            if (rows == null) return null;
+            foreach (var row in rows)
+                if (row.extensionCount == extensionCount) return row;
+            return null;
+        }
+
+        Button FindButtonInChildren(string childName)
+        {
+            foreach (var btn in GetComponentsInChildren<Button>(true))
+                if (btn.name == childName) return btn;
+            return null;
+        }
+
+        TextMeshProUGUI FindTextInChildren(string childName)
+        {
+            foreach (var t in GetComponentsInChildren<TextMeshProUGUI>(true))
+                if (t.name == childName) return t;
+            return null;
         }
     }
 }

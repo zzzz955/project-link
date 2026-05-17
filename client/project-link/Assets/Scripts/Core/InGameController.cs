@@ -31,6 +31,7 @@ namespace ProjectLink.Core
         int               _moveLimit;
         int               _movesUsed;
         bool              _stageEndSubmitted;
+        bool              _pathMoved;
 
         readonly Dictionary<PathModel, PathView> _pathViewMap = new();
         int     _activeGroupId;
@@ -177,6 +178,7 @@ namespace ProjectLink.Core
             var cell = InputSnapper.Snap(worldPos, _board, _cellSize);
             if (!_drawer.TryStartPath(cell)) return;
 
+            _pathMoved     = false;
             _activeGroupId = _drawer.ActivePath.ColorId;
             _lastDragPos   = worldPos;
             CleanupStalePathViews();   // Issue 2: remove views for paths cleared by TryStartPath
@@ -188,6 +190,7 @@ namespace ProjectLink.Core
         void HandleDragMove(Vector2 worldPos)
         {
             if (_stateMachine.Current != GameState.Drawing) return;
+            _pathMoved = true;
 
             Vector2 delta    = worldPos - _lastDragPos;
             float   stepSize = _cellSize * 0.5f;
@@ -208,8 +211,10 @@ namespace ProjectLink.Core
 
         void HandleDragEnd(Vector2 worldPos)
         {
+            bool counted = _pathMoved;
+            _pathMoved = false;
             _drawer.EndPath();
-            _movesUsed++;
+            if (counted) _movesUsed++;
             CleanupStalePathViews();
             _boardView.Refresh();
             foreach (var pv in _pathViewMap.Values) pv.Refresh();
@@ -297,7 +302,7 @@ namespace ProjectLink.Core
                 {
                     Debug.LogError($"Stage end failed: {stageResult.ErrorCode} {stageResult.ErrorMessage}");
                     GameContext.ClearStageSession();
-                    OpenClearPopup(new StageClearPopupModel(_stageId, 3, 0, 0, _movesUsed, _moveLimit, elapsedMs, 0, false, _stageId + 1, true));
+                    OpenClearPopup(new StageClearPopupModel(_stageId, 3, 0, 0, _movesUsed, _moveLimit, elapsedMs, 0, false, _stageId + 1, true, null));
                     return;
                 }
 
@@ -307,12 +312,12 @@ namespace ProjectLink.Core
                 var nextStageId = value.NextStageId ?? _stageId + 1;
                 var nextStageUnlocked = value.NextStageUnlocked;
                 var streakDirective = value.StreakChallenge?.NavigationDirective ?? "NONE";
-                if (streakDirective == "RETURN_TO_LOBBY" || streakDirective == "OPEN_REWARD_POPUP")
+                if (streakDirective == "RETURN_TO_LOBBY")
                     nextStageUnlocked = false;
                 if (streakDirective == "OPEN_EVENT_POPUP")
                     GameContext.ShouldOpenStreakPopupOnLobby = true;
 
-                OpenClearPopup(new StageClearPopupModel(
+                var model = new StageClearPopupModel(
                     _stageId,
                     value.Stars,
                     value.SoftReward,
@@ -323,13 +328,25 @@ namespace ProjectLink.Core
                     value.Score,
                     value.IsBestRecord,
                     nextStageId,
-                    nextStageUnlocked));
+                    nextStageUnlocked,
+                    value.RankPercentile);
+                model.StreakDirective = streakDirective;
+                OpenClearPopup(model);
             });
         }
 
         void OpenClearPopup(StageClearPopupModel model)
         {
+            SetInputEnabled(false);
+            _timer?.Pause();
             PopupManager.Request(PopupId.StageClear, model);
+        }
+
+        public void ExtendTime(int seconds)
+        {
+            PopupManager.Instance.CloseAll();
+            _timer.Start(seconds);
+            SetInputEnabled(true);
         }
 
         void HandleTimeUp()
@@ -347,7 +364,7 @@ namespace ProjectLink.Core
             foreach (var pv in _pathViewMap.Values) pv.Refresh();
             _hud?.SetTimerDisplay(0f);
 
-            PopupManager.Instance.Open<TimeoutPopup>().Init(_stageId);
+            PopupManager.Request(PopupId.Timeout, _stageId);
         }
 
         void FitCameraToBoard()

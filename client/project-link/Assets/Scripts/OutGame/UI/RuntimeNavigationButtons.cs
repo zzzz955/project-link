@@ -72,6 +72,14 @@ namespace ProjectLink.OutGame.UI
             PopupManager.Request(PopupId.Reward);
         }
 
+        public void OpenDailyRewardPopup()
+        {
+            if (PopupManager.Instance == null)
+                return;
+
+            PopupManager.Request(PopupId.DailyReward);
+        }
+
         public void OpenPausePopup()
         {
             if (Core.InGameController.Instance != null)

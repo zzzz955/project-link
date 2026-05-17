@@ -11,7 +11,7 @@ namespace ProjectLink.InGame.UI
 {
     public sealed class StageClearPopupModel
     {
-        public StageClearPopupModel(int stageId, int stars, int softReward, long softBalanceAfter, int movesUsed, int moveLimit, long clearElapsedMs, int score, bool isBestRecord, int nextStageId, bool nextStageUnlocked)
+        public StageClearPopupModel(int stageId, int stars, int softReward, long softBalanceAfter, int movesUsed, int moveLimit, long clearElapsedMs, int score, bool isBestRecord, int nextStageId, bool nextStageUnlocked, int? rankPercentile)
         {
             StageId = stageId;
             Stars = stars;
@@ -24,6 +24,7 @@ namespace ProjectLink.InGame.UI
             IsBestRecord = isBestRecord;
             NextStageId = nextStageId;
             NextStageUnlocked = nextStageUnlocked;
+            RankPercentile = rankPercentile;
         }
 
         public int StageId { get; }
@@ -37,108 +38,154 @@ namespace ProjectLink.InGame.UI
         public bool IsBestRecord { get; }
         public int NextStageId { get; }
         public bool NextStageUnlocked { get; }
+        public int? RankPercentile { get; }
+        public string StreakDirective { get; set; } = "NONE";
+        public bool IsSuccess => Stars > 0;
     }
 
     public class ClearPopup : PopupBase
     {
-        [SerializeField] Button nextButton;
         [SerializeField] Button retryButton;
         [SerializeField] Button lobbyButton;
+        [SerializeField] Button nextButton;
+        [SerializeField] Button doubleButton;
+        [SerializeField] Button addMovesButton;
+        [SerializeField] Button quitButton;
+        [SerializeField] RectTransform successRoot;
+        [SerializeField] RectTransform failureRoot;
+        [SerializeField] TextMeshProUGUI titleText;
+        [SerializeField] TextMeshProUGUI resultText;
         [SerializeField] TextMeshProUGUI stageText;
         [SerializeField] TextMeshProUGUI rewardText;
         [SerializeField] TextMeshProUGUI movesText;
+        [SerializeField] TextMeshProUGUI bestText;
         [SerializeField] TextMeshProUGUI scoreText;
+        [SerializeField] TextMeshProUGUI rankPercentileText;
         [SerializeField] RectTransform starRow;
+        [SerializeField] Sprite starOnSprite;
+        [SerializeField] Sprite starOffSprite;
 
         bool _initialized;
         StageClearPopupModel _model;
-        bool _progressLoaded;
-        bool _nextStageUnlocked;
-        bool _nextStageCleared;
 
         public void Init(int stageId, int stars)
         {
-            Init(new StageClearPopupModel(stageId, stars, 0, 0, 0, 0, 0, 0, false, stageId + 1, true));
+            Init(new StageClearPopupModel(stageId, stars, 0, 0, 0, 0, 0, 0, false, stageId + 1, true, null));
         }
 
         public void Init(StageClearPopupModel model)
         {
             if (_initialized) return;
             _initialized = true;
-            _model = model ?? new StageClearPopupModel(GameContext.SelectedStageId, 0, 0, 0, 0, 0, 0, 0, false, GameContext.SelectedStageId + 1, false);
+            _model = model ?? new StageClearPopupModel(GameContext.SelectedStageId, 0, 0, 0, 0, 0, 0, 0, false, GameContext.SelectedStageId + 1, false, null);
 
             ResolveMissingReferences();
-            if (nextButton == null || retryButton == null || lobbyButton == null)
+            if (retryButton == null || lobbyButton == null)
                 BuildFallback();
 
             Apply();
             BindButtons();
-            RefreshNextStageProgress();
         }
 
         public override void OnBackPressed() { }
 
         void Apply()
         {
-            SetText(stageText, $"Stage {_model.StageId}");
-            SetText(rewardText, $"+{_model.SoftReward} / {FormatTime(_model.ClearElapsedMs)}");
-            SetText(movesText, _model.MoveLimit > 0 ? $"{_model.MovesUsed}/{_model.MoveLimit}" : _model.MovesUsed.ToString());
-            SetText(scoreText, _model.IsBestRecord ? $"{_model.Score} BEST" : _model.Score.ToString());
+            var levelFmt = LocalizationManager.Get("popup.clear.level_fmt");
+            SetText(titleText, string.Format(levelFmt, _model.StageId));
+            SetText(stageText, string.Format(levelFmt, _model.StageId));
+            SetText(resultText, _model.IsSuccess
+                ? LocalizationManager.Get(_model.Stars >= 3 ? "popup.clear.perfect" : "popup.clear.title")
+                : LocalizationManager.Get("popup.clear.try_again"));
 
+            var scoreLbl = LocalizationManager.Get("popup.clear.label_score");
+            var scoreSuffix = _model.IsBestRecord ? " BEST" : "";
+            SetText(scoreText, $"{scoreLbl}: {_model.Score}{scoreSuffix}");
+
+            SetText(movesText, _model.MovesUsed.ToString());
+            SetText(bestText, _model.MoveLimit > 0 ? _model.MoveLimit.ToString() : "-");
+            SetAllText("MovesText", _model.MovesUsed.ToString());
+            SetAllText("BestText", _model.MoveLimit > 0 ? _model.MoveLimit.ToString() : "-");
+
+            SetText(rewardText, $"+{_model.SoftReward}");
+
+            ApplyRankPercentile();
+            ApplyStars(_model.Stars);
+            RefreshButtonVisibility();
+        }
+
+        void ApplyRankPercentile()
+        {
+            if (rankPercentileText == null) return;
+            if (_model.RankPercentile.HasValue)
+            {
+                var fmt = LocalizationManager.Get("popup.clear.rank_top_fmt");
+                rankPercentileText.text = string.Format(fmt, _model.RankPercentile.Value);
+                rankPercentileText.gameObject.SetActive(true);
+            }
+            else
+            {
+                rankPercentileText.gameObject.SetActive(false);
+            }
+        }
+
+        void ApplyStars(int earned)
+        {
+            if (starRow == null) return;
+            if (starRow.Find("Img_Star_0") != null)
+            {
+                for (int i = 0; i < 3; i++)
+                {
+                    var slot = starRow.Find($"Img_Star_{i}");
+                    if (slot == null) continue;
+                    var img = slot.GetComponent<Image>();
+                    if (img == null) continue;
+                    bool filled = i < Mathf.Clamp(earned, 0, 3);
+                    var sprite = filled ? starOnSprite : starOffSprite;
+                    if (sprite != null) { img.sprite = sprite; img.color = Color.white; img.preserveAspect = true; }
+                    else img.color = filled ? new Color(1f, 0.82f, 0.1f, 1f) : new Color(1f, 1f, 1f, 0.2f);
+                }
+                return;
+            }
             ClearChildren(starRow);
-            for (int i = 0; i < Mathf.Clamp(_model.Stars, 0, 3); i++)
-                AddStar(i);
+            for (int i = 0; i < 3; i++)
+                AddStar(starRow, i < Mathf.Clamp(earned, 0, 3));
+        }
 
-            RefreshNextButton();
+        void RefreshButtonVisibility()
+        {
+            if (successRoot != null)
+                successRoot.gameObject.SetActive(_model.IsSuccess);
+            if (failureRoot != null)
+                failureRoot.gameObject.SetActive(!_model.IsSuccess);
+            if (retryButton != null)
+                retryButton.gameObject.SetActive(!_model.IsSuccess);
+            if (lobbyButton != null)
+                lobbyButton.gameObject.SetActive(true);
+            if (nextButton != null)
+                nextButton.gameObject.SetActive(_model.IsSuccess);
+            if (doubleButton != null)
+                doubleButton.gameObject.SetActive(_model.IsSuccess);
+            if (addMovesButton != null)
+                addMovesButton.gameObject.SetActive(!_model.IsSuccess);
+            if (quitButton != null)
+                quitButton.gameObject.SetActive(!_model.IsSuccess);
         }
 
         void BindButtons()
         {
-            if (nextButton != null)
-                nextButton.onClick.AddListener(LoadNext);
             if (retryButton != null)
                 retryButton.onClick.AddListener(Retry);
             if (lobbyButton != null)
                 lobbyButton.onClick.AddListener(LoadLobby);
-        }
-
-        void LoadNext()
-        {
-            if (!_progressLoaded)
-            {
-                if (nextButton != null)
-                    nextButton.interactable = false;
-                UiServiceLocator.UiData.GetProgress(result =>
-                {
-                    ApplyProgress(result);
-                    if (_nextStageCleared)
-                        OpenClearedNextConfirm();
-                    else
-                        LoadNextConfirmed();
-                    RefreshNextButton();
-                });
-                return;
-            }
-
-            if (_nextStageCleared)
-            {
-                OpenClearedNextConfirm();
-                return;
-            }
-
-            LoadNextConfirmed();
-        }
-
-        void LoadNextConfirmed()
-        {
-            PopupManager.Instance.CloseAll();
-            RuntimeNavigationButtons.EnterStage(_model.NextStageId);
-        }
-
-        void OpenClearedNextConfirm()
-        {
-            PopupManager.Request(PopupId.ClearNextStageConfirm,
-                new ClearNextStageConfirmModel(_model.NextStageId, LoadNextConfirmed, LoadLobby));
+            if (nextButton != null)
+                nextButton.onClick.AddListener(Next);
+            if (quitButton != null)
+                quitButton.onClick.AddListener(LoadLobby);
+            if (doubleButton != null)
+                doubleButton.interactable = false;
+            if (addMovesButton != null)
+                addMovesButton.interactable = false;
         }
 
         void Retry()
@@ -153,61 +200,40 @@ namespace ProjectLink.InGame.UI
             SceneLoader.Instance.LoadScene("Lobby");
         }
 
-        void RefreshNextStageProgress()
+        void Next()
         {
-            _nextStageUnlocked = _model.NextStageUnlocked;
-            _nextStageCleared = false;
-            RefreshNextButton();
-            UiServiceLocator.UiData.GetProgress(ApplyProgress);
-        }
-
-        void ApplyProgress(ServiceResult<ProgressResponse> result)
-        {
-            if (!result.IsSuccess || result.Value == null)
+            if (_model.StreakDirective == "OPEN_REWARD_POPUP")
             {
-                _progressLoaded = false;
-                _nextStageUnlocked = _model.NextStageUnlocked;
-                _nextStageCleared = false;
-                RefreshNextButton();
+                PopupManager.Request(PopupId.StreakRewardConfirm,
+                    new ProjectLink.OutGame.UI.StreakRewardConfirmModel(_model.NextStageId, _model.NextStageUnlocked));
                 return;
             }
-
-            _progressLoaded = true;
-            _nextStageUnlocked = false;
-            _nextStageCleared = false;
-
-            for (int i = 0; i < result.Value.Stages.Count; i++)
-            {
-                var entry = result.Value.Stages[i];
-                if (entry.StageId != _model.NextStageId)
-                    continue;
-
-                _nextStageUnlocked = entry.IsUnlocked;
-                _nextStageCleared = entry.Stars > 0 || !string.IsNullOrEmpty(entry.ClearedAt);
-                break;
-            }
-
-            RefreshNextButton();
-        }
-
-        void RefreshNextButton()
-        {
-            if (nextButton != null)
-                nextButton.interactable = _model.NextStageId > 0
-                    && _model.NextStageId <= StageLoader.MaxStageId
-                    && (_nextStageUnlocked || _model.NextStageUnlocked);
+            PopupManager.Instance.CloseAll();
+            if (_model.NextStageUnlocked)
+                RuntimeNavigationButtons.EnterStage(_model.NextStageId);
+            else
+                SceneLoader.Instance.LoadScene("Lobby");
         }
 
         void ResolveMissingReferences()
         {
-            nextButton ??= FindButton("NextButton");
-            retryButton ??= FindButton("RetryButton");
-            lobbyButton ??= FindButton("LobbyButton");
+            retryButton ??= FindButton("RetryButton") ?? FindButton("Btn_Retry");
+            lobbyButton ??= FindButton("LobbyButton") ?? FindButton("Btn_Lobby");
+            nextButton ??= FindButton("Btn_Next");
+            doubleButton ??= FindButton("Btn_Double");
+            addMovesButton ??= FindButton("Btn_AddMoves");
+            quitButton ??= FindButton("Btn_Quit");
+            successRoot ??= FindRect("SuccessContent");
+            failureRoot ??= FindRect("FailureContent");
+            titleText ??= FindText("Txt_Title");
+            resultText ??= FindText("ResultText");
             stageText ??= FindText("StageText");
             rewardText ??= FindText("RewardText");
             movesText ??= FindText("MovesText");
+            bestText ??= FindText("BestText");
             scoreText ??= FindText("ScoreText");
-            starRow ??= FindRect("StarRow");
+            rankPercentileText ??= FindText("RankPercentileText");
+            starRow ??= FindRect("StarRow") ?? FindRect("Group_Stars");
         }
 
         void BuildFallback()
@@ -218,28 +244,31 @@ namespace ProjectLink.InGame.UI
             panelGo.transform.SetParent(transform, false);
             var panelRect = panelGo.GetComponent<RectTransform>();
             panelRect.anchorMin = panelRect.anchorMax = panelRect.pivot = new Vector2(0.5f, 0.5f);
-            panelRect.sizeDelta = new Vector2(640f, 760f);
+            panelRect.sizeDelta = new Vector2(640f, 780f);
             panelRect.anchoredPosition = Vector2.zero;
             panelGo.GetComponent<Image>().color = new Color(0.1f, 0.1f, 0.15f, 1f);
 
-            AddLocalizedLabel(panelGo.transform, "game_stage_clear", 64, new Vector2(0f, 270f), new Vector2(560f, 90f));
-            stageText = AddLabel(panelGo.transform, "StageText", 38, new Vector2(0f, 190f), new Vector2(500f, 64f));
-            starRow = AddRow(panelGo.transform, "StarRow", new Vector2(0f, 95f), new Vector2(420f, 90f));
-            rewardText = AddLabel(panelGo.transform, "RewardText", 34, new Vector2(0f, 10f), new Vector2(520f, 60f));
-            movesText = AddLabel(panelGo.transform, "MovesText", 30, new Vector2(0f, -55f), new Vector2(520f, 52f));
-            scoreText = AddLabel(panelGo.transform, "ScoreText", 30, new Vector2(0f, -115f), new Vector2(520f, 52f));
-            nextButton = AddLocalizedButton(panelGo.transform, "NextButton", "game_next", new Vector2(0f, -215f));
-            retryButton = AddLocalizedButton(panelGo.transform, "RetryButton", "game_retry", new Vector2(0f, -325f));
-            lobbyButton = AddLocalizedButton(panelGo.transform, "LobbyButton", "game_lobby", new Vector2(0f, -435f));
+            AddLocalizedLabel(panelGo.transform, _model.IsSuccess ? "popup.clear.title" : "popup.clear.failed", 48, new Vector2(0f, 290f), new Vector2(560f, 72f));
+            stageText = AddLabel(panelGo.transform, "StageText", 34, new Vector2(0f, 230f), new Vector2(520f, 56f));
+            rankPercentileText = AddLabel(panelGo.transform, "RankPercentileText", 28, new Vector2(0f, 175f), new Vector2(420f, 44f));
+            rankPercentileText.color = new Color(1f, 0.85f, 0.2f, 1f);
+            starRow = AddRow(panelGo.transform, "StarRow", new Vector2(0f, 110f), new Vector2(420f, 90f));
+            scoreText = AddLabel(panelGo.transform, "ScoreText", 28, new Vector2(0f, 40f), new Vector2(520f, 48f));
+            movesText = AddLabel(panelGo.transform, "MovesText", 26, new Vector2(0f, -15f), new Vector2(520f, 44f));
+            rewardText = AddLabel(panelGo.transform, "RewardText", 26, new Vector2(0f, -65f), new Vector2(520f, 44f));
+            retryButton = AddLocalizedButton(panelGo.transform, "RetryButton", "popup.clear.retry", new Vector2(0f, -185f));
+            lobbyButton = AddLocalizedButton(panelGo.transform, "LobbyButton", "common.lobby", new Vector2(0f, -295f));
         }
 
-        void AddStar(int index)
+        void AddStar(RectTransform parent, bool filled)
         {
-            if (starRow == null) return;
-
-            var go = new GameObject($"Star_{index}", typeof(RectTransform), typeof(Image), typeof(LayoutElement));
-            go.transform.SetParent(starRow, false);
-            go.GetComponent<Image>().color = new Color(1f, 0.85f, 0f, 1f);
+            if (parent == null) return;
+            var go = new GameObject("Star", typeof(RectTransform), typeof(Image), typeof(LayoutElement));
+            go.transform.SetParent(parent, false);
+            var img = go.GetComponent<Image>();
+            var sprite = filled ? starOnSprite : starOffSprite;
+            if (sprite != null) { img.sprite = sprite; img.color = Color.white; img.preserveAspect = true; }
+            else img.color = filled ? new Color(1f, 0.82f, 0.1f, 1f) : new Color(1f, 1f, 1f, 0.2f);
             var element = go.GetComponent<LayoutElement>();
             element.preferredWidth = 82f;
             element.preferredHeight = 82f;
@@ -254,7 +283,7 @@ namespace ProjectLink.InGame.UI
             rect.sizeDelta = new Vector2(420f, 86f);
             rect.anchoredPosition = anchoredPos;
             go.GetComponent<Image>().color = new Color(0.2f, 0.5f, 0.9f, 1f);
-            AddLocalizedLabel(go.transform, stringId, 38, Vector2.zero, new Vector2(400f, 80f));
+            AddLocalizedLabel(go.transform, stringId, 34, Vector2.zero, new Vector2(400f, 80f));
             return go.GetComponent<Button>();
         }
 
@@ -321,6 +350,13 @@ namespace ProjectLink.InGame.UI
         {
             if (label != null)
                 label.text = value ?? "";
+        }
+
+        void SetAllText(string objectName, string value)
+        {
+            foreach (var label in GetComponentsInChildren<TextMeshProUGUI>(true))
+                if (label.name == objectName)
+                    label.text = value ?? "";
         }
 
         static void ClearChildren(RectTransform parent)

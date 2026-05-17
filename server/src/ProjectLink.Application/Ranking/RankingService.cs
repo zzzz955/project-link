@@ -158,6 +158,16 @@ public class RankingService
         return (long)(encodedScore / 1e10);
     }
 
+    public async Task<int?> GetStageRankPercentileAsync(string userId, int stageId, CancellationToken ct)
+    {
+        var key   = $"ranking:stage:{stageId}:score";
+        var rank  = await _redis.SortedSetRankAsync(key, userId, Order.Descending);
+        if (!rank.HasValue) return null;
+        var total = await _redis.SortedSetLengthAsync(key);
+        if (total == 0) return null;
+        return (int)Math.Ceiling((double)(rank.Value + 1) / total * 100);
+    }
+
     public async Task<MyRankResponse> GetMyRankAsync(string userId, CancellationToken ct)
     {
         MyRankEntry? stagesEntry = null;

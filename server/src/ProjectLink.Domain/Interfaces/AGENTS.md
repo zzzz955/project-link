@@ -30,6 +30,7 @@
 | `IStreakChallengeTransaction.ActivateAsync` | method | creates new cycle + level rows; idempotent on duplicate cycleId |
 | `IStreakChallengeTransaction.ClaimRewardAsync` | method | marks level reward claimed; deduplicates via correlation_id |
 | `IStaminaRefillTransaction.ExecuteAsync` | method | throws `StaminaAlreadyFullException` or `InsufficientFundsException` |
+| `IStaticDataService.GetTimeExtendConfig` | method | O(1) lookup by extensionCount; null if not configured; used by `StageService.ExtendAsync` |
 
 ## Cross-refs
 - Implemented by: server `Infrastructure.Persistence.*` and `Infrastructure.Data.StaticDataService`

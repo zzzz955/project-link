@@ -19,7 +19,12 @@ namespace ProjectLink.Core
         public void NotifyReady() => _readyToFadeIn = true;
 
         private Image _overlay;
+        private Image _spinner;
         private TextMeshProUGUI _loadingText;
+        private Coroutine _spinRoutine;
+        private Coroutine _textRoutine;
+
+        private static readonly string[] _loadingDots = { "Loading.", "Loading..", "Loading..." };
 
         void Awake()
         {
@@ -55,6 +60,28 @@ namespace ProjectLink.Core
             _overlay = imageGo.AddComponent<Image>();
             _overlay.color = new Color(0, 0, 0, 0);
             _overlay.raycastTarget = false;
+            // Attempt to load a custom skin sprite; falls back to solid color if absent
+            var skinSprite = Resources.Load<Sprite>("UI/slot_loading_bg");
+            if (skinSprite != null) _overlay.sprite = skinSprite;
+
+            var spinnerGo = new GameObject("Spinner");
+            spinnerGo.transform.SetParent(canvasGo.transform, false);
+            var srt = spinnerGo.AddComponent<RectTransform>();
+            srt.anchorMin = new Vector2(0.5f, 0.5f);
+            srt.anchorMax = new Vector2(0.5f, 0.5f);
+            srt.pivot = new Vector2(0.5f, 0.5f);
+            srt.sizeDelta = new Vector2(120, 120);
+            srt.anchoredPosition = new Vector2(0, 80);
+            _spinner = spinnerGo.AddComponent<Image>();
+            _spinner.color = new Color(1, 1, 1, 0);
+            _spinner.raycastTarget = false;
+            var spinnerSprite = Resources.Load<Sprite>("UI/slot_loading_spinner");
+            if (spinnerSprite != null)
+            {
+                _spinner.sprite = spinnerSprite;
+                _spinner.color = Color.white;
+            }
+            spinnerGo.SetActive(false);
 
             var textGo = new GameObject("LoadingText");
             textGo.transform.SetParent(canvasGo.transform, false);
@@ -62,10 +89,10 @@ namespace ProjectLink.Core
             textRt.anchorMin = new Vector2(0.5f, 0.5f);
             textRt.anchorMax = new Vector2(0.5f, 0.5f);
             textRt.pivot = new Vector2(0.5f, 0.5f);
-            textRt.sizeDelta = new Vector2(200, 60);
-            textRt.anchoredPosition = Vector2.zero;
+            textRt.sizeDelta = new Vector2(300, 60);
+            textRt.anchoredPosition = new Vector2(0, -40);
             _loadingText = textGo.AddComponent<TextMeshProUGUI>();
-            _loadingText.text = "...";
+            _loadingText.text = _loadingDots[0];
             _loadingText.fontSize = 48;
             _loadingText.alignment = TextAlignmentOptions.Center;
             _loadingText.color = Color.white;
@@ -98,6 +125,44 @@ namespace ProjectLink.Core
             _overlay.raycastTarget = false;
         }
 
+        private IEnumerator SpinRoutine()
+        {
+            while (true)
+            {
+                _spinner.transform.Rotate(0f, 0f, -360f * Time.deltaTime);
+                yield return null;
+            }
+        }
+
+        private IEnumerator LoadingTextRoutine()
+        {
+            int index = 0;
+            while (true)
+            {
+                _loadingText.text = _loadingDots[index % _loadingDots.Length];
+                index++;
+                yield return new WaitForSecondsRealtime(0.4f);
+            }
+        }
+
+        private void StartLoadingVisuals()
+        {
+            _loadingText.gameObject.SetActive(true);
+            _spinner.gameObject.SetActive(true);
+            if (_textRoutine != null) StopCoroutine(_textRoutine);
+            _textRoutine = StartCoroutine(LoadingTextRoutine());
+            if (_spinRoutine != null) StopCoroutine(_spinRoutine);
+            _spinRoutine = StartCoroutine(SpinRoutine());
+        }
+
+        private void StopLoadingVisuals()
+        {
+            _loadingText.gameObject.SetActive(false);
+            _spinner.gameObject.SetActive(false);
+            if (_textRoutine != null) { StopCoroutine(_textRoutine); _textRoutine = null; }
+            if (_spinRoutine != null) { StopCoroutine(_spinRoutine); _spinRoutine = null; }
+        }
+
         public void LoadScene(string sceneName, Action onComplete = null)
         {
             if (IsLoading) return;
@@ -115,7 +180,7 @@ namespace ProjectLink.Core
             _readyToFadeIn = true;
             IsLoading = true;
             yield return FadeOut(0.3f);
-            _loadingText.gameObject.SetActive(true);
+            StartLoadingVisuals();
             var op = SceneManager.LoadSceneAsync(sceneName);
             op.allowSceneActivation = false;
             float elapsed = 0f;
@@ -124,7 +189,7 @@ namespace ProjectLink.Core
                 elapsed += Time.deltaTime;
                 yield return null;
             }
-            _loadingText.gameObject.SetActive(false);
+            StopLoadingVisuals();
             op.allowSceneActivation = true;
             yield return new WaitUntil(() => op.isDone);
             yield return new WaitUntil(() => _readyToFadeIn);
@@ -138,7 +203,7 @@ namespace ProjectLink.Core
             _readyToFadeIn = true;
             IsLoading = true;
             yield return FadeOut(0.3f);
-            _loadingText.gameObject.SetActive(true);
+            StartLoadingVisuals();
             var op = SceneManager.LoadSceneAsync(buildIndex);
             op.allowSceneActivation = false;
             float elapsed = 0f;
@@ -147,7 +212,7 @@ namespace ProjectLink.Core
                 elapsed += Time.deltaTime;
                 yield return null;
             }
-            _loadingText.gameObject.SetActive(false);
+            StopLoadingVisuals();
             op.allowSceneActivation = true;
             yield return new WaitUntil(() => op.isDone);
             yield return new WaitUntil(() => _readyToFadeIn);

@@ -16,11 +16,30 @@ namespace ProjectLink.InGame.UI
         [SerializeField] Button brushButton;
         [SerializeField] TextMeshProUGUI levelLabelText;
         [SerializeField] TextMeshProUGUI moveCounterText;
+        [SerializeField] TextMeshProUGUI timerText;
+        [SerializeField] TextMeshProUGUI objectiveText;
+
+        public TextMeshProUGUI MoveCounterText => moveCounterText;
+        public TextMeshProUGUI TimerText => timerText;
+        public TextMeshProUGUI ObjectiveText => objectiveText;
+
+        void Awake()
+        {
+            // Resolve refs by name if not set in inspector
+            timerText ??= FindText("Txt_Timer");
+            objectiveText ??= FindText("Txt_Objective");
+            if (moveCounterText == null)
+                moveCounterText = FindText("Txt_Moves");
+        }
 
         void Start()
         {
-            SetText(levelLabelText, $"Stage {GameContext.SelectedStageId}");
-            SetText(moveCounterText, "");
+            SetText(levelLabelText, string.Format(LocalizationManager.Get("popup.stage.title_n_fmt"), GameContext.SelectedStageId));
+        }
+
+        public void SetStageLabel(int stageId)
+        {
+            SetText(levelLabelText, string.Format(LocalizationManager.Get("popup.stage.title_n_fmt"), stageId));
         }
 
         public void SetToolButtonsInteractable(bool interactable)
@@ -32,6 +51,13 @@ namespace ProjectLink.InGame.UI
             if (paintItemButton != null) paintItemButton.interactable = interactable;
             if (hammerButton != null) hammerButton.interactable = interactable;
             if (brushButton != null) brushButton.interactable = interactable;
+        }
+
+        TextMeshProUGUI FindText(string childName)
+        {
+            foreach (var t in GetComponentsInChildren<TextMeshProUGUI>(true))
+                if (t.name == childName) return t;
+            return null;
         }
 
         static void SetText(TextMeshProUGUI label, string value)

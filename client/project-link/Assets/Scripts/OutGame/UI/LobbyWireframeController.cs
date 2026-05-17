@@ -47,6 +47,14 @@ namespace ProjectLink.OutGame.UI
         readonly Dictionary<int, int> _stageStars = new();
         readonly HashSet<int> _unlockedStages = new();
         bool _progressLoaded;
+        bool _staminaFull;
+        bool _firstLobbyApply = true;
+        Coroutine _energyAnim;
+        Coroutine _coinAnim;
+        [SerializeField] Sprite starOnSprite;
+        [SerializeField] Sprite starOffSprite;
+        [SerializeField] Sprite[] difficultySprites;
+        [SerializeField] Sprite lockSprite;
         DateTimeOffset? _nextRechargeAt;
         float _nextTimerRefreshAt;
         RectTransform _centerStageNode;
@@ -130,14 +138,43 @@ namespace ProjectLink.OutGame.UI
         void ApplyShop(ShopScreenModel model)
         {
             SetText(shopBalanceText, FormatNumber(model.SoftBalance));
-            ClearRows(shopContent, "Product_");
+            ConfigureShopGrid();
+            ClearRows(shopContent, "Product_", "Section_");
 
-            foreach (var product in model.Products)
+            for (int i = 0; i < model.Products.Count; i++)
             {
-                string title = string.IsNullOrEmpty(product.ItemName) ? product.Name : product.ItemName;
-                string price = product.IsIapProduct ? product.PriceIapSku : FormatNumber(product.PriceSoft);
-                AddRow(shopContent, $"Product_{product.ProductId}", title, price, true);
+                var p = model.Products[i];
+                var title = p.Category == "COIN" && p.GrantQuantity > 0
+                    ? FormatNumber(p.GrantQuantity)
+                    : p.ItemName ?? p.Name;
+                var price = p.PriceSoft > 0 ? FormatNumber(p.PriceSoft) : p.PriceIapSku;
+                AddProductCard(shopContent, $"Product_{p.ProductId}", title, price, i == 1);
             }
+        }
+
+        void ConfigureShopGrid()
+        {
+            if (shopContent == null) return;
+
+            var balance = shopContent.Find("Row_Balance");
+            if (balance != null) balance.gameObject.SetActive(false);
+            var header = shopContent.Find("Header_Stamina");
+            if (header != null) header.gameObject.SetActive(false);
+
+            var vertical = shopContent.GetComponent<VerticalLayoutGroup>();
+            if (vertical != null) DestroyImmediate(vertical);
+            var fitter = shopContent.GetComponent<ContentSizeFitter>();
+            if (fitter == null) fitter = shopContent.gameObject.AddComponent<ContentSizeFitter>();
+            fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+            var grid = shopContent.GetComponent<GridLayoutGroup>();
+            if (grid == null) grid = shopContent.gameObject.AddComponent<GridLayoutGroup>();
+            grid.cellSize = new Vector2(280f, 500f);
+            grid.spacing = new Vector2(24f, 24f);
+            grid.padding = new RectOffset(16, 16, 16, 16);
+            grid.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
+            grid.constraintCount = 3;
+            grid.childAlignment = TextAnchor.UpperCenter;
         }
 
         void ApplyLobby(LobbyScreenModel lobby)
@@ -156,10 +193,22 @@ namespace ProjectLink.OutGame.UI
             GameContext.SelectedStageId = _selectedStageId;
             _nextRechargeAt = ParseDateTime(lobby.NextRechargeAt);
 
-            SetText(profileNameText, string.IsNullOrEmpty(lobby.DisplayName) ? "Guest" : lobby.DisplayName);
-            SetText(energyText, $"{lobby.StaminaCurrent}/{lobby.StaminaMax}");
+            _staminaFull = lobby.StaminaCurrent >= lobby.StaminaMax;
+            if (_firstLobbyApply)
+            {
+                _firstLobbyApply = false;
+                if (_energyAnim != null) StopCoroutine(_energyAnim);
+                _energyAnim = StartCoroutine(AnimateCount(energyText, lobby.StaminaCurrent, 0.8f,
+                    v => v.ToString(CultureInfo.InvariantCulture)));
+                if (_coinAnim != null) StopCoroutine(_coinAnim);
+                _coinAnim = StartCoroutine(AnimateCount(coinText, lobby.SoftCurrency, 0.8f, FormatNumber));
+            }
+            else
+            {
+                SetText(energyText, lobby.StaminaCurrent.ToString(CultureInfo.InvariantCulture));
+                SetText(coinText, FormatNumber(lobby.SoftCurrency));
+            }
             RefreshStaminaTimer();
-            SetText(coinText, FormatNumber(lobby.SoftCurrency));
             RefreshStageCarousel();
             var sc = lobby.StreakChallenge;
             streakBadge?.Apply(sc?.EventStatus, sc?.HasPendingReward ?? false, sc?.RemainingTimeIso ?? "");
@@ -198,14 +247,14 @@ namespace ProjectLink.OutGame.UI
 
         void ApplyRanking(RankingListResponse ranking)
         {
-            ClearRows(rankingContent, "TopRankCard", "Rank_", "MyRankPin");
+            ClearRows(rankingContent, "TopRankCard", "Rank_");
             SetText(rankingMetricText, ranking.MetricLabel);
             RefreshRankingSegmentState(ranking.Category);
 
             if (ranking.Entries.Count > 0)
             {
                 var top = ranking.Entries[0];
-                AddRow(rankingContent, "TopRankCard", $"#1 {top.DisplayName}", FormatNumber(top.Value), top.IsMe);
+                AddRow(rankingContent, "TopRankCard", $"#1 {top.DisplayName}", FormatNumber(top.Value), highlighted: true);
             }
 
             for (int i = 0; i < ranking.Entries.Count; i++)
@@ -216,7 +265,6 @@ namespace ProjectLink.OutGame.UI
 
             if (ranking.MyRank != null)
             {
-                AddRow(rankingContent, "MyRankPin", $"#{ranking.MyRank.Rank} {ranking.MyRank.DisplayName}", FormatNumber(ranking.MyRank.Value), true);
                 SetText(_pinnedRankText, $"#{ranking.MyRank.Rank}");
                 SetText(_pinnedScoreText, FormatNumber(ranking.MyRank.Value));
             }
@@ -229,7 +277,6 @@ namespace ProjectLink.OutGame.UI
 
         void ResolveMissingReferences()
         {
-            profileNameText ??= FindText("Txt_Nickname");
             energyText ??= FindText("Txt_StaminaCount");
             staminaTimerText ??= FindText("Txt_StaminaTimer");
             coinText ??= FindText("Txt_CurrencyCount");
@@ -254,8 +301,16 @@ namespace ProjectLink.OutGame.UI
             EnsureSideStageNodes();
         }
 
+        void BindAvatarButton()
+        {
+            var avatarBtn = FindButton("Slot_Avatar");
+            if (avatarBtn != null)
+                avatarBtn.onClick.AddListener(() => PopupManager.Request(PopupId.Account));
+        }
+
         void BindStageNavigation()
         {
+            BindAvatarButton();
             if (previousStageButton != null)
             {
                 previousStageButton.onClick.AddListener(SelectPreviousStage);
@@ -301,9 +356,29 @@ namespace ProjectLink.OutGame.UI
 
             SetText(previousStageNumberText, hasPrev ? (_selectedStageId - 1).ToString(CultureInfo.InvariantCulture) : "");
             SetText(nextStageNumberText,     hasNext ? (_selectedStageId + 1).ToString(CultureInfo.InvariantCulture) : "");
+            // starsText kept for fallback; primary rendering via Img_Star_* images
             SetText(starsText, FormatStageStars(_selectedStageId));
             SetText(_previousStageStarsText, hasPrev ? FormatStageStars(_selectedStageId - 1) : "");
             SetText(_nextStageStarsText, hasNext ? FormatStageStars(_selectedStageId + 1) : "");
+
+            if (_centerStageNode != null)
+            {
+                RenderStarImages(_centerStageNode, _selectedStageId);
+                RenderDifficultySprite(_centerStageNode, _selectedStageId);
+                RenderLockIcon(_centerStageNode, _selectedStageId);
+            }
+            if (_previousStageNode != null && hasPrev)
+            {
+                RenderStarImages(_previousStageNode, _selectedStageId - 1);
+                RenderDifficultySprite(_previousStageNode, _selectedStageId - 1);
+                RenderLockIcon(_previousStageNode, _selectedStageId - 1);
+            }
+            if (_nextStageNode != null && hasNext)
+            {
+                RenderStarImages(_nextStageNode, _selectedStageId + 1);
+                RenderDifficultySprite(_nextStageNode, _selectedStageId + 1);
+                RenderLockIcon(_nextStageNode, _selectedStageId + 1);
+            }
 
             if (previousStageButton != null)
                 previousStageButton.interactable = hasPrev;
@@ -358,14 +433,55 @@ namespace ProjectLink.OutGame.UI
                 : "0";
         }
 
+        void RenderStarImages(RectTransform node, int stageId)
+        {
+            var starsRow = node.Find("Group_Stars") as RectTransform;
+            if (starsRow == null) return;
+            int earned = _stageStars.TryGetValue(stageId, out var s) ? s : 0;
+            for (int i = 0; i < 3; i++)
+            {
+                var slot = starsRow.Find($"Img_Star_{i}");
+                if (slot == null) continue;
+                var img = slot.GetComponent<UnityEngine.UI.Image>();
+                if (img == null) continue;
+                bool filled = i < earned;
+                var sprite = filled ? starOnSprite : starOffSprite;
+                if (sprite != null) { img.sprite = sprite; img.color = Color.white; img.preserveAspect = true; }
+                else img.color = filled ? new Color(1f, 0.82f, 0.15f, 1f) : new Color(1f, 1f, 1f, 0.25f);
+            }
+        }
+
+        void RenderDifficultySprite(RectTransform node, int stageId)
+        {
+            if (difficultySprites == null || difficultySprites.Length == 0) return;
+            var img = node.GetComponent<UnityEngine.UI.Image>();
+            if (img == null) return;
+            int difficulty = Mathf.Clamp(StageLoader.GetDifficulty(stageId), 1, difficultySprites.Length);
+            var sprite = difficultySprites[difficulty - 1];
+            if (sprite != null) { img.sprite = sprite; img.color = Color.white; img.preserveAspect = false; }
+        }
+
+        void RenderLockIcon(RectTransform node, int stageId)
+        {
+            var lockIconTf = node.Find("LockIcon");
+            if (lockIconTf == null) return;
+            bool locked = _progressLoaded && !_unlockedStages.Contains(stageId);
+            lockIconTf.gameObject.SetActive(locked);
+            if (locked && lockSprite != null)
+            {
+                var img = lockIconTf.GetComponent<UnityEngine.UI.Image>();
+                if (img != null) { img.sprite = lockSprite; img.color = Color.white; }
+            }
+        }
+
         void RefreshStaminaTimer()
         {
             if (staminaTimerText == null)
                 return;
 
-            if (_nextRechargeAt == null)
+            if (_staminaFull || _nextRechargeAt == null)
             {
-                staminaTimerText.text = "";
+                staminaTimerText.text = _staminaFull ? LocalizationManager.Get("status.stamina_full") : "";
                 return;
             }
 
@@ -550,6 +666,82 @@ namespace ProjectLink.OutGame.UI
             return null;
         }
 
+        static void AddSectionHeader(RectTransform parent, string name, string label)
+        {
+            if (parent == null) return;
+            var go = new GameObject(name, typeof(RectTransform), typeof(TextMeshProUGUI), typeof(LayoutElement));
+            go.transform.SetParent(parent, false);
+            var txt = go.GetComponent<TextMeshProUGUI>();
+            txt.text = label;
+            txt.fontSize = 28f;
+            txt.fontStyle = FontStyles.Bold;
+            txt.color = new Color(0.63f, 0.68f, 0.76f, 1f);
+            txt.alignment = TextAlignmentOptions.MidlineLeft;
+            txt.raycastTarget = false;
+            var le = go.GetComponent<LayoutElement>();
+            le.preferredHeight = 56f;
+        }
+
+        static void AddProductCard(RectTransform parent, string name, string title, string price, bool best)
+        {
+            if (parent == null) return;
+            var card = new GameObject(name, typeof(RectTransform), typeof(Image), typeof(LayoutElement));
+            card.transform.SetParent(parent, false);
+            card.GetComponent<Image>().color = new Color(0.06f, 0.16f, 0.28f, 0.9f);
+            var element = card.GetComponent<LayoutElement>();
+            element.preferredWidth = 280f;
+            element.preferredHeight = 500f;
+
+            var rect = card.GetComponent<RectTransform>();
+            // Title — top-left
+            var titleGo = new GameObject("Txt_Title", typeof(RectTransform), typeof(TextMeshProUGUI));
+            titleGo.transform.SetParent(rect, false);
+            var titleRect = titleGo.GetComponent<RectTransform>();
+            titleRect.anchorMin = new Vector2(0f, 1f);
+            titleRect.anchorMax = new Vector2(1f, 1f);
+            titleRect.pivot = new Vector2(0.5f, 1f);
+            titleRect.sizeDelta = new Vector2(0f, 88f);
+            titleRect.anchoredPosition = new Vector2(0f, -36f);
+            var titleTmp = titleGo.GetComponent<TextMeshProUGUI>();
+            titleTmp.text = title;
+            titleTmp.fontSize = 46f;
+            titleTmp.fontStyle = FontStyles.Bold;
+            titleTmp.color = new Color(1f, 0.82f, 0.08f, 1f);
+            titleTmp.alignment = TextAlignmentOptions.Center;
+            titleTmp.raycastTarget = false;
+
+            // Price — bottom-right
+            var iconGo = new GameObject("Icon_Wire", typeof(RectTransform), typeof(TextMeshProUGUI));
+            iconGo.transform.SetParent(rect, false);
+            var iconRect = iconGo.GetComponent<RectTransform>();
+            iconRect.anchorMin = iconRect.anchorMax = iconRect.pivot = new Vector2(0.5f, 0.5f);
+            iconRect.sizeDelta = new Vector2(190f, 190f);
+            iconRect.anchoredPosition = new Vector2(0f, 16f);
+            var iconTmp = iconGo.GetComponent<TextMeshProUGUI>();
+            iconTmp.text = "*";
+            iconTmp.fontSize = 150f;
+            iconTmp.fontStyle = FontStyles.Bold;
+            iconTmp.color = new Color(1f, 0.75f, 0.02f, 1f);
+            iconTmp.alignment = TextAlignmentOptions.Center;
+            iconTmp.raycastTarget = false;
+
+            var priceGo = new GameObject("Txt_Price", typeof(RectTransform), typeof(TextMeshProUGUI));
+            priceGo.transform.SetParent(rect, false);
+            var priceRect = priceGo.GetComponent<RectTransform>();
+            priceRect.anchorMin = new Vector2(0f, 0f);
+            priceRect.anchorMax = new Vector2(1f, 0f);
+            priceRect.pivot = new Vector2(0.5f, 0f);
+            priceRect.sizeDelta = new Vector2(-36f, 96f);
+            priceRect.anchoredPosition = new Vector2(0f, 26f);
+            var priceTmp = priceGo.GetComponent<TextMeshProUGUI>();
+            priceTmp.text = price;
+            priceTmp.fontSize = 36f;
+            priceTmp.fontStyle = FontStyles.Bold;
+            priceTmp.color = Color.white;
+            priceTmp.alignment = TextAlignmentOptions.Center;
+            priceTmp.raycastTarget = false;
+        }
+
         static void AddRow(RectTransform parent, string rowName, string left, string right, bool highlighted)
         {
             if (parent == null) return;
@@ -631,6 +823,19 @@ namespace ProjectLink.OutGame.UI
         static string FormatNumber(long value)
         {
             return value.ToString("N0", CultureInfo.InvariantCulture);
+        }
+
+        IEnumerator AnimateCount(TextMeshProUGUI label, long target, float duration, Func<long, string> formatter)
+        {
+            float elapsed = 0f;
+            while (elapsed < duration)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                float t = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(elapsed / duration));
+                if (label != null) label.text = formatter((long)(t * target));
+                yield return null;
+            }
+            if (label != null) label.text = formatter(target);
         }
     }
 }

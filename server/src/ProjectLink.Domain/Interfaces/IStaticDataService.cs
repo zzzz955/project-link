@@ -13,7 +13,8 @@ public interface IStaticDataService
     IReadOnlyList<OutgameAvatarData>     GetAllAvatars();
     IReadOnlyList<OutgameShopCatalogData> GetShopCatalog();
     OutgameShopCatalogData?              GetShopProduct(int productId);
-    IReadOnlyList<OutgameSeasonEventData> GetAllSeasonEvents();
+    IReadOnlyList<OutgameSeasonEventData>   GetAllSeasonEvents();
+    OutgameTimeExtendConfigData?            GetTimeExtendConfig(int extensionCount);
 
     StreakChallengeEventData?              GetStreakChallengeEvent(int eventId, int version);
     StreakChallengeEventData?              GetLatestEnabledStreakChallengeEvent();

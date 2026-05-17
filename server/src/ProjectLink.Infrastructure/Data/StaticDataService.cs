@@ -12,6 +12,7 @@ public class StaticDataService : IStaticDataService
     private readonly IReadOnlyDictionary<int, OutgameAvatarData>     _avatars;
     private readonly IReadOnlyDictionary<int, OutgameShopCatalogData> _shopCatalog;
     private readonly IReadOnlyList<OutgameSeasonEventData>            _seasonEvents;
+    private readonly IReadOnlyDictionary<int, OutgameTimeExtendConfigData> _timeExtendConfigs;
     private readonly IReadOnlyDictionary<(int, int), StreakChallengeEventData>         _streakEvents;
     private readonly IReadOnlyDictionary<(int, int), List<StreakChallengeLevelData>>   _streakLevels;
     private readonly IReadOnlyDictionary<(int, int), List<StreakChallengeRewardItemData>> _streakRewardItems;
@@ -29,6 +30,7 @@ public class StaticDataService : IStaticDataService
         _avatars           = LoadAvatars(Path.Combine(outgamePath, "outgame_avatar.csv"), logger);
         _shopCatalog       = LoadShopCatalog(Path.Combine(outgamePath, "outgame_shop_catalog.csv"), logger);
         _seasonEvents      = LoadSeasonEvents(Path.Combine(outgamePath, "outgame_season_event.csv"), logger);
+        _timeExtendConfigs = LoadTimeExtendConfigs(Path.Combine(outgamePath, "outgame_time_extend_config.csv"), logger);
         _streakEvents      = LoadStreakEvents(Path.Combine(streakPath, "streak_challenge_event.csv"), logger);
         _streakLevels      = LoadStreakLevels(Path.Combine(streakPath, "streak_challenge_level.csv"), logger);
         _streakRewardItems = LoadStreakRewardItems(Path.Combine(streakPath, "streak_challenge_reward_item.csv"), logger);
@@ -42,7 +44,8 @@ public class StaticDataService : IStaticDataService
     public IReadOnlyList<OutgameAvatarData>      GetAllAvatars()            => _avatars.Values.ToList();
     public IReadOnlyList<OutgameShopCatalogData> GetShopCatalog()           => _shopCatalog.Values.ToList();
     public OutgameShopCatalogData?               GetShopProduct(int id)     => _shopCatalog.GetValueOrDefault(id);
-    public IReadOnlyList<OutgameSeasonEventData> GetAllSeasonEvents()       => _seasonEvents;
+    public IReadOnlyList<OutgameSeasonEventData> GetAllSeasonEvents()            => _seasonEvents;
+    public OutgameTimeExtendConfigData?          GetTimeExtendConfig(int count) => _timeExtendConfigs.GetValueOrDefault(count);
 
     public StreakChallengeEventData? GetStreakChallengeEvent(int eventId, int version)
         => _streakEvents.GetValueOrDefault((eventId, version));
@@ -195,6 +198,31 @@ public class StaticDataService : IStaticDataService
             };
         }
         logger.LogInformation("Loaded {Count} shop products from static data", result.Count);
+        return result;
+    }
+
+    // outgame_time_extend_config: extensionCount,extendSeconds,costSoft
+    private static IReadOnlyDictionary<int, OutgameTimeExtendConfigData> LoadTimeExtendConfigs(string path, ILogger logger)
+    {
+        var result = new Dictionary<int, OutgameTimeExtendConfigData>();
+        if (!File.Exists(path)) { logger.LogWarning("outgame_time_extend_config.csv not found at {Path}", path); return result; }
+
+        using var reader = new StreamReader(path);
+        reader.ReadLine();
+        string? line;
+        while ((line = reader.ReadLine()) is not null)
+        {
+            if (string.IsNullOrWhiteSpace(line)) continue;
+            var cols = line.Split(',');
+            var row = new OutgameTimeExtendConfigData
+            {
+                ExtensionCount = int.Parse(cols[0]),
+                ExtendSeconds  = int.Parse(cols[1]),
+                CostSoft       = int.Parse(cols[2]),
+            };
+            result[row.ExtensionCount] = row;
+        }
+        logger.LogInformation("Loaded {Count} time extend config rows from static data", result.Count);
         return result;
     }
 

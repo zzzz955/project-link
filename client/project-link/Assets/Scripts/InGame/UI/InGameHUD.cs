@@ -15,7 +15,6 @@ namespace ProjectLink.InGame.UI
         TextMeshProUGUI _timerText;
         Func<int> _getConnectedCount;
         int _totalColors;
-        RectTransform _root;
 
         static readonly Color _timerNormal = Color.white;
         static readonly Color _timerUrgent = new(1f, 0.25f, 0.3f, 1f);
@@ -25,10 +24,8 @@ namespace ProjectLink.InGame.UI
             _totalColors = totalColors;
             _getConnectedCount = getConnectedCount;
 
-            var parent = UIManager.Instance.GetLayer(UILayer.HUD);
-            DestroyStaleHud(parent);
-            _root = CreateRoot(parent);
-            BuildHud(_root, stageId, timeLimitSeconds > 0);
+            // Bind to DDL-generated elements first; fall back to runtime creation
+            BindToDdlElements(stageId, timeLimitSeconds > 0);
             Refresh();
         }
 
@@ -46,21 +43,82 @@ namespace ProjectLink.InGame.UI
             _timerText.color = s <= 10 ? _timerUrgent : _timerNormal;
         }
 
+        public void SetMoveDisplay(int movesUsed, int moveLimit)
+        {
+            if (_moveCounterText == null) return;
+            _moveCounterText.text = moveLimit > 0 ? $"{movesUsed}/{moveLimit}" : movesUsed.ToString();
+        }
+
+        void BindToDdlElements(int stageId, bool showTimer)
+        {
+            var hudLayer = UIManager.Instance?.GetLayer(UILayer.HUD);
+            if (hudLayer == null) return;
+
+            // Search scene-wide first (HUD_Top lives on GameCanvas safe area, not under Canvas_HUD)
+            var ctrl = UnityEngine.Object.FindFirstObjectByType<GameWireframeController>(FindObjectsInactive.Include);
+            if (ctrl == null)
+                ctrl = hudLayer.GetComponentInChildren<GameWireframeController>(true);
+            if (ctrl != null)
+            {
+                ctrl.SetStageLabel(stageId);
+                _moveCounterText = ctrl.MoveCounterText;
+                _timerText = ctrl.TimerText;
+                _pipeCounterText = ctrl.ObjectiveText;
+
+                // Bind pause button from DDL
+                var pauseBtn = FindButtonInHud(hudLayer, "Btn_Pause");
+                if (pauseBtn != null)
+                    pauseBtn.onClick.AddListener(() => OnPausePressed?.Invoke());
+                return;
+            }
+
+            // Fallback: create runtime HUD root if DDL controller not found
+            CreateRuntimeHud(hudLayer, stageId, showTimer);
+        }
+
+        void CreateRuntimeHud(Transform parent, int stageId, bool showTimer)
+        {
+            DestroyStaleHud(parent);
+            var root = CreateRoot(parent);
+            BuildHudFallback(root, stageId, showTimer);
+        }
+
+        void BuildHudFallback(RectTransform root, int stageId, bool showTimer)
+        {
+            AddImageSlot(root, "LevelHeaderSlot", new Vector2(0f, -20f), new Vector2(360f, 160f), true);
+            AddImageSlot(root, "BottomToolBarSlot", new Vector2(0f, 56f), new Vector2(980f, 170f), false);
+
+            var pause = AddHotspot(root, "PauseButton", new Vector2(425f, -78f), new Vector2(120f, 120f), true);
+            pause.onClick.AddListener(() => OnPausePressed?.Invoke());
+
+            AddHotspot(root, "HintButton",    new Vector2(-405f, 56f), new Vector2(150f, 150f), false).onClick.AddListener(OpenBuyItemPopup);
+            AddHotspot(root, "UndoButton",    new Vector2(-225f, 56f), new Vector2(150f, 150f), false).onClick.AddListener(OpenBuyItemPopup);
+            AddHotspot(root, "ShuffleButton", new Vector2(120f,  56f), new Vector2(140f, 140f), false).onClick.AddListener(OpenBuyItemPopup);
+            AddHotspot(root, "HammerButton",  new Vector2(295f,  56f), new Vector2(140f, 140f), false).onClick.AddListener(OpenBuyItemPopup);
+            AddHotspot(root, "PaintButton",   new Vector2(470f,  56f), new Vector2(140f, 140f), false).onClick.AddListener(OpenBuyItemPopup);
+
+            _pipeCounterText = AddDynamicLabel(root, "0 / 0",  60, new Vector2(42f,   -105f), new Vector2(150f, 80f),  true);
+            _moveCounterText = AddDynamicLabel(root, "",        34, new Vector2(0f,    -42f),  new Vector2(260f, 56f),  true);
+
+            if (showTimer)
+                _timerText = AddDynamicLabel(root, "--:--", 36, new Vector2(-345f, -82f), new Vector2(150f, 58f), true);
+        }
+
         void OnDestroy()
         {
-            if (_root != null)
-                Destroy(_root.gameObject);
+            // Runtime root is parented to UILayer.HUD; clean up if we created one
+            var hudLayer = UIManager.Instance?.GetLayer(UILayer.HUD);
+            if (hudLayer == null) return;
+            var stale = hudLayer.Find("WireframeInGameHUD");
+            if (stale != null) Destroy(stale.gameObject);
         }
 
         static void DestroyStaleHud(Transform parent)
         {
             var stale = parent.Find("ModernInGameHUD");
-            if (stale != null)
-                Destroy(stale.gameObject);
-
+            if (stale != null) Destroy(stale.gameObject);
             stale = parent.Find("WireframeInGameHUD");
-            if (stale != null)
-                Destroy(stale.gameObject);
+            if (stale != null) Destroy(stale.gameObject);
         }
 
         static RectTransform CreateRoot(Transform parent)
@@ -72,31 +130,11 @@ namespace ProjectLink.InGame.UI
             return rect;
         }
 
-        void BuildHud(RectTransform root, int stageId, bool showTimer)
+        static Button FindButtonInHud(Transform hudRoot, string name)
         {
-            AddImageSlot(root, "LevelHeaderSlot", new Vector2(0f, -20f), new Vector2(360f, 160f), true);
-            AddImageSlot(root, "BottomToolBarSlot", new Vector2(0f, 56f), new Vector2(980f, 170f), false);
-
-            var pause = AddHotspot(root, "PauseButton", new Vector2(425f, -78f), new Vector2(120f, 120f), true);
-            pause.onClick.AddListener(() => OnPausePressed?.Invoke());
-
-            AddHotspot(root, "HintButton", new Vector2(-405f, 56f), new Vector2(150f, 150f), false).onClick.AddListener(OpenBuyItemPopup);
-            AddHotspot(root, "UndoButton", new Vector2(-225f, 56f), new Vector2(150f, 150f), false).onClick.AddListener(OpenBuyItemPopup);
-            AddHotspot(root, "ShuffleButton", new Vector2(120f, 56f), new Vector2(140f, 140f), false).onClick.AddListener(OpenBuyItemPopup);
-            AddHotspot(root, "HammerButton", new Vector2(295f, 56f), new Vector2(140f, 140f), false).onClick.AddListener(OpenBuyItemPopup);
-            AddHotspot(root, "PaintButton", new Vector2(470f, 56f), new Vector2(140f, 140f), false).onClick.AddListener(OpenBuyItemPopup);
-
-            _pipeCounterText = AddDynamicLabel(root, "0 / 0", 60, new Vector2(42f, -105f), new Vector2(150f, 80f), true);
-            _moveCounterText = AddDynamicLabel(root, "", 34, new Vector2(0f, -42f), new Vector2(260f, 56f), true);
-
-            if (showTimer)
-                _timerText = AddDynamicLabel(root, "--:--", 36, new Vector2(-345f, -82f), new Vector2(150f, 58f), true);
-        }
-
-        public void SetMoveDisplay(int movesUsed, int moveLimit)
-        {
-            if (_moveCounterText == null) return;
-            _moveCounterText.text = moveLimit > 0 ? $"{movesUsed}/{moveLimit}" : movesUsed.ToString();
+            foreach (var btn in hudRoot.GetComponentsInChildren<Button>(true))
+                if (btn.name == name) return btn;
+            return null;
         }
 
         static RectTransform AddImageSlot(RectTransform parent, string name, Vector2 position, Vector2 size, bool top)
@@ -106,7 +144,7 @@ namespace ProjectLink.InGame.UI
             var rect = go.GetComponent<RectTransform>();
             rect.anchorMin = top ? new Vector2(0.5f, 1f) : new Vector2(0.5f, 0f);
             rect.anchorMax = rect.anchorMin;
-            rect.pivot = top ? new Vector2(0.5f, 1f) : new Vector2(0.5f, 0f);
+            rect.pivot = rect.anchorMin;
             rect.anchoredPosition = position;
             rect.sizeDelta = size;
 
@@ -124,7 +162,7 @@ namespace ProjectLink.InGame.UI
             var rect = go.GetComponent<RectTransform>();
             rect.anchorMin = top ? new Vector2(0.5f, 1f) : new Vector2(0.5f, 0f);
             rect.anchorMax = rect.anchorMin;
-            rect.pivot = top ? new Vector2(0.5f, 1f) : new Vector2(0.5f, 0f);
+            rect.pivot = rect.anchorMin;
             rect.anchoredPosition = position;
             rect.sizeDelta = size;
 
@@ -145,7 +183,7 @@ namespace ProjectLink.InGame.UI
             var rect = go.GetComponent<RectTransform>();
             rect.anchorMin = top ? new Vector2(0.5f, 1f) : new Vector2(0.5f, 0f);
             rect.anchorMax = rect.anchorMin;
-            rect.pivot = top ? new Vector2(0.5f, 1f) : new Vector2(0.5f, 0f);
+            rect.pivot = rect.anchorMin;
             rect.anchoredPosition = position;
             rect.sizeDelta = rectSize;
 

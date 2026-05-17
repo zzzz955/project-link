@@ -28,6 +28,13 @@ public class StageEndResponse
     public int   MoveLimit         { get; set; }
     public int?                               NextStageId       { get; set; }
     public bool                               NextStageUnlocked { get; set; }
+    public int?                               RankPercentile    { get; set; }
     public StreakChallengeStageResultResponse? StreakChallenge   { get; set; }
+}
+
+public class StageExtendResponse
+{
+    public int  ExtendedSeconds  { get; set; }
+    public long SoftBalanceAfter { get; set; }
 }
 }

@@ -6,7 +6,7 @@ Arguments: $ARGUMENTS — optional guidance for work type, issue number, or comm
 1. Read `.env.dev`.
 2. Use `GITHUB_REPO_URL` as the target GitHub repository.
 3. If `GITHUB_REPO_URL` is missing, STOP and return an exception to the user.
-4. Use the issue list from `GITHUB_REPO_URL` to choose matching issue numbers.
+4. Use the issue list at `https://github.com/madalang-games/project-link/issues` to choose matching issue numbers.
 
 ## Commit Message Convention
 Use one of the following formats:
@@ -31,7 +31,7 @@ Never use `cd {path} && git ...`. Always use `git -C {repo_path} <subcommand>` t
 ## Steps
 1. Read `.env.dev` and verify `GITHUB_REPO_URL` exists.
 2. Run `git status` and inspect the current `git diff`.
-3. Fetch or inspect the issue list for `GITHUB_REPO_URL`.
+3. Fetch or inspect the issue list at `https://github.com/madalang-games/project-link/issues`.
 4. Group changed files and hunks by work nature.
    If multiple distinct work units exist, create separate commits.
 5. For each work unit:

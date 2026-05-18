@@ -6,14 +6,20 @@ namespace ProjectLink.Core
 {
     public sealed class ButtonPressEffect : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IPointerExitHandler
     {
-        const float PressScale = 0.88f;
+        const float PressScaleMultiplier = 0.88f;
         const float AnimDur = 0.07f;
 
         Coroutine _anim;
+        float _restoreScale = 1f;
 
-        public void OnPointerDown(PointerEventData _) => Animate(PressScale);
-        public void OnPointerUp(PointerEventData _)   => Animate(1f);
-        public void OnPointerExit(PointerEventData _) => Animate(1f);
+        public void OnPointerDown(PointerEventData _)
+        {
+            _restoreScale = transform.localScale.x;
+            Animate(_restoreScale * PressScaleMultiplier);
+        }
+
+        public void OnPointerUp(PointerEventData _)   => Animate(_restoreScale);
+        public void OnPointerExit(PointerEventData _) => Animate(_restoreScale);
 
         void Animate(float target)
         {

@@ -3062,6 +3062,7 @@ GameObject:
   - component: {fileID: 5157098510052690749}
   - component: {fileID: 2872992263163046335}
   - component: {fileID: 1302372536466227063}
+  - component: {fileID: 6422902556935608279}
   m_Layer: 0
   m_Name: Btn_Close
   m_TagString: Untagged
@@ -3170,6 +3171,19 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &6422902556935608279
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5857791919243517158}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e864df836f64edd45a88b975a23ba068, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectLink.OutGame.UI.UIIconAnimator
+  intervalSeconds: 5
 --- !u!1 &6484652314329468104
 GameObject:
   m_ObjectHideFlags: 0

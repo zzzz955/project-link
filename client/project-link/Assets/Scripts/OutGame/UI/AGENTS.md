@@ -3,7 +3,8 @@
 ## Files
 | file | class | role |
 |---|---|---|
-| `LocalizedText.cs` | `LocalizedText` | MonoBehaviour; auto-refreshes TMP text on LanguageChanged |
+| `LocalizedText.cs` | `LocalizedText` | MonoBehaviour; auto-refreshes TMP text + font on LanguageChanged (static labels with stringId) |
+| `LocalizedFont.cs` | `LocalizedFont` | MonoBehaviour; auto-applies FontRegistry font on Awake/OnEnable/LanguageChanged (dynamic labels without stringId); UIBuilder adds this to all TMP labels that lack LocalizedText |
 | `LanguageSelector.cs` | `LanguageSelector` | TMP_Dropdown wired to LocalizationManager; builds dropdown template programmatically in Awake if not assigned |
 | `RuntimeNavigationButtons.cs` | `RuntimeNavigationButtons` | Scene navigation + popup trigger entry points |
 | `BootstrapWireframeController.cs` | `BootstrapWireframeController` | Bootstrap generated UI refs; renders `BootstrapViewModel` loading/version/force-update state |
@@ -14,6 +15,7 @@
 | `SafeAreaFitter.cs` | `SafeAreaFitter` | Adjusts RectTransform anchors to device safe area in Awake |
 | `ModernUI.cs` | `ModernUI` | Shared code-created glossy UI helper methods/colors |
 | `RepeatButton.cs` | `RepeatButton` | Pointer hold helper that repeats button actions for carousel navigation |
+| `UIIconAnimator.cs` | `UIIconAnimator` | MonoBehaviour; every 5 s plays bounce (scale punch) + additive glow (child Img_Glow, UIGlow shader) on icon Images; added by UIBuilder to Icon_*/btn_icon_* GOs |
 | `LobbyStageMapView.cs` | `LobbyStageMapView` | Paginated stage button grid |
 | `ConfirmPopupBase.cs` | `ConfirmPopupBase` | Abstract base; provides panel/button/label builder helpers |
 | `ExitGamePopup.cs` | `ExitGamePopup` | Prefab controller; binds cancel/confirm hotspots for quit |
@@ -35,6 +37,7 @@
 | symbol | kind | note |
 |---|---|---|
 | `LocalizedText.SetStringId(string)` | method | changes key + immediate refresh via LocalizationManager.Get |
+| `LocalizedFont.Apply()` | method | resolves FontRegistry font for current language + bold style; assigns to TMP label + ForceMeshUpdate(false,true); no-op if FontRegistry/LocalizationManager not ready |
 | `RuntimeNavigationButtons.LoadGame()` | method | uses `defaultStageId` field; sets GameContext, loads Game |
 | `RuntimeNavigationButtons.OpenStageDetail(int)` | method | opens StageDetail popup for lobby stage selection |
 | `RuntimeNavigationButtons.EnterStage(int)` | method | server stage-start guard; returns Lobby and opens Energy popup on insufficient stamina |
@@ -50,7 +53,7 @@
 | `LobbyTabController.Configure(...)` | method | assigns tab buttons and tab panels from generated UI builder |
 | `LobbyWireframeController.RefreshRanking(string)` | method | clears current ranking rows and requests selected ranking segment through `LobbyViewModel` |
 | `LobbyWireframeController.Render()` | method | renders Lobby/Shop/Ranking viewmodel state and localized errors; stage carousel initial selection comes from Lobby API, bounds from CSV catalog, play/stars from server progress |
-| `LobbyWireframeController.RefreshStaminaTimer()` | method | shows "Full" (status.stamina_full) when `_staminaFull`; else "MM:SS" countdown to next recharge |
+| `LobbyWireframeController.RefreshStaminaTimer()` | method | shows "Full" (status.stamina_full) when `_staminaFull`; else "MM:SS" countdown; font applied separately via `ApplyFontsToAllLabels` |
 | `LobbyWireframeController.RenderCenterStarImages(int)` | method | updates Img_Star_0/1/2 in Group_Stars under StageNode_Center using starOnSprite/starOffSprite; fallback to yellow/dim color when sprites null |
 | `LobbyWireframeController._staminaFull` | field | bool; set in ApplyLobby when StaminaCurrent >= StaminaMax; drives RefreshStaminaTimer display |
 | `LobbyWireframeController.AnimateCount(label,target,duration,formatter)` | coroutine | SmoothStep count-up from 0 → target over duration (unscaled time); used for stamina/coin on first lobby load |
@@ -60,9 +63,9 @@
 | `SceneEscapeHandler.action` | field | `[SerializeField]` EscapeAction enum |
 | `ReturnTitlePopup.Init()` | method | binds close/cancel/confirm hotspots |
 | `ExitGamePopup.Init(RuntimeNavigationButtons)` | method | binds close/cancel/confirm hotspots |
-| `SettingPopup.Init()` | method | binds close/save hotspots; loads player settings; adds LanguageSelector to TMP_Dropdown child at runtime if missing; starts coroutine-based toggle animations on change |
+| `SettingPopup.Init()` | method | binds close/save hotspots; reads BGM/SFX/haptics/notifications from `DataManager` (PlayerPrefs); adds LanguageSelector to TMP_Dropdown child at runtime if missing; starts coroutine-based toggle animations on change; no API calls |
 | `SettingPopup.AnimateToggleVisual(toggle,isOn)` | method | stops any running animation for the toggle, starts `ToggleAnim` coroutine |
-| `SettingPopup.ToggleAnim(toggle,isOn)` | coroutine | scale-compress (0.82) → swap Img_Off/Img_On alpha → bounce-overshoot (1.10→1.0) over 0.25 s |
+| `SettingPopup.ToggleAnim(toggle,isOn)` | coroutine | scale-compress (0.82, 0.07 s) → swap `Img_Toggle` sprite (slot_toggle_on/off) at min scale → bounce-overshoot (1.10→1.0, 0.18 s) |
 | `BuyItemPopup.Init()` | method | binds close/buy hotspots |
 | `EnergyPopup.Init()` | method | binds close/watch/refill hotspots |
 | `StreakChallengePopup.Init()` | method | fetches `StreakChallengeStateResponse` and renders level list; idempotent |
@@ -74,6 +77,8 @@
 | `MaintenancePopup.Init(string)` | method | sets Txt_Body text from server maintenance message |
 | `StageDetailPopup.Init(int)` | method | binds Btn_Close/Btn_Play; sets dynamic title via `popup.stage.title_n_fmt`; renders stars and top-10 stage ranking (score, descending); no MyRankPanel, no Txt_Best/Txt_MyRank |
 | `StreakRewardConfirmPopup.Init(StreakRewardConfirmModel)` | method | Btn_Lobby: sets `ShouldOpenStreakPopupOnLobby=true` + CloseAll + LoadScene("Lobby"); Btn_Continue: CloseAll + EnterStage if unlocked, else Lobby |
+| `UIIconAnimator.intervalSeconds` | field | [SerializeField] default 5 s; controls bounce+glow cycle period |
+| `UIIconAnimator.EnsureGlow()` | method | creates `Img_Glow` child (RectTransform offset ±14, same sprite, `ProjectLink/UIGlow` additive shader, alpha 0) at runtime Awake |
 
 ## Cross-refs
 - Consumed by: client `Core.PopupManager`
@@ -88,5 +93,5 @@
 - Stamina timer text: `status.stamina_full` when full; else "MM:SS" countdown. Key added to clientstring.csv.
 - StageDetailPopup title: dynamic via `popup.stage.title_n_fmt` (format arg: stageId int). LocalizedText component disabled on Txt_Title before setting text.
 - "Guest" display name: use `LocalizationManager.Get("popup.account.guest")` (AccountPopup, SettingPopup, StageDetailPopup ranking display name fallback).
-- Toggle visuals: `Img_Off` (alpha 1 = off) and `Img_On` (alpha 1 = on) children of the Toggle transform; no `Handle` child.
+- Toggle visuals: single `Img_Toggle` child of the Toggle transform; sprite swaps between `[SerializeField] toggleOnSprite`/`toggleOffSprite` (assigned by UIBuilder from UISpriteSkin `slot_toggle_on`/`slot_toggle_off`). No `Img_Off`/`Img_On`/`Handle`/`Track` children.
 - LobbyTabController.SetTabVisual: Indicator find is null-safe; Indicator no longer exists in generated TabBar.

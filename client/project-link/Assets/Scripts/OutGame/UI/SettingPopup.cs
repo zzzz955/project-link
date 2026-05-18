@@ -1,8 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
-using ProjectLink.Contracts.Settings;
 using ProjectLink.Core;
-using ProjectLink.Services;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -19,9 +17,10 @@ namespace ProjectLink.OutGame.UI
         [SerializeField] Toggle sfxToggle;
         [SerializeField] Toggle hapticsToggle;
         [SerializeField] Toggle notifToggle;
+        [SerializeField] Sprite toggleOnSprite;
+        [SerializeField] Sprite toggleOffSprite;
 
         bool _initialized;
-        PlayerSettingsResponse _settings;
         readonly Dictionary<Toggle, Coroutine> _toggleAnims = new();
 
         public void Init()
@@ -58,55 +57,21 @@ namespace ProjectLink.OutGame.UI
 
         void LoadSettings()
         {
-            UiServiceLocator.UiData.GetPlayerSettings(result =>
-            {
-                if (result.IsSuccess && result.Value != null)
-                {
-                    _settings = result.Value;
-                    ApplySettingsToToggles(_settings);
-                }
-                else
-                {
-                    _settings = new PlayerSettingsResponse();
-                    ApplySettingsToToggles(_settings);
-                }
-                BindToggleListeners();
-            });
-        }
-
-        void ApplySettingsToToggles(PlayerSettingsResponse settings)
-        {
-            SetToggle(bgmToggle, settings.BgmEnabled);
-            SetToggle(sfxToggle, settings.SfxEnabled);
-            SetToggle(hapticsToggle, settings.HapticsEnabled);
-            SetToggle(notifToggle, settings.NotificationsEnabled);
+            var dm = DataManager.Instance;
+            if (dm == null) { BindToggleListeners(); return; }
+            SetToggle(bgmToggle,     dm.SoundVolume > 0f);
+            SetToggle(sfxToggle,     dm.SfxVolume > 0f);
+            SetToggle(hapticsToggle, dm.HapticEnabled);
+            SetToggle(notifToggle,   dm.GetFlag("notifications_enabled", true));
+            BindToggleListeners();
         }
 
         void BindToggleListeners()
         {
-            BindToggle(bgmToggle, v =>
-            {
-                if (_settings != null) _settings.BgmEnabled = v;
-                SaveSingleSetting(bgmEnabled: v);
-                DataManager.Instance.SoundVolume = v ? 1f : 0f;
-            });
-            BindToggle(sfxToggle, v =>
-            {
-                if (_settings != null) _settings.SfxEnabled = v;
-                SaveSingleSetting(sfxEnabled: v);
-                DataManager.Instance.SfxVolume = v ? 1f : 0f;
-            });
-            BindToggle(hapticsToggle, v =>
-            {
-                if (_settings != null) _settings.HapticsEnabled = v;
-                SaveSingleSetting(hapticsEnabled: v);
-                DataManager.Instance.HapticEnabled = v;
-            });
-            BindToggle(notifToggle, v =>
-            {
-                if (_settings != null) _settings.NotificationsEnabled = v;
-                SaveSingleSetting(notificationsEnabled: v);
-            });
+            BindToggle(bgmToggle,     v => DataManager.Instance.SoundVolume   = v ? 1f : 0f);
+            BindToggle(sfxToggle,     v => DataManager.Instance.SfxVolume     = v ? 1f : 0f);
+            BindToggle(hapticsToggle, v => DataManager.Instance.HapticEnabled = v);
+            BindToggle(notifToggle,   v => DataManager.Instance.SetFlag("notifications_enabled", v));
         }
 
         void BindToggle(Toggle toggle, System.Action<bool> onChanged)
@@ -127,14 +92,12 @@ namespace ProjectLink.OutGame.UI
             _toggleAnims[toggle] = StartCoroutine(ToggleAnim(toggle, isOn));
         }
 
-        static IEnumerator ToggleAnim(Toggle toggle, bool isOn)
+        IEnumerator ToggleAnim(Toggle toggle, bool isOn)
         {
             var rect = toggle.GetComponent<RectTransform>();
-            var imgOff = toggle.transform.Find("Img_Off")?.GetComponent<Image>();
-            var imgOn  = toggle.transform.Find("Img_On")?.GetComponent<Image>();
+            var img  = toggle.transform.Find("Img_Toggle")?.GetComponent<Image>();
             if (rect == null) yield break;
 
-            // Compress
             float t = 0f;
             while (t < 0.07f)
             {
@@ -144,11 +107,13 @@ namespace ProjectLink.OutGame.UI
                 yield return null;
             }
 
-            // Swap images instantly at min scale
-            if (imgOff != null) { var c = imgOff.color; c.a = isOn ? 0f : 1f; imgOff.color = c; }
-            if (imgOn  != null) { var c = imgOn.color;  c.a = isOn ? 1f : 0f; imgOn.color  = c; }
+            if (img != null)
+            {
+                var sprite = isOn ? toggleOnSprite : toggleOffSprite;
+                if (sprite != null) { img.sprite = sprite; img.color = Color.white; }
+                else img.color = isOn ? new Color(0.2f, 0.8f, 0.4f, 1f) : new Color(0.4f, 0.4f, 0.5f, 1f);
+            }
 
-            // Bounce back with overshoot
             t = 0f;
             while (t < 0.18f)
             {
@@ -161,17 +126,6 @@ namespace ProjectLink.OutGame.UI
                 yield return null;
             }
             rect.localScale = Vector3.one;
-        }
-
-        void SaveSingleSetting(bool? bgmEnabled = null, bool? sfxEnabled = null, bool? hapticsEnabled = null, bool? notificationsEnabled = null)
-        {
-            UiServiceLocator.UiData.UpdatePlayerSettings(new PlayerSettingsUpdateRequest
-            {
-                BgmEnabled           = bgmEnabled,
-                SfxEnabled           = sfxEnabled,
-                HapticsEnabled       = hapticsEnabled,
-                NotificationsEnabled = notificationsEnabled,
-            }, _ => { });
         }
 
         void OnSave()
@@ -194,14 +148,15 @@ namespace ProjectLink.OutGame.UI
                 button.onClick.AddListener(CloseTop);
         }
 
-        static void SetToggle(Toggle toggle, bool value)
+        void SetToggle(Toggle toggle, bool value)
         {
             if (toggle == null) return;
             toggle.SetIsOnWithoutNotify(value);
-            var imgOff = toggle.transform.Find("Img_Off")?.GetComponent<Image>();
-            var imgOn  = toggle.transform.Find("Img_On")?.GetComponent<Image>();
-            if (imgOff != null) { var c = imgOff.color; c.a = value ? 0f : 1f; imgOff.color = c; }
-            if (imgOn  != null) { var c = imgOn.color;  c.a = value ? 1f : 0f; imgOn.color  = c; }
+            var img = toggle.transform.Find("Img_Toggle")?.GetComponent<Image>();
+            if (img == null) return;
+            var sprite = value ? toggleOnSprite : toggleOffSprite;
+            if (sprite != null) { img.sprite = sprite; img.color = Color.white; }
+            else img.color = value ? new Color(0.2f, 0.8f, 0.4f, 1f) : new Color(0.4f, 0.4f, 0.5f, 1f);
         }
 
         Toggle FindToggleInRow(string rowName)

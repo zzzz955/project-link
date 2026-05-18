@@ -92,7 +92,7 @@ namespace ProjectLink.EditorTools
                 System.IO.Path.GetFullPath(AssetDatabase.GUIDToAssetPath(guids[0])));
 
             // All "btn_*" and "slot_*" string literals in the source
-            var re = new System.Text.RegularExpressions.Regex(@"""((btn|slot)_[a-z_]+)""");
+            var re = new System.Text.RegularExpressions.Regex(@"""((btn|slot)_[a-z_0-9]+)""");
             foreach (System.Text.RegularExpressions.Match m in re.Matches(src))
                 keys.Add(m.Groups[1].Value);
 
@@ -175,6 +175,207 @@ namespace ProjectLink.EditorTools
             AssetDatabase.Refresh();
         }
 
+        [MenuItem("Tools/Project Link/UI Build/Assign Icon Animations")]
+        public static void AssignIconAnimations()
+        {
+            _skin = null;
+            int total = 0;
+
+            if (!Application.isBatchMode)
+                EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo();
+
+            string[] scenePaths =
+            {
+                "Assets/Scenes/Bootstrap.unity",
+                "Assets/Scenes/Title.unity",
+                "Assets/Scenes/Lobby.unity",
+                "Assets/Scenes/Game.unity"
+            };
+
+            foreach (var path in scenePaths)
+            {
+                if (!System.IO.File.Exists(path)) continue;
+                var scene = EditorSceneManager.OpenScene(path, OpenSceneMode.Single);
+                foreach (var root in scene.GetRootGameObjects())
+                    total += AddAnimatorToIconImages(root);
+                EditorSceneManager.MarkSceneDirty(scene);
+                EditorSceneManager.SaveScene(scene);
+            }
+
+            var guids = AssetDatabase.FindAssets("t:Prefab", new[] { PopupPrefabRoot });
+            foreach (var guid in guids)
+            {
+                var prefabPath = AssetDatabase.GUIDToAssetPath(guid);
+                var prefab = PrefabUtility.LoadPrefabContents(prefabPath);
+                int n = AddAnimatorToIconImages(prefab);
+                if (n > 0) PrefabUtility.SaveAsPrefabAsset(prefab, prefabPath);
+                PrefabUtility.UnloadPrefabContents(prefab);
+                total += n;
+            }
+
+            AssetDatabase.SaveAssets();
+            Debug.Log($"UIIconAnimator assigned to {total} icon images.");
+        }
+
+        [MenuItem("Tools/Project Link/UI Build/Register Untracked Sprites")]
+        public static void RegisterUntrackedSprites()
+        {
+            _skin = null;
+            var skin = LoadSkin();
+            if (skin == null) { Debug.LogError("UISpriteSkin not found. Run 'Create UI Sprite Skin' first."); return; }
+
+            // Track already-registered sprites and keys
+            var trackedSprites = new System.Collections.Generic.HashSet<Sprite>();
+            var existingKeys   = new System.Collections.Generic.HashSet<string>();
+            foreach (var e in skin.sprites)
+            {
+                if (e.sprite != null) trackedSprites.Add(e.sprite);
+                if (!string.IsNullOrEmpty(e.elementName)) existingKeys.Add(e.elementName);
+            }
+
+            // sprite != null → group by Sprite reference (same sprite = same key = shared)
+            var spriteGroups = new System.Collections.Generic.Dictionary<Sprite, (string goName, string parentName)>();
+            // sprite == null → group by GO name (same name = same key = shared)
+            var nullGroups   = new System.Collections.Generic.Dictionary<string, string>(); // goName → parentName
+
+            void ScanGo(GameObject root)
+            {
+                foreach (var img in root.GetComponentsInChildren<Image>(true))
+                {
+                    if (img.sprite != null)
+                    {
+                        if (trackedSprites.Contains(img.sprite)) continue;
+                        if (!spriteGroups.ContainsKey(img.sprite))
+                            spriteGroups[img.sprite] = (img.gameObject.name, img.transform.parent?.name ?? "");
+                    }
+                    else
+                    {
+                        var goName = img.gameObject.name;
+                        if (!nullGroups.ContainsKey(goName))
+                            nullGroups[goName] = img.transform.parent?.name ?? "";
+                    }
+                }
+            }
+
+            if (!Application.isBatchMode)
+                EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo();
+
+            string[] scenePaths =
+            {
+                "Assets/Scenes/Bootstrap.unity",
+                "Assets/Scenes/Title.unity",
+                "Assets/Scenes/Lobby.unity",
+                "Assets/Scenes/Game.unity"
+            };
+
+            foreach (var path in scenePaths)
+            {
+                if (!System.IO.File.Exists(path)) continue;
+                var scene = EditorSceneManager.OpenScene(path, OpenSceneMode.Single);
+                foreach (var root in scene.GetRootGameObjects())
+                    ScanGo(root);
+            }
+
+            var guids = AssetDatabase.FindAssets("t:Prefab", new[] { PopupPrefabRoot });
+            foreach (var guid in guids)
+            {
+                var prefabPath = AssetDatabase.GUIDToAssetPath(guid);
+                var prefab = PrefabUtility.LoadPrefabContents(prefabPath);
+                ScanGo(prefab);
+                PrefabUtility.UnloadPrefabContents(prefab);
+            }
+
+            int added = 0;
+            var newEntries = new System.Collections.Generic.List<UISpriteSkin.Entry>(skin.sprites);
+
+            // Pass 1: sprite groups (real sprites — higher priority for key names)
+            foreach (var kvp in spriteGroups)
+            {
+                var key = DeriveKey(kvp.Value.goName, kvp.Value.parentName, existingKeys);
+                existingKeys.Add(key);
+                newEntries.Add(new UISpriteSkin.Entry { elementName = key, sprite = kvp.Key });
+                added++;
+            }
+
+            // Pass 2: null-sprite groups (registered with null sprite so builder can load them later)
+            foreach (var kvp in nullGroups)
+            {
+                var key = DeriveKey(kvp.Key, kvp.Value, existingKeys);
+                if (existingKeys.Contains(key)) continue; // already claimed by sprite pass or pre-existing
+                existingKeys.Add(key);
+                newEntries.Add(new UISpriteSkin.Entry { elementName = key, sprite = null });
+                added++;
+            }
+
+            if (added == 0) { Debug.Log("RegisterUntrackedSprites: all images already tracked."); return; }
+
+            skin.sprites = newEntries.ToArray();
+            EditorUtility.SetDirty(skin);
+            AssetDatabase.SaveAssets();
+            Selection.activeObject = skin;
+            Debug.Log($"RegisterUntrackedSprites: added {added} entries ({spriteGroups.Count} with sprite, {nullGroups.Count} null-sprite) to UISpriteSkin.");
+        }
+
+        static string DeriveKey(string goName, string parentName, System.Collections.Generic.HashSet<string> existingKeys)
+        {
+            string prefix = "slot_";
+            string base_;
+
+            if (goName.StartsWith("Btn_", System.StringComparison.OrdinalIgnoreCase))
+            { prefix = "btn_"; base_ = goName.Substring(4); }
+            else if (goName.StartsWith("Img_", System.StringComparison.OrdinalIgnoreCase))
+                base_ = goName.Substring(4);
+            else if (goName.StartsWith("Slot_", System.StringComparison.OrdinalIgnoreCase))
+                base_ = goName.Substring(5);
+            else if (goName.StartsWith("Icon_", System.StringComparison.OrdinalIgnoreCase))
+                base_ = "icon_" + goName.Substring(5);
+            else
+                base_ = goName;
+
+            base_ = base_.ToLower().Replace(" ", "_");
+            string key = prefix + base_;
+
+            if (existingKeys.Contains(key) && !string.IsNullOrEmpty(parentName))
+            {
+                var ctx = parentName.ToLower()
+                    .Replace("group_", "").Replace("panel_", "").Replace("slot_", "")
+                    .Replace("img_", "").Replace("_", "");
+                key = prefix + ctx + "_" + base_;
+            }
+
+            int idx = 2;
+            while (existingKeys.Contains(key)) { key = prefix + base_ + "_" + idx; idx++; }
+
+            return key;
+        }
+
+        static int AddAnimatorToIconImages(GameObject root)
+        {
+            var skin = LoadSkin();
+            var btnIconSprites = new System.Collections.Generic.HashSet<Sprite>();
+            if (skin != null)
+                foreach (var e in skin.sprites)
+                    if (e.elementName.StartsWith("btn_icon_") && e.sprite != null)
+                        btnIconSprites.Add(e.sprite);
+
+            int count = 0;
+            foreach (var img in root.GetComponentsInChildren<Image>(true))
+            {
+                var n = img.gameObject.name;
+                bool named = n.StartsWith("Icon_", System.StringComparison.OrdinalIgnoreCase)
+                          || string.Equals(n, "Icon", System.StringComparison.OrdinalIgnoreCase);
+                bool isBtnIcon = img.sprite != null && btnIconSprites.Contains(img.sprite);
+
+                if (!named && !isBtnIcon) continue;
+                if (img.GetComponent<UIIconAnimator>() != null) continue;
+
+                img.gameObject.AddComponent<UIIconAnimator>();
+                EditorUtility.SetDirty(img.gameObject);
+                count++;
+            }
+            return count;
+        }
+
         [MenuItem("Tools/Project Link/UI Build/Configure UI Texture Imports")]
         public static void ConfigureUiTextureImports()
         {
@@ -207,6 +408,8 @@ namespace ProjectLink.EditorTools
             }
 
             NormalizeLayoutText(canvas);
+            EnsureLocalizedFonts(canvas);
+            AddAnimatorToIconImages(canvas);
         }
 
         // ─── Bootstrap ────────────────────────────────────────────────────
@@ -371,9 +574,9 @@ namespace ProjectLink.EditorTools
             var hudHlg = hud.gameObject.AddComponent<HorizontalLayoutGroup>();
             hudHlg.spacing = 16;
             hudHlg.padding = new RectOffset(24, 24, 16, 16);
-            hudHlg.childAlignment = TextAnchor.MiddleLeft;
+            hudHlg.childAlignment = TextAnchor.MiddleCenter;
             hudHlg.childControlWidth = true; hudHlg.childControlHeight = true;
-            hudHlg.childForceExpandWidth = false; hudHlg.childForceExpandHeight = true;
+            hudHlg.childForceExpandWidth = true; hudHlg.childForceExpandHeight = true;
 
             var avatar = MakeChild(hud, "Slot_Avatar");
             avatar.sizeDelta = new Vector2(80, 80);
@@ -608,22 +811,22 @@ namespace ProjectLink.EditorTools
             UnityEventTools.AddPersistentListener(nodeBtn.onClick, router.LoadGame);
             // Stage number — large, centered in top half
             var stageNum = MakeChild(node, "Txt_StageNum");
-            Center(stageNum, new Vector2(0, 60), new Vector2(400, 120));
+            Center(stageNum, new Vector2(0, 140), new Vector2(400, 120));
             var numTmp = stageNum.gameObject.AddComponent<TextMeshProUGUI>();
-            numTmp.text = "1"; numTmp.fontSize = 72; numTmp.fontStyle = FontStyles.Bold;
+            numTmp.text = "1"; numTmp.fontSize = 96; numTmp.fontStyle = FontStyles.Bold;
             numTmp.color = TextCol; numTmp.alignment = TextAlignmentOptions.Midline;
 
             // Star images at bottom of node — slot_star_on/slot_star_off assigned at runtime
             var starsRow = MakeChild(node, "Group_Stars");
-            Center(starsRow, new Vector2(0, -160), new Vector2(200, 56));
+            Center(starsRow, new Vector2(0, -160), new Vector2(336, 96));
             var starsHlg = starsRow.gameObject.AddComponent<HorizontalLayoutGroup>();
-            starsHlg.spacing = 12; starsHlg.childAlignment = TextAnchor.MiddleCenter;
+            starsHlg.spacing = 24; starsHlg.childAlignment = TextAnchor.MiddleCenter;
             starsHlg.childControlWidth = false; starsHlg.childControlHeight = false;
             starsHlg.childForceExpandWidth = false; starsHlg.childForceExpandHeight = false;
             for (int si = 0; si < 3; si++)
             {
                 var starSlot = MakeChild(starsRow, $"Img_Star_{si}");
-                starSlot.sizeDelta = new Vector2(48, 48);
+                starSlot.sizeDelta = new Vector2(96, 96);
                 var starImg = starSlot.gameObject.AddComponent<Image>();
                 starImg.color = new Color(1f, 1f, 1f, 0.25f);
                 ApplySkin(starImg, "slot_star_off");
@@ -631,7 +834,7 @@ namespace ProjectLink.EditorTools
 
             // LockIcon — shown at runtime when stage is locked
             var lockIcon = MakeChild(node, "LockIcon");
-            Center(lockIcon, Vector2.zero, new Vector2(120, 120));
+            Center(lockIcon, Vector2.zero, new Vector2(160, 160));
             var lockImg = lockIcon.gameObject.AddComponent<Image>();
             lockImg.color = new Color(1f, 1f, 1f, 0.85f);
             ApplySkin(lockImg, "slot_lock_icon");
@@ -655,38 +858,35 @@ namespace ProjectLink.EditorTools
             var evtGroup = MakeChild(tab, "Group_Events");
             SetAnchor(evtGroup, new Vector2(0, 1), new Vector2(0, 1), new Vector2(0, 1));
             evtGroup.anchoredPosition = new Vector2(12, -44);
-            evtGroup.sizeDelta = new Vector2(0, 96);
-            var evtHlg = evtGroup.gameObject.AddComponent<HorizontalLayoutGroup>();
-            evtHlg.spacing = 8; evtHlg.childAlignment = TextAnchor.UpperLeft;
-            evtHlg.childControlWidth = false; evtHlg.childControlHeight = false;
-            evtHlg.childForceExpandWidth = false; evtHlg.childForceExpandHeight = false;
+            evtGroup.sizeDelta = new Vector2(160, 0);
+            var evtVlg = evtGroup.gameObject.AddComponent<VerticalLayoutGroup>();
+            evtVlg.spacing = 8; evtVlg.childAlignment = TextAnchor.UpperCenter;
+            evtVlg.childControlWidth = false; evtVlg.childControlHeight = false;
+            evtVlg.childForceExpandWidth = false; evtVlg.childForceExpandHeight = false;
             var evtFitter = evtGroup.gameObject.AddComponent<ContentSizeFitter>();
-            evtFitter.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
+            evtFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
             var badge = MakeChild(evtGroup, "Badge_Streak");
-            badge.sizeDelta = new Vector2(96, 96);
-            badge.gameObject.AddComponent<LayoutElement>().preferredWidth = 96;
+            badge.sizeDelta = new Vector2(160, 160);
+            var badgeLE = badge.gameObject.AddComponent<LayoutElement>();
+            badgeLE.preferredWidth = 160; badgeLE.preferredHeight = 160;
             var badgeBg = badge.gameObject.AddComponent<Image>();
             badgeBg.color = new Color(0.35f, 0.35f, 0.4f, 0.9f);
             ApplySkin(badgeBg, "slot_streak_badge");
             var badgeBtn = badge.gameObject.AddComponent<Button>();
             badgeBtn.targetGraphic = badgeBg;
 
-            var badgeIconTxt = MakeChild(badge, "Txt_Icon");
-            Center(badgeIconTxt, new Vector2(0, 8), new Vector2(80, 36));
-            var biTmp = badgeIconTxt.gameObject.AddComponent<TextMeshProUGUI>();
-            biTmp.text = "SC"; biTmp.fontSize = 22;
-            biTmp.fontStyle = FontStyles.Bold; biTmp.color = Color.white;
-            biTmp.alignment = TextAlignmentOptions.Midline;
-
-            var badgeProgTxt = MakeChild(badge, "Txt_Progress");
-            Center(badgeProgTxt, new Vector2(0, -26), new Vector2(90, 22));
+            var badgeProgTxt = MakeChild(evtGroup, "Txt_Progress");
+            badgeProgTxt.sizeDelta = new Vector2(160, 32);
+            var bpLE = badgeProgTxt.gameObject.AddComponent<LayoutElement>();
+            bpLE.preferredWidth = 160; bpLE.preferredHeight = 32;
             var bpTmp = badgeProgTxt.gameObject.AddComponent<TextMeshProUGUI>();
             bpTmp.text = ""; bpTmp.fontSize = 16;
             bpTmp.color = new Color(0.9f, 0.9f, 0.9f, 1f);
             bpTmp.alignment = TextAlignmentOptions.Midline;
 
-            badge.gameObject.AddComponent<StreakChallengeBadge>();
+            var streakBadge = badge.gameObject.AddComponent<StreakChallengeBadge>();
+            Assign(streakBadge, "progressText", bpTmp);
 
             // Card_Event (hidden by default)
             var cardEvent = MakeChild(tab, "Card_Event");
@@ -849,7 +1049,7 @@ namespace ProjectLink.EditorTools
             var ytTmp = youTxt.gameObject.AddComponent<TextMeshProUGUI>();
             ytTmp.fontSize = 26; ytTmp.fontStyle = FontStyles.Bold; ytTmp.color = AccentB;
             ytTmp.alignment = TextAlignmentOptions.MidlineLeft;
-            youTxt.gameObject.AddComponent<LocalizedText>().SetStringId("rank.you");
+            youTxt.gameObject.AddComponent<LocalizedFont>();
             var youLE = youTxt.gameObject.AddComponent<LayoutElement>();
             youLE.flexibleWidth = 1;
 
@@ -891,7 +1091,7 @@ namespace ProjectLink.EditorTools
             var vlg = go.gameObject.AddComponent<VerticalLayoutGroup>();
             vlg.childAlignment = TextAnchor.MiddleCenter;
             vlg.childControlWidth = true; vlg.childControlHeight = true;
-            vlg.padding = new RectOffset(0, 0, 0, 8);
+            vlg.padding = new RectOffset(0, 0, 0, 24);
             go.gameObject.AddComponent<LayoutElement>().flexibleWidth = 1;
 
             var icon = MakeChild(go, "Icon");
@@ -908,7 +1108,7 @@ namespace ProjectLink.EditorTools
             txt.sizeDelta = new Vector2(120, 32);
             txt.anchoredPosition = new Vector2(0, 16);
             var tmpTxt = txt.gameObject.AddComponent<TextMeshProUGUI>();
-            tmpTxt.fontSize = 22; tmpTxt.color = isDefault ? TextCol : TextMuted;
+            tmpTxt.fontSize = 36; tmpTxt.color = isDefault ? TextCol : TextMuted;
             tmpTxt.alignment = TextAlignmentOptions.Midline;
             txt.gameObject.AddComponent<LocalizedText>().SetStringId(labelKey);
 
@@ -970,13 +1170,6 @@ namespace ProjectLink.EditorTools
             objHlg.spacing = 16; objHlg.childAlignment = TextAnchor.MiddleLeft;
             objHlg.childControlWidth = true; objHlg.childControlHeight = true;
             objRow.gameObject.AddComponent<LayoutElement>().preferredHeight = 56;
-
-            var objBar = MakeChild(objRow, "Bar_Objective");
-            objBar.sizeDelta = new Vector2(0, 28);
-            var objBarImg = objBar.gameObject.AddComponent<Image>();
-            objBarImg.color = HexColor("#FFFFFF22");
-            var objBarLE = objBar.gameObject.AddComponent<LayoutElement>();
-            objBarLE.preferredHeight = 28; objBarLE.flexibleWidth = 1;
 
             var moveTxt = MakeChild(objRow, "Txt_Moves");
             moveTxt.sizeDelta = new Vector2(200, 40);
@@ -1066,9 +1259,11 @@ namespace ProjectLink.EditorTools
             AddFooterButton(footer, "Btn_Cancel", "common.cancel", "btn_secondary");
             AddFooterButton(footer, "Btn_Save", "common.save", "btn_primary", isPrimary: true);
             var popup = root.GetComponent<SettingPopup>();
-            Assign(popup, "closeIconButton", FindButtonInChildren(root, "Btn_Close"));
-            Assign(popup, "closeButton", FindButtonInChildren(root, "Btn_Cancel"));
-            Assign(popup, "saveButton", FindButtonInChildren(root, "Btn_Save"));
+            Assign(popup, "closeIconButton",  FindButtonInChildren(root, "Btn_Close"));
+            Assign(popup, "closeButton",      FindButtonInChildren(root, "Btn_Cancel"));
+            Assign(popup, "saveButton",       FindButtonInChildren(root, "Btn_Save"));
+            Assign(popup, "toggleOnSprite",   LoadSkin()?.Get("slot_toggle_on"));
+            Assign(popup, "toggleOffSprite",  LoadSkin()?.Get("slot_toggle_off"));
             SavePopupPrefab(root, "SettingPopup");
         }
 
@@ -1100,19 +1295,19 @@ namespace ProjectLink.EditorTools
             var (root, panel, content, footer) = CreatePopupShell<StageDetailPopup>(
                 "StageDetailPopup", "popup.stage.title_fmt", dismissible: true);
             var starRow = MakeChild(content, "Group_Stars");
-            starRow.sizeDelta = new Vector2(0, 80);
+            starRow.sizeDelta = new Vector2(0, 96);
             var starHlgD = starRow.gameObject.AddComponent<HorizontalLayoutGroup>();
             starHlgD.childAlignment = TextAnchor.MiddleCenter;
-            starHlgD.spacing = 16;
+            starHlgD.spacing = 24;
             starHlgD.childControlWidth = false;
             starHlgD.childControlHeight = false;
             starHlgD.childForceExpandWidth = false;
             starHlgD.childForceExpandHeight = false;
-            starRow.gameObject.AddComponent<LayoutElement>().preferredHeight = 80;
+            starRow.gameObject.AddComponent<LayoutElement>().preferredHeight = 96;
             for (int si = 0; si < 3; si++)
             {
                 var starSlot = MakeChild(starRow, $"Img_Star_{si}");
-                starSlot.sizeDelta = new Vector2(64, 64);
+                starSlot.sizeDelta = new Vector2(96, 96);
                 var starImg = starSlot.gameObject.AddComponent<Image>();
                 starImg.color = new Color(1f, 1f, 1f, 0.18f);
                 ApplySkin(starImg, "slot_star_off");
@@ -1298,12 +1493,49 @@ namespace ProjectLink.EditorTools
         {
             var (root, panel, content, footer) = CreatePopupShell<TimeoutPopup>(
                 "TimeoutPopup", "popup.timeout.title", dismissible: false);
+
             var spine = MakeChild(content, "Slot_Spine");
-            spine.sizeDelta = new Vector2(400, 400);
+            spine.sizeDelta = new Vector2(400, 280);
             spine.gameObject.AddComponent<Image>().color = SlotPlaceholder;
-            spine.gameObject.AddComponent<LayoutElement>().preferredHeight = 400;
-            AddFooterButton(footer, "Btn_Retry", "common.retry", "btn_primary", isPrimary: true);
+            spine.gameObject.AddComponent<LayoutElement>().preferredHeight = 280;
+
+            // Extend section
+            var extendGroup = MakeChild(content, "Group_Extend");
+            extendGroup.sizeDelta = new Vector2(0, 100);
+            var extendVlg = extendGroup.gameObject.AddComponent<VerticalLayoutGroup>();
+            extendVlg.spacing = 4; extendVlg.childAlignment = TextAnchor.MiddleCenter;
+            extendVlg.childForceExpandWidth = true; extendVlg.childForceExpandHeight = false;
+            extendGroup.gameObject.AddComponent<LayoutElement>().preferredHeight = 100;
+
+            var extendDesc = MakeText(extendGroup, "Txt_ExtendDesc", "popup.timeout.extend_desc",
+                22, TextMuted, TextAlignmentOptions.Midline);
+            extendDesc.gameObject.AddComponent<LayoutElement>().preferredHeight = 36;
+
+            var extendCostRow = MakeChild(extendGroup, "Row_ExtendCost");
+            extendCostRow.sizeDelta = new Vector2(0, 48);
+            var costHlg = extendCostRow.gameObject.AddComponent<HorizontalLayoutGroup>();
+            costHlg.spacing = 8; costHlg.childAlignment = TextAnchor.MiddleCenter;
+            costHlg.childForceExpandWidth = false; costHlg.childForceExpandHeight = true;
+            extendCostRow.gameObject.AddComponent<LayoutElement>().preferredHeight = 48;
+
+            var extendCost = MakeText(extendCostRow, "Txt_ExtendCost", "",
+                28, Warning, TextAlignmentOptions.Midline);
+            extendCost.GetComponent<TextMeshProUGUI>().fontStyle = FontStyles.Bold;
+            var extendCostLe = extendCost.gameObject.AddComponent<LayoutElement>();
+            extendCostLe.preferredWidth = 120; extendCostLe.preferredHeight = 40;
+
+            var extendBtn = AddFooterButton(content, "Btn_Extend", "popup.timeout.extend_desc", "btn_primary", isPrimary: true);
+
+            AddFooterButton(footer, "Btn_Retry", "common.retry", "btn_secondary");
             AddFooterButton(footer, "Btn_Lobby", "common.lobby", "btn_secondary");
+
+            var rootRect = root.GetComponent<RectTransform>();
+            var popup = root.GetComponent<TimeoutPopup>();
+            Assign(popup, "btnRetry",     FindButtonInChildren(root, "Btn_Retry"));
+            Assign(popup, "btnLobby",     FindButtonInChildren(root, "Btn_Lobby"));
+            Assign(popup, "btnExtend",    extendBtn);
+            Assign(popup, "txtExtendDesc", FindTmpInChildren(rootRect, "Txt_ExtendDesc"));
+            Assign(popup, "txtExtendCost", FindTmpInChildren(rootRect, "Txt_ExtendCost"));
             SavePopupPrefab(root, "TimeoutPopup");
         }
 
@@ -1489,18 +1721,19 @@ namespace ProjectLink.EditorTools
 
             var toggle = MakeChild(row, "Toggle");
             toggle.sizeDelta = new Vector2(120, 56);
-            var toggleImg = toggle.gameObject.AddComponent<Image>();
-            toggleImg.color = HexColor("#FFFFFF33");
-            ApplySkin(toggleImg, "slot_toggle_track");
-            toggle.gameObject.AddComponent<Toggle>().targetGraphic = toggleImg;
+            var toggleBg = toggle.gameObject.AddComponent<Image>();
+            toggleBg.color = new Color(0, 0, 0, 0);
+            var toggleComp = toggle.gameObject.AddComponent<Toggle>();
+            toggleComp.transition = UnityEngine.UI.Selectable.Transition.None;
             toggle.gameObject.AddComponent<LayoutElement>().preferredWidth = 120;
 
-            var handle = MakeChild(toggle, "Handle");
-            handle.sizeDelta = new Vector2(48, 48);
-            handle.anchoredPosition = new Vector2(4, 0);
-            var handleImg = handle.gameObject.AddComponent<Image>();
-            handleImg.color = TextCol;
-            ApplySkin(handleImg, "slot_toggle_handle");
+            var imgToggle = MakeChild(toggle, "Img_Toggle");
+            Stretch(imgToggle);
+            var imgToggleImg = imgToggle.gameObject.AddComponent<Image>();
+            imgToggleImg.color = new Color(0.4f, 0.4f, 0.5f, 1f);
+            imgToggleImg.preserveAspect = false;
+            ApplySkin(imgToggleImg, "slot_toggle_off", false);
+            toggleComp.targetGraphic = imgToggleImg;
         }
 
         static void AddDropdownRow(RectTransform parent, string name, string labelKey)
@@ -1565,6 +1798,8 @@ namespace ProjectLink.EditorTools
         static void SavePopupPrefab(GameObject root, string prefabName)
         {
             NormalizeLayoutText(root);
+            EnsureLocalizedFonts(root);
+            AddAnimatorToIconImages(root);
             PrefabUtility.SaveAsPrefabAsset(root, $"{PopupPrefabRoot}/{prefabName}.prefab");
             Object.DestroyImmediate(root);
         }
@@ -1748,6 +1983,16 @@ namespace ProjectLink.EditorTools
         }
 
         // ─── RectTransform helpers ────────────────────────────────────────
+
+        static void EnsureLocalizedFonts(GameObject root)
+        {
+            foreach (var tmp in root.GetComponentsInChildren<TextMeshProUGUI>(true))
+            {
+                if (tmp.GetComponent<LocalizedText>() != null) continue;
+                if (tmp.GetComponent<LocalizedFont>() != null) continue;
+                tmp.gameObject.AddComponent<LocalizedFont>();
+            }
+        }
 
         static void NormalizeLayoutText(GameObject root)
         {

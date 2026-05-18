@@ -16,10 +16,13 @@
 | `ProjectLinkUIBuilder.BuildAllSceneUIBatch()` | method | CI/batch variant; no dialogs |
 | `ProjectLinkUIBuilder.BuildPopupPrefabs()` | method | [MenuItem] creates all popup prefabs under `Assets/Resources/Prefabs/UI/` using standard popup shell (Overlay/Panel/Header/Content/Footer), including clear-next confirmation |
 | `ProjectLinkUIBuilder.CreateUISpriteSkin()` | method | [MenuItem] creates/syncs `Assets/Editor/UISpriteSkin.asset`; scans source for `btn_*`/`slot_*` keys automatically |
+| `ProjectLinkUIBuilder.AssignIconAnimations()` | method | [MenuItem] scans all scenes + popup prefabs; adds `UIIconAnimator` to every `Icon_*`/`Icon` GO and any Image using a `btn_icon_*` skin key; auto-called from BuildScene/SavePopupPrefab |
+| `ProjectLinkUIBuilder.RegisterUntrackedSprites()` | method | [MenuItem] scans all scenes + popup prefabs for Image.sprite not tracked in UISpriteSkin; groups by Sprite reference; derives `slot_*`/`btn_*` keys and adds entries to UISpriteSkin.asset |
+| `ProjectLinkUIBuilder.AddAnimatorToIconImages(root)` | method | adds `UIIconAnimator` to icon images in a GO hierarchy; used by BuildScene/SavePopupPrefab/AssignIconAnimations |
+| `ProjectLinkUIBuilder.DeriveKey(goName,parentName,existingKeys)` | method | converts a GO name to a UISpriteSkin key (`slot_*`/`btn_*`); disambiguates with parent name or numeric suffix |
 | `ProjectLinkUIBuilder.ConfigureUiTextureImports()` | method | configures AssetResource sheets as Multiple sprites via SpriteDataProvider |
 | `ProjectLinkUIBuilder.CreatePopupShell<T>(...)` | method | creates standard popup shell: Overlay + Panel(Header+Divider+Content+Divider+Footer); Header: no HLG; Txt_Title Stretch full-width MidlineCenter; Btn_Close anchor (1,0.5) anchoredPosition (-24,0); dismissible controls Overlay button and Btn_Close; `PopupShape` param selects background skin key |
-| `ProjectLinkUIBuilder.ApplyBuilderFont(tmp)` | method | assigns EN `TMP_FontAsset` from `FontRegistry.Instance` to a TMP component; called on all builder-created text |
-| `ProjectLinkUIBuilder.ApplyFontToAll(root)` | method | batch-applies `ApplyBuilderFont` to all TMP children of root; called in `SavePopupPrefab` and at end of `BuildScene` |
+| `ProjectLinkUIBuilder.EnsureLocalizedFonts(root)` | method | adds `LocalizedFont` component to every TMP child that lacks `LocalizedText`; called in `SavePopupPrefab` and at end of `BuildScene`; idempotent (skips if already present) |
 | `ProjectLinkUIBuilder.BuildBootstrap(...)` | method | Slot_Logo + ProgressBar(Slider+Fill) + Btn_Retry + Txt_NetworkError + PopupLayer; wires BootstrapWireframeController |
 | `ProjectLinkUIBuilder.BuildTitle(...)` | method | Btn_Settings + Slot_Logo + Group_AuthButtons(Btn_Google+Btn_Apple) + Btn_TapToStart + Txt_Version; wires TitleWireframeController |
 | `ProjectLinkUIBuilder.BuildLobby(...)` | method | HUD_Strip(single HLG h=120 transparent: Slot_Avatar+Group_Stamina+Group_Currency+Btn_Menu) + MenuDropdown + Group_TabBodies(Tab_Home+Tab_Shop+Tab_Ranking) + TabBar; wires LobbyWireframeController + LobbyTabController |
@@ -49,9 +52,9 @@
 - `UISpriteSkin.asset` lives in `Assets/Editor/` (never `Assets/Resources/`) to exclude it from player builds.
 - Prefer anchors/layout groups/ScrollRect over fixed-only placement for generated UI hierarchy.
 - Never touch `Assets/Resources/Data/` or `Assets/Scripts/Data/Generated/`
-- All builder-created TMP elements receive EN font from `FontRegistry` via `ApplyBuilderFont`; runtime re-apply handled by `LocalizedText.ApplyFont()`. Never leave TMP with default LiberationSans SDF.
+- All builder-created TMP elements receive `LocalizedFont` component via `EnsureLocalizedFonts` (called in `SavePopupPrefab` and `BuildScene`); static labels with `stringId` use `LocalizedText` (handles both text + font); dynamic labels use `LocalizedFont` (font only). Never leave TMP with default LiberationSans SDF.
 - Popup header: no HLG. `Txt_Title` stretches full-width (symmetric left/right margins when dismissible) with `MidlineCenter` alignment. `Btn_Close` anchored (1,0.5) with anchoredPosition (-24,0).
-- Toggle rows use two child Images (`Img_Off`/`Img_On` skin keys: `slot_toggle_off`/`slot_toggle_on`); no `Handle` child. Visibility controlled by alpha at runtime in `SettingPopup`.
+- Toggle rows use a single child Image `Img_Toggle` (skin key: `slot_toggle_off` at build time); no `Handle`/`Track`/`Img_On`/`Img_Off` children. Toggle component uses `Transition.None`. Runtime `SettingPopup` swaps `Img_Toggle` sprite between `slot_toggle_off`/`slot_toggle_on` sprites on value change with a scale-compress → bounce animation.
 - TabBar buttons: no `Indicator` child. Selected state driven entirely by `LobbyTabController.SetTabVisual` (bold + scale). VLG has 8 px bottom padding to prevent text descender clipping.
 - All builder-created TMP center alignment uses `TextAlignmentOptions.Midline` (geometry center, TMP 3.x); left/right variants use `MidlineLeft`/`MidlineRight`. Never use bare `Center` (= bounding-box Middle, visually different).
 - Star images in popup Group_Stars use skin keys `slot_star_on` (earned) / `slot_star_off` (empty). Builder pre-creates three `Img_Star_0/1/2` Image slots; runtime popups update them in-place or fallback to dynamic creation. Popups expose `[SerializeField] Sprite starOnSprite, starOffSprite` assigned by builder from UISpriteSkin.

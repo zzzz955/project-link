@@ -68,8 +68,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: streak.activate
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 94b698a58786e8e4b8aebf2193c63cc6, type: 2}
+  m_sharedMaterial: {fileID: -4614010349753722954, guid: 94b698a58786e8e4b8aebf2193c63cc6, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -220,8 +220,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: streak.status_inactive
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 94b698a58786e8e4b8aebf2193c63cc6, type: 2}
+  m_sharedMaterial: {fileID: -4614010349753722954, guid: 94b698a58786e8e4b8aebf2193c63cc6, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1142,8 +1142,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: streak.popup.title
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 94b698a58786e8e4b8aebf2193c63cc6, type: 2}
+  m_sharedMaterial: {fileID: -4614010349753722954, guid: 94b698a58786e8e4b8aebf2193c63cc6, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1333,6 +1333,7 @@ GameObject:
   - component: {fileID: 4847122157728875901}
   - component: {fileID: 7253695823619195213}
   - component: {fileID: 2005653108044651978}
+  - component: {fileID: 8933383311549544115}
   m_Layer: 0
   m_Name: Btn_Close
   m_TagString: Untagged
@@ -1441,6 +1442,23 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &8933383311549544115
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7963466392310250971}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e864df836f64edd45a88b975a23ba068, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectLink.OutGame.UI.UIIconAnimator
+  intervalSeconds: 10
+  bounceScale: 1.08
+  bounceDuration: 0.8
+  shimmerDuration: 0.65
+  shimmerWidth: 0.35
 --- !u!1 &8433358367676220540
 GameObject:
   m_ObjectHideFlags: 0
@@ -1453,6 +1471,7 @@ GameObject:
   - component: {fileID: 8356973546653355534}
   - component: {fileID: 7083819373999948702}
   - component: {fileID: 6660867940505723367}
+  - component: {fileID: 6082256216091495706}
   m_Layer: 0
   m_Name: TimerText
   m_TagString: Untagged
@@ -1509,8 +1528,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: 
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 94b698a58786e8e4b8aebf2193c63cc6, type: 2}
+  m_sharedMaterial: {fileID: -4614010349753722954, guid: 94b698a58786e8e4b8aebf2193c63cc6, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1599,6 +1618,18 @@ MonoBehaviour:
   m_FlexibleWidth: 1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
+--- !u!114 &6082256216091495706
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8433358367676220540}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d7832219fbdb624a8f611ef40ac0572, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectLink.OutGame.UI.LocalizedFont
 --- !u!1 &8483368464577873777
 GameObject:
   m_ObjectHideFlags: 0

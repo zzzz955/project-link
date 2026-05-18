@@ -297,19 +297,19 @@ namespace ProjectLink.OutGame.UI
                 SetLabel(LocalizationManager.Get("streak.activate"));
                 activateButton.onClick.AddListener(OnActivateAndStart);
             }
-            else if (state.AvailableActions.Contains("START_LEVEL"))
-            {
-                int lvl = GetLevelIndexByStatus(state, "READY");
-                Show(true);
-                SetLabel(string.Format(LocalizationManager.Get("streak.start_level"), lvl + 1));
-                activateButton.onClick.AddListener(() => OnStartLevel(lvl));
-            }
             else if (state.AvailableActions.Contains("CLAIM_REWARD"))
             {
                 int lvl = GetLevelIndexByReward(state, "PENDING");
                 Show(true);
                 SetLabel(LocalizationManager.Get("streak.claim"));
                 activateButton.onClick.AddListener(() => OnClaimReward(lvl));
+            }
+            else if (state.AvailableActions.Contains("START_LEVEL"))
+            {
+                int lvl = GetLevelIndexByStatus(state, "READY");
+                Show(true);
+                SetLabel(string.Format(LocalizationManager.Get("streak.start_level"), lvl + 1));
+                activateButton.onClick.AddListener(() => OnStartLevel(lvl));
             }
             else if (state.AvailableActions.Contains("CONTINUE_LEVEL"))
             {
@@ -441,14 +441,119 @@ namespace ProjectLink.OutGame.UI
 
         void ResolveRefs()
         {
-            closeButton    ??= FindButton("CloseButton");
-            activateButton ??= FindButton("ActivateButton");
+            closeButton    ??= FindButton("CloseButton") ?? FindButton("Btn_Close");
+            activateButton ??= FindButton("ActivateButton") ?? FindButton("Btn_Activate");
             statusText     ??= FindText("StatusText");
             timerText      ??= FindText("TimerText");
             levelListRoot  ??= FindRect("LevelList");
 
             if (activateButton != null)
                 _actionLabel = activateButton.GetComponentInChildren<TextMeshProUGUI>(true);
+
+            if (levelListRoot == null)
+                BuildFallback();
+        }
+
+        void BuildFallback()
+        {
+            gameObject.AddComponent<Image>().color = new Color(0f, 0f, 0f, 0.72f);
+
+            var panel = new GameObject("Panel", typeof(RectTransform), typeof(Image));
+            panel.transform.SetParent(transform, false);
+            var panelRt = panel.GetComponent<RectTransform>();
+            panelRt.anchorMin = new Vector2(0.04f, 0.06f);
+            panelRt.anchorMax = new Vector2(0.96f, 0.94f);
+            panelRt.offsetMin = panelRt.offsetMax = Vector2.zero;
+            panel.GetComponent<Image>().color = new Color(0.10f, 0.12f, 0.18f, 0.97f);
+
+            // Title
+            var titleGo = new GameObject("Txt_Title", typeof(RectTransform), typeof(TextMeshProUGUI));
+            titleGo.transform.SetParent(panelRt, false);
+            var titleRt = titleGo.GetComponent<RectTransform>();
+            titleRt.anchorMin = new Vector2(0f, 1f); titleRt.anchorMax = new Vector2(1f, 1f);
+            titleRt.pivot = new Vector2(0.5f, 1f);
+            titleRt.sizeDelta = new Vector2(-32f, 64f);
+            titleRt.anchoredPosition = new Vector2(0f, -16f);
+            var titleTmp = titleGo.GetComponent<TextMeshProUGUI>();
+            titleTmp.text = LocalizationManager.Get("streak.popup.title");
+            titleTmp.fontSize = 32f; titleTmp.fontStyle = FontStyles.Bold;
+            titleTmp.color = Color.white; titleTmp.alignment = TextAlignmentOptions.Center;
+            titleTmp.raycastTarget = false;
+
+            // Status text
+            var stGo = new GameObject("StatusText", typeof(RectTransform), typeof(TextMeshProUGUI));
+            stGo.transform.SetParent(panelRt, false);
+            var stRt = stGo.GetComponent<RectTransform>();
+            stRt.anchorMin = new Vector2(0f, 1f); stRt.anchorMax = new Vector2(1f, 1f);
+            stRt.pivot = new Vector2(0.5f, 1f);
+            stRt.sizeDelta = new Vector2(-32f, 40f);
+            stRt.anchoredPosition = new Vector2(0f, -88f);
+            statusText = stGo.GetComponent<TextMeshProUGUI>();
+            statusText.fontSize = 22f; statusText.color = new Color(0.7f, 0.7f, 0.8f, 1f);
+            statusText.alignment = TextAlignmentOptions.Center; statusText.raycastTarget = false;
+
+            // Timer text
+            var tmGo = new GameObject("TimerText", typeof(RectTransform), typeof(TextMeshProUGUI));
+            tmGo.transform.SetParent(panelRt, false);
+            var tmRt = tmGo.GetComponent<RectTransform>();
+            tmRt.anchorMin = new Vector2(0f, 1f); tmRt.anchorMax = new Vector2(1f, 1f);
+            tmRt.pivot = new Vector2(0.5f, 1f);
+            tmRt.sizeDelta = new Vector2(-32f, 36f);
+            tmRt.anchoredPosition = new Vector2(0f, -132f);
+            timerText = tmGo.GetComponent<TextMeshProUGUI>();
+            timerText.fontSize = 20f; timerText.color = new Color(1f, 0.7f, 0.1f, 1f);
+            timerText.alignment = TextAlignmentOptions.Center; timerText.raycastTarget = false;
+
+            // Level list
+            var listGo = new GameObject("LevelList", typeof(RectTransform), typeof(VerticalLayoutGroup), typeof(ContentSizeFitter));
+            listGo.transform.SetParent(panelRt, false);
+            var listRt = listGo.GetComponent<RectTransform>();
+            listRt.anchorMin = new Vector2(0f, 0f); listRt.anchorMax = new Vector2(1f, 1f);
+            listRt.offsetMin = new Vector2(16f, 128f); listRt.offsetMax = new Vector2(-16f, -172f);
+            var vg = listGo.GetComponent<VerticalLayoutGroup>();
+            vg.spacing = 12; vg.padding = new RectOffset(0, 0, 8, 8);
+            vg.childForceExpandWidth = true; vg.childForceExpandHeight = false;
+            listGo.GetComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+            levelListRoot = listRt;
+
+            // Activate button
+            var btnGo = new GameObject("ActivateButton", typeof(RectTransform), typeof(Image), typeof(Button));
+            btnGo.transform.SetParent(panelRt, false);
+            var btnRt = btnGo.GetComponent<RectTransform>();
+            btnRt.anchorMin = new Vector2(0.05f, 0f); btnRt.anchorMax = new Vector2(0.95f, 0f);
+            btnRt.pivot = new Vector2(0.5f, 0f);
+            btnRt.sizeDelta = new Vector2(0f, 88f);
+            btnRt.anchoredPosition = new Vector2(0f, 96f);
+            btnGo.GetComponent<Image>().color = new Color(0.48f, 0.18f, 0.74f, 1f);
+            activateButton = btnGo.GetComponent<Button>();
+            var btnLbl = new GameObject("Lbl", typeof(RectTransform), typeof(TextMeshProUGUI));
+            btnLbl.transform.SetParent(btnGo.transform, false);
+            var lblRt = btnLbl.GetComponent<RectTransform>();
+            lblRt.anchorMin = Vector2.zero; lblRt.anchorMax = Vector2.one;
+            lblRt.offsetMin = lblRt.offsetMax = Vector2.zero;
+            _actionLabel = btnLbl.GetComponent<TextMeshProUGUI>();
+            _actionLabel.fontSize = 28f; _actionLabel.fontStyle = FontStyles.Bold;
+            _actionLabel.color = Color.white; _actionLabel.alignment = TextAlignmentOptions.Center;
+
+            // Close button
+            var closeBtnGo = new GameObject("Btn_Close", typeof(RectTransform), typeof(Image), typeof(Button));
+            closeBtnGo.transform.SetParent(panelRt, false);
+            var closeBtnRt = closeBtnGo.GetComponent<RectTransform>();
+            closeBtnRt.anchorMin = closeBtnRt.anchorMax = new Vector2(1f, 1f);
+            closeBtnRt.pivot = new Vector2(1f, 1f);
+            closeBtnRt.sizeDelta = new Vector2(64f, 64f);
+            closeBtnRt.anchoredPosition = new Vector2(-8f, -8f);
+            closeBtnGo.GetComponent<Image>().color = new Color(1f, 1f, 1f, 0.14f);
+            closeButton = closeBtnGo.GetComponent<Button>();
+            var closeLbl = new GameObject("X", typeof(RectTransform), typeof(TextMeshProUGUI));
+            closeLbl.transform.SetParent(closeBtnGo.transform, false);
+            var closeLblRt = closeLbl.GetComponent<RectTransform>();
+            closeLblRt.anchorMin = Vector2.zero; closeLblRt.anchorMax = Vector2.one;
+            closeLblRt.offsetMin = closeLblRt.offsetMax = Vector2.zero;
+            var closeTmp = closeLbl.GetComponent<TextMeshProUGUI>();
+            closeTmp.text = "✕"; closeTmp.fontSize = 28f;
+            closeTmp.color = Color.white; closeTmp.alignment = TextAlignmentOptions.Center;
+            closeTmp.raycastTarget = false;
         }
 
         Button? FindButton(string n)

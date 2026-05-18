@@ -20,11 +20,11 @@ MonoBehaviour:
   - elementName: btn_icon_close
     sprite: {fileID: 21300000, guid: 61c30a294c12dcd498e2f10fa4edeac9, type: 3}
   - elementName: btn_icon_menu
-    sprite: {fileID: 21300000, guid: 7de97fd968e237d4fb3e3cd37e0f311e, type: 3}
+    sprite: {fileID: 21300000, guid: a222d4ff779b3704e938acf810bbba71, type: 3}
   - elementName: btn_icon_pause
-    sprite: {fileID: 21300000, guid: 66cc6f2527dc11641b953d2310697a0d, type: 3}
+    sprite: {fileID: 21300000, guid: b1b1bcbadf380b74f8880a39f8c81e68, type: 3}
   - elementName: btn_icon_settings
-    sprite: {fileID: 21300000, guid: 7de97fd968e237d4fb3e3cd37e0f311e, type: 3}
+    sprite: {fileID: 21300000, guid: a222d4ff779b3704e938acf810bbba71, type: 3}
   - elementName: btn_primary
     sprite: {fileID: 21300000, guid: 81f598a6f99424d4ab0f23d69bdadb8d, type: 3}
   - elementName: btn_secondary
@@ -38,13 +38,23 @@ MonoBehaviour:
   - elementName: slot_avatar
     sprite: {fileID: 21300000, guid: f72056af3a9aea64bba5024f6ba05876, type: 3}
   - elementName: slot_currency_soft
-    sprite: {fileID: 21300000, guid: 735e082c30521dd4199a94e6d9de74dc, type: 3}
+    sprite: {fileID: 21300000, guid: d6d33fc445d684f4ea9a4c20eb7eb29d, type: 3}
+  - elementName: slot_difficulty_1
+    sprite: {fileID: 21300000, guid: 451178c781158b54c8c626eb057c4715, type: 3}
+  - elementName: slot_difficulty_2
+    sprite: {fileID: 21300000, guid: 3189158f71f80ee4787f0fcb0a52d34e, type: 3}
+  - elementName: slot_difficulty_3
+    sprite: {fileID: 21300000, guid: 9258d8c73c2a4d04aa42f099c33aeb87, type: 3}
+  - elementName: slot_difficulty_4
+    sprite: {fileID: 21300000, guid: c1cc22d75118a8144b085aac9fdeda8d, type: 3}
+  - elementName: slot_difficulty_5
+    sprite: {fileID: 21300000, guid: ae86449c8eeee41418ee804ed7cf0059, type: 3}
   - elementName: slot_event_banner
-    sprite: {fileID: 21300000, guid: 3ca9e703edc0fa7408478f9c48d46fe0, type: 3}
+    sprite: {fileID: 21300000, guid: 0822f338f05913b47a20214bd543788d, type: 3}
   - elementName: slot_hud_bg
     sprite: {fileID: 0}
   - elementName: slot_lock_icon
-    sprite: {fileID: 0}
+    sprite: {fileID: 21300000, guid: 4594072e57147074397b40aa256fa926, type: 3}
   - elementName: slot_logo
     sprite: {fileID: 6547496072925479820, guid: e93e52f7fbf7c7a43820b34fc1b5d339, type: 3}
   - elementName: slot_popup_bg
@@ -69,6 +79,10 @@ MonoBehaviour:
     sprite: {fileID: 21300000, guid: 2d235c84e7ee2224e9e14082c015c97b, type: 3}
   - elementName: slot_streak_badge
     sprite: {fileID: 21300000, guid: 9c40f6dfa61f67c4a94fd73743191899, type: 3}
+  - elementName: slot_toggle_off
+    sprite: {fileID: 21300000, guid: 4fe0cb5d03416ed4290e0e4e32ba1eb3, type: 3}
+  - elementName: slot_toggle_on
+    sprite: {fileID: 21300000, guid: bb352e62039d0e141a5671c9f06d9ff4, type: 3}
   - elementName: slot_toggle_handle
     sprite: {fileID: 21300000, guid: bb352e62039d0e141a5671c9f06d9ff4, type: 3}
   - elementName: slot_toggle_track
@@ -77,9 +91,121 @@ MonoBehaviour:
     sprite: {fileID: 21300000, guid: e609237df9a219c4eaff075232370fb2, type: 3}
   - elementName: slot_popup_bg_vertical
     sprite: {fileID: 21300000, guid: e0341c3511b3ca9458b1e76e8593fd31, type: 3}
-  - elementName: slot_toggle_off
-    sprite: {fileID: 21300000, guid: 4fe0cb5d03416ed4290e0e4e32ba1eb3, type: 3}
-  - elementName: slot_toggle_on
-    sprite: {fileID: 21300000, guid: bb352e62039d0e141a5671c9f06d9ff4, type: 3}
   - elementName: slot_tab_indicator
     sprite: {fileID: 21300000, guid: 60451d7ca25722f4d852a98fcd534eab, type: 3}
+  - elementName: btn_claim
+    sprite: {fileID: 21300000, guid: 5a30dfa7759d21449b07d8dbe52a6dfb, type: 3}
+  - elementName: btn_panel_claim
+    sprite: {fileID: 21300000, guid: 7b931afed1392824b8fc957627e93f74, type: 3}
+  - elementName: slot_panel_background
+    sprite: {fileID: 0}
+  - elementName: slot_fill
+    sprite: {fileID: 0}
+  - elementName: slot_hud_strip
+    sprite: {fileID: 0}
+  - elementName: btn_settings
+    sprite: {fileID: 0}
+  - elementName: btn_language
+    sprite: {fileID: 0}
+  - elementName: slot_carousel_stages
+    sprite: {fileID: 0}
+  - elementName: slot_viewport
+    sprite: {fileID: 0}
+  - elementName: slot_seg_mode
+    sprite: {fileID: 0}
+  - elementName: slot_seg_clear
+    sprite: {fileID: 0}
+  - elementName: slot_seg_score
+    sprite: {fileID: 0}
+  - elementName: slot_row_myrank_pinned
+    sprite: {fileID: 0}
+  - elementName: slot_tabbar
+    sprite: {fileID: 0}
+  - elementName: slot_tab_shop
+    sprite: {fileID: 0}
+  - elementName: slot_tab_home
+    sprite: {fileID: 0}
+  - elementName: slot_tab_ranking
+    sprite: {fileID: 0}
+  - elementName: slot_hud_top
+    sprite: {fileID: 0}
+  - elementName: slot_bar_objective
+    sprite: {fileID: 0}
+  - elementName: slot_itemslot_1
+    sprite: {fileID: 0}
+  - elementName: slot_itemslot_2
+    sprite: {fileID: 0}
+  - elementName: slot_itemslot_3
+    sprite: {fileID: 0}
+  - elementName: slot_overlay
+    sprite: {fileID: 0}
+  - elementName: slot_divider_top
+    sprite: {fileID: 0}
+  - elementName: slot_content_avatar
+    sprite: {fileID: 0}
+  - elementName: slot_row_providera
+    sprite: {fileID: 0}
+  - elementName: slot_row_providerb
+    sprite: {fileID: 0}
+  - elementName: slot_divider_bot
+    sprite: {fileID: 0}
+  - elementName: slot_panelimageslot
+    sprite: {fileID: 0}
+  - elementName: slot_titleimageslot
+    sprite: {fileID: 0}
+  - elementName: slot_featureditemcardslot
+    sprite: {fileID: 0}
+  - elementName: slot_undoitemslot
+    sprite: {fileID: 0}
+  - elementName: slot_paintitemslot
+    sprite: {fileID: 0}
+  - elementName: slot_shuffleitemslot
+    sprite: {fileID: 0}
+  - elementName: slot_pricepanelslot
+    sprite: {fileID: 0}
+  - elementName: slot_closeiconbutton
+    sprite: {fileID: 0}
+  - elementName: slot_undoitembutton
+    sprite: {fileID: 0}
+  - elementName: slot_paintitembutton
+    sprite: {fileID: 0}
+  - elementName: slot_shuffleitembutton
+    sprite: {fileID: 0}
+  - elementName: slot_buybutton
+    sprite: {fileID: 0}
+  - elementName: slot_itemgrid
+    sprite: {fileID: 0}
+  - elementName: slot_icon
+    sprite: {fileID: 0}
+  - elementName: slot_spine
+    sprite: {fileID: 0}
+  - elementName: slot_panel
+    sprite: {fileID: 0}
+  - elementName: btn_close
+    sprite: {fileID: 0}
+  - elementName: slot_bar_progress
+    sprite: {fileID: 0}
+  - elementName: btn_complete
+    sprite: {fileID: 0}
+  - elementName: slot_hud_balance
+    sprite: {fileID: 0}
+  - elementName: slot_day_1
+    sprite: {fileID: 0}
+  - elementName: slot_day_2
+    sprite: {fileID: 0}
+  - elementName: slot_day_3
+    sprite: {fileID: 0}
+  - elementName: slot_day_4
+    sprite: {fileID: 0}
+  - elementName: slot_day_5
+    sprite: {fileID: 0}
+  - elementName: slot_day_6
+    sprite: {fileID: 0}
+  - elementName: slot_day_7
+    sprite: {fileID: 0}
+  - elementName: slot_ribbon
+    sprite: {fileID: 0}
+  - elementName: slot_toggle
+    sprite: {fileID: 0}
+  - elementName: slot_dropdown
+    sprite: {fileID: 0}

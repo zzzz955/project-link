@@ -66,7 +66,7 @@ namespace ProjectLink.OutGame.UI
             if (_label.font != target)
             {
                 _label.font = target;
-                _label.ForceMeshUpdate();
+                _label.ForceMeshUpdate(false, true);
             }
         }
     }

@@ -19,13 +19,14 @@ namespace ProjectLink.InGame.UI
         [SerializeField] TextMeshProUGUI timerText;
         [SerializeField] TextMeshProUGUI objectiveText;
 
+        int _stageId;
+
         public TextMeshProUGUI MoveCounterText => moveCounterText;
         public TextMeshProUGUI TimerText => timerText;
         public TextMeshProUGUI ObjectiveText => objectiveText;
 
         void Awake()
         {
-            // Resolve refs by name if not set in inspector
             timerText ??= FindText("Txt_Timer");
             objectiveText ??= FindText("Txt_Objective");
             if (moveCounterText == null)
@@ -34,11 +35,18 @@ namespace ProjectLink.InGame.UI
 
         void Start()
         {
-            SetText(levelLabelText, string.Format(LocalizationManager.Get("popup.stage.title_n_fmt"), GameContext.SelectedStageId));
+            SetStageLabel(GameContext.SelectedStageId);
         }
+
+        void OnEnable()  { LocalizationManager.LanguageChanged += OnLanguageChanged; }
+        void OnDisable() { LocalizationManager.LanguageChanged -= OnLanguageChanged; }
+        void OnDestroy() { LocalizationManager.LanguageChanged -= OnLanguageChanged; }
+
+        void OnLanguageChanged() => SetStageLabel(_stageId);
 
         public void SetStageLabel(int stageId)
         {
+            _stageId = stageId;
             SetText(levelLabelText, string.Format(LocalizationManager.Get("popup.stage.title_n_fmt"), stageId));
         }
 

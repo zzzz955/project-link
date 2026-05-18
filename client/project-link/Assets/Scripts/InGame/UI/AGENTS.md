@@ -18,8 +18,8 @@
 | `InGameHUD.Init(int,int,Func<int>,int)` | method | stageId, totalColors, connectedCount getter, timeLimitSeconds (0=no timer); rebuilds wireframe HUD |
 | `InGameHUD.Refresh()` | method | updates objective counter text via connectedCount getter |
 | `InGameHUD.SetTimerDisplay(float)` | method | remaining seconds -> `MM:SS` (zero-padded); color -> urgent red when <= 10 s |
-| `InGameHUD.SetMoveDisplay(int,int)` | method | moves used / server move limit text |
-| `GameWireframeController.SetStageLabel(int)` | method | updates levelLabelText via `popup.stage.title_n_fmt` LocalizationManager key (no hardcoded "Stage N") |
+| `InGameHUD.SetMoveDisplay(int,int)` | method | localized move counter: `hud.moves_fmt` (limit) / `hud.moves_no_limit_fmt` (no limit) via `LocalizationManager.Get` |
+| `GameWireframeController.SetStageLabel(int)` | method | updates levelLabelText via `popup.stage.title_n_fmt` LocalizationManager key; font handled automatically by `LocalizedFont` component on the label (added by UIBuilder) |
 | `GameWireframeController.SetToolButtonsInteractable(bool)` | method | toggles generated shell button refs |
 | `CircularGauge.Show(Vector3,Color)` | method | positions at world pos, sets arc color, enables |
 | `CircularGauge.SetProgress(float)` | method | t in [0,1] draws arc (0=empty, 1=full circle) |

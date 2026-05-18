@@ -46,7 +46,9 @@ namespace ProjectLink.InGame.UI
         public void SetMoveDisplay(int movesUsed, int moveLimit)
         {
             if (_moveCounterText == null) return;
-            _moveCounterText.text = moveLimit > 0 ? $"{movesUsed}/{moveLimit}" : movesUsed.ToString();
+            _moveCounterText.text = moveLimit > 0
+                ? string.Format(LocalizationManager.Get("hud.moves_fmt"), movesUsed, moveLimit)
+                : string.Format(LocalizationManager.Get("hud.moves_no_limit_fmt"), movesUsed);
         }
 
         void BindToDdlElements(int stageId, bool showTimer)

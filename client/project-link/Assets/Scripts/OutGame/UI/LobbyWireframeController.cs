@@ -67,6 +67,7 @@ namespace ProjectLink.OutGame.UI
         Button _rankingStagesButton;
         Button _rankingScoreButton;
         TextMeshProUGUI _pinnedRankText;
+        TextMeshProUGUI _pinnedYouText;
         TextMeshProUGUI _pinnedScoreText;
 
         void Awake()
@@ -96,10 +97,20 @@ namespace ProjectLink.OutGame.UI
             _viewModel.LoadRanking(DefaultRankingCategory, OnLoadDone);
         }
 
+        void OnEnable()  { LocalizationManager.LanguageChanged += OnLanguageChanged; }
+        void OnDisable() { LocalizationManager.LanguageChanged -= OnLanguageChanged; }
+
         void OnDestroy()
         {
             if (_viewModel != null)
                 _viewModel.Changed -= Render;
+            LocalizationManager.LanguageChanged -= OnLanguageChanged;
+        }
+
+        void OnLanguageChanged()
+        {
+            RefreshStaminaTimer();
+            RefreshPlayState(_viewModel?.Lobby);
         }
 
         void Update()
@@ -247,15 +258,9 @@ namespace ProjectLink.OutGame.UI
 
         void ApplyRanking(RankingListResponse ranking)
         {
-            ClearRows(rankingContent, "TopRankCard", "Rank_");
+            ClearRows(rankingContent, "Rank_");
             SetText(rankingMetricText, ranking.MetricLabel);
             RefreshRankingSegmentState(ranking.Category);
-
-            if (ranking.Entries.Count > 0)
-            {
-                var top = ranking.Entries[0];
-                AddRow(rankingContent, "TopRankCard", $"#1 {top.DisplayName}", FormatNumber(top.Value), highlighted: true);
-            }
 
             for (int i = 0; i < ranking.Entries.Count; i++)
             {
@@ -267,11 +272,16 @@ namespace ProjectLink.OutGame.UI
             {
                 SetText(_pinnedRankText, $"#{ranking.MyRank.Rank}");
                 SetText(_pinnedScoreText, FormatNumber(ranking.MyRank.Value));
+                var name = ranking.MyRank.DisplayName;
+                SetText(_pinnedYouText, string.IsNullOrEmpty(name)
+                    ? LocalizationManager.Get("popup.account.guest")
+                    : name);
             }
             else
             {
                 SetText(_pinnedRankText, "#--");
                 SetText(_pinnedScoreText, "0");
+                SetText(_pinnedYouText, LocalizationManager.Get("popup.account.guest"));
             }
         }
 
@@ -297,6 +307,7 @@ namespace ProjectLink.OutGame.UI
             _rankingStagesButton ??= FindButton("Seg_Clear");
             _rankingScoreButton ??= FindButton("Seg_Score");
             _pinnedRankText ??= FindTextInParent("Row_MyRank_Pinned", "Txt_Rank");
+            _pinnedYouText ??= FindTextInParent("Row_MyRank_Pinned", "Txt_You");
             _pinnedScoreText ??= FindTextInParent("Row_MyRank_Pinned", "Txt_Score");
             EnsureSideStageNodes();
         }
@@ -680,6 +691,7 @@ namespace ProjectLink.OutGame.UI
             txt.raycastTarget = false;
             var le = go.GetComponent<LayoutElement>();
             le.preferredHeight = 56f;
+            go.AddComponent<LocalizedFont>();
         }
 
         static void AddProductCard(RectTransform parent, string name, string title, string price, bool best)
@@ -709,6 +721,7 @@ namespace ProjectLink.OutGame.UI
             titleTmp.color = new Color(1f, 0.82f, 0.08f, 1f);
             titleTmp.alignment = TextAlignmentOptions.Center;
             titleTmp.raycastTarget = false;
+            titleGo.AddComponent<LocalizedFont>();
 
             // Price — bottom-right
             var iconGo = new GameObject("Icon_Wire", typeof(RectTransform), typeof(TextMeshProUGUI));
@@ -740,6 +753,7 @@ namespace ProjectLink.OutGame.UI
             priceTmp.color = Color.white;
             priceTmp.alignment = TextAlignmentOptions.Center;
             priceTmp.raycastTarget = false;
+            priceGo.AddComponent<LocalizedFont>();
         }
 
         static void AddRow(RectTransform parent, string rowName, string left, string right, bool highlighted)
@@ -777,6 +791,7 @@ namespace ProjectLink.OutGame.UI
             label.fontSizeMin = 18f;
             label.fontSizeMax = 36f;
             go.GetComponent<LayoutElement>().flexibleWidth = flexibleWidth;
+            go.AddComponent<LocalizedFont>();
         }
 
         static void ClearChildren(RectTransform parent)

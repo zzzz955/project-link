@@ -20,6 +20,8 @@ title.continue_google,Continue with Google,Google로 계속하기,使用 Google 
 title.continue_apple,Continue with Apple,Apple로 계속하기,使用 Apple 继续,使用 Apple 繼續,ดำเนินการต่อด้วย Apple
 hud.settings,Settings,설정,设置,設定,การตั้งค่า
 hud.language,Language,언어,语言,語言,ภาษา
+hud.moves_fmt,Moves: {0}/{1},이동 횟수 : {0}/{1},步数: {0}/{1},步數: {0}/{1},การเคลื่อนที่: {0}/{1}
+hud.moves_no_limit_fmt,Moves: {0},이동 횟수 : {0},步数: {0},步數: {0},การเคลื่อนที่: {0}
 status.energy_empty,Energy 0,에너지 0,能量 0,能量 0,พลังงาน 0
 status.stamina_full,Full,가득 참,已满,已滿,เต็ม
 tab.shop,Shop,상점,商店,商店,ร้านค้า

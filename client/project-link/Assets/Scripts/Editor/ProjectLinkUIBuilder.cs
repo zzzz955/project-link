@@ -136,10 +136,19 @@ namespace ProjectLink.EditorTools
 
             foreach (string path in scenePaths)
             {
+                string prev = System.IO.File.Exists(path) ? System.IO.File.ReadAllText(path) : null;
+
                 var scene = EditorSceneManager.OpenScene(path, OpenSceneMode.Single);
                 BuildScene(scene.name);
                 EditorSceneManager.MarkSceneDirty(scene);
                 EditorSceneManager.SaveScene(scene);
+
+                if (prev != null && ContentMatchesIgnoringFileIds(System.IO.File.ReadAllText(path), prev))
+                {
+                    System.IO.File.WriteAllText(path, prev);
+                    // Reload from disk so the in-memory scene is clean (no "unsaved changes" prompt)
+                    EditorSceneManager.OpenScene(path, OpenSceneMode.Single);
+                }
             }
 
             if (!Application.isBatchMode)
@@ -1419,29 +1428,116 @@ namespace ProjectLink.EditorTools
             var (root, panel, content, footer) = CreatePopupShell<StreakChallengePopup>(
                 "StreakChallengePopup", "streak.popup.title", dismissible: true);
 
-            var statusTxt = MakeText(content, "StatusText", "streak.status_inactive",
-                26, TextCol, TextAlignmentOptions.Midline);
-            statusTxt.gameObject.AddComponent<LayoutElement>().preferredHeight = 48;
+            panel.sizeDelta = new Vector2(960, 0);
+            var panelVlg = panel.GetComponent<VerticalLayoutGroup>();
+            panelVlg.spacing = 14;
+            panelVlg.padding = new RectOffset(36, 36, 26, 34);
 
-            var timerTxt = MakeText(content, "TimerText", "",
-                22, Warning, TextAlignmentOptions.Midline);
-            timerTxt.gameObject.AddComponent<LayoutElement>().preferredHeight = 36;
+            var header = FindRectInChildren(panel, "Header");
+            if (header != null)
+            {
+                var infoBtn = MakeChild(header, "Btn_Info");
+                SetAnchor(infoBtn, new Vector2(0, 0.5f), new Vector2(0, 0.5f), new Vector2(0, 0.5f));
+                infoBtn.sizeDelta = new Vector2(80, 80);
+                infoBtn.anchoredPosition = new Vector2(20, 0);
+                var infoImg = infoBtn.gameObject.AddComponent<Image>();
+                infoImg.color = HexColor("#26A6FFEE");
+                ApplySkin(infoImg, "btn_icon_info");
+                var infoButton = infoBtn.gameObject.AddComponent<Button>();
+                infoButton.targetGraphic = infoImg;
+                infoBtn.gameObject.AddComponent<ProjectLink.Core.ButtonPressEffect>();
 
-            var levelList = MakeChild(content, "LevelList");
-            var lvlVlg = levelList.gameObject.AddComponent<VerticalLayoutGroup>();
-            lvlVlg.spacing = 12; lvlVlg.padding = new RectOffset(0, 0, 8, 8);
-            lvlVlg.childControlWidth = true; lvlVlg.childControlHeight = false;
-            levelList.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
-            levelList.gameObject.AddComponent<LayoutElement>().flexibleHeight = 1;
+                var infoLabel = AddLocalizedLabel(infoBtn, "Txt_InfoGlyph", "", Vector2.zero,
+                    Vector2.zero, 42f, TextAlignmentOptions.Midline, FontStyles.Bold);
+                infoLabel.text = "i";
+            }
 
-            var activateBtn = AddFooterButton(footer, "ActivateButton", "streak.activate", "btn_primary", isPrimary: true);
+            var banner = MakeChild(content, "Img_Banner");
+            banner.sizeDelta = new Vector2(780, 230);
+            banner.gameObject.AddComponent<LayoutElement>().preferredHeight = 230;
+            var bannerImg = banner.gameObject.AddComponent<Image>();
+            bannerImg.color = HexColor("#248DFF66");
+            ApplySkin(bannerImg, "slot_streak_banner");
+            if (bannerImg.sprite == null) ApplySkin(bannerImg, "slot_event_banner");
+
+            var timerBadge = MakeChild(content, "Slot_TimerBadge");
+            timerBadge.sizeDelta = new Vector2(330, 72);
+            timerBadge.gameObject.AddComponent<LayoutElement>().preferredHeight = 72;
+            var timerBg = timerBadge.gameObject.AddComponent<Image>();
+            timerBg.color = HexColor("#FFE6BDEE");
+            ApplySkin(timerBg, "slot_streak_time_badge");
+            AddLocalizedLabel(timerBadge, "Txt_Timer", "", Vector2.zero, Vector2.zero,
+                34f, TextAlignmentOptions.Midline, FontStyles.Bold);
+
+            var levelTxt = MakeText(content, "Txt_Level", "streak.level_progress_fmt",
+                40, TextCol, TextAlignmentOptions.Midline);
+            levelTxt.gameObject.AddComponent<LayoutElement>().preferredHeight = 58;
+
+            var prize = MakeChild(content, "Panel_Prize");
+            prize.sizeDelta = new Vector2(760, 154);
+            prize.gameObject.AddComponent<LayoutElement>().preferredHeight = 154;
+            var prizeImg = prize.gameObject.AddComponent<Image>();
+            prizeImg.color = HexColor("#7B2FBEF5");
+            ApplySkin(prizeImg, "slot_streak_prize_panel");
+
+            var prizeTitle = AddLocalizedLabel(prize, "Txt_PrizeTitle", "streak.grand_prize",
+                new Vector2(0, 42), new Vector2(690, 44), 27f,
+                TextAlignmentOptions.Midline, FontStyles.Bold);
+            prizeTitle.color = TextCol;
+
+            var prizeIcon = MakeChild(prize, "Img_PrizeIcon");
+            Center(prizeIcon, new Vector2(-132, -28), new Vector2(72, 72));
+            var prizeIconImg = prizeIcon.gameObject.AddComponent<Image>();
+            prizeIconImg.color = Warning;
+            ApplySkin(prizeIconImg, "slot_currency_soft");
+
+            var prizeAmount = AddLocalizedLabel(prize, "Txt_PrizeAmount", "",
+                new Vector2(92, -28), new Vector2(420, 78), 46f,
+                TextAlignmentOptions.Midline, FontStyles.Bold);
+            prizeAmount.color = TextCol;
+
+            var levelList = MakeChild(content, "LevelPath");
+            levelList.sizeDelta = new Vector2(0, 660);
+            levelList.gameObject.AddComponent<LayoutElement>().preferredHeight = 660;
+
+            var activateBtn = AddFooterButton(footer, "Btn_Claim", "streak.claim", "btn_streak_claim", isPrimary: true);
+            if (activateBtn.GetComponent<Image>() != null)
+                ApplySkin(activateBtn.GetComponent<Image>(), "btn_claim");
+
+            var infoPopup = MakeChild(panel, "InfoPopup");
+            SetAnchor(infoPopup, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f));
+            infoPopup.sizeDelta = new Vector2(760, 420);
+            infoPopup.anchoredPosition = new Vector2(0, 120);
+            var infoPopupImg = infoPopup.gameObject.AddComponent<Image>();
+            infoPopupImg.color = HexColor("#0D1B36FA");
+            ApplySkin(infoPopupImg, "slot_streak_info_panel");
+            AddLocalizedLabel(infoPopup, "Txt_InfoTitle", "streak.info_title",
+                new Vector2(0, 134), new Vector2(640, 64), 34f,
+                TextAlignmentOptions.Midline, FontStyles.Bold);
+            var infoBody = AddLocalizedLabel(infoPopup, "Txt_InfoBody", "streak.info_body",
+                new Vector2(0, -24), new Vector2(620, 220), 26f,
+                TextAlignmentOptions.TopLeft, FontStyles.Normal);
+            infoBody.textWrappingMode = TextWrappingModes.Normal;
+            infoPopup.gameObject.SetActive(false);
 
             var popup = root.GetComponent<StreakChallengePopup>();
             Assign(popup, "closeButton",    FindButtonInChildren(root, "Btn_Close"));
+            Assign(popup, "infoButton",     FindButtonInChildren(root, "Btn_Info"));
             Assign(popup, "activateButton", activateBtn);
-            Assign(popup, "statusText",     statusTxt.GetComponent<TextMeshProUGUI>());
-            Assign(popup, "timerText",      timerTxt.GetComponent<TextMeshProUGUI>());
+            Assign(popup, "infoPopup",      infoPopup.gameObject);
+            Assign(popup, "bannerImage",    bannerImg);
+            Assign(popup, "timerText",      FindTmpInChildren(root.GetComponent<RectTransform>(), "Txt_Timer"));
+            Assign(popup, "levelText",      levelTxt.GetComponent<TextMeshProUGUI>());
+            Assign(popup, "prizeTitleText", prizeTitle);
+            Assign(popup, "prizeIcon",      prizeIconImg);
+            Assign(popup, "prizeAmountText", prizeAmount);
             Assign(popup, "levelListRoot",  levelList);
+            Assign(popup, "pathLineSprite", LoadSkin()?.Get("slot_streak_path_line"));
+            Assign(popup, "pathNodeSprite", LoadSkin()?.Get("slot_streak_path_node"));
+            Assign(popup, "pathNodeDoneSprite", LoadSkin()?.Get("slot_streak_path_node_done"));
+            Assign(popup, "platformSprite", LoadSkin()?.Get("slot_streak_platform"));
+            Assign(popup, "softCurrencySprite", LoadSkin()?.Get("slot_currency_soft"));
+            Assign(popup, "itemRewardSprite", LoadSkin()?.Get("slot_streak_reward_item"));
             SavePopupPrefab(root, "StreakChallengePopup");
         }
 
@@ -2060,8 +2156,12 @@ namespace ProjectLink.EditorTools
 
             EnsureLocalizedFonts(root);
             AddAnimatorToIconImages(root);
-            PrefabUtility.SaveAsPrefabAsset(root, $"{PopupPrefabRoot}/ShopProductCard.prefab");
+
+            string cardPath = $"{PopupPrefabRoot}/ShopProductCard.prefab";
+            string prevCard = System.IO.File.Exists(cardPath) ? System.IO.File.ReadAllText(cardPath) : null;
+            PrefabUtility.SaveAsPrefabAsset(root, cardPath);
             Object.DestroyImmediate(root);
+            RestoreIfUnchanged(cardPath, prevCard);
         }
 
         static void SavePopupPrefab(GameObject root, string prefabName)
@@ -2069,8 +2169,14 @@ namespace ProjectLink.EditorTools
             NormalizeLayoutText(root);
             EnsureLocalizedFonts(root);
             AddAnimatorToIconImages(root);
-            PrefabUtility.SaveAsPrefabAsset(root, $"{PopupPrefabRoot}/{prefabName}.prefab");
+
+            string path = $"{PopupPrefabRoot}/{prefabName}.prefab";
+            string prev = System.IO.File.Exists(path) ? System.IO.File.ReadAllText(path) : null;
+
+            PrefabUtility.SaveAsPrefabAsset(root, path);
             Object.DestroyImmediate(root);
+
+            RestoreIfUnchanged(path, prev);
         }
 
         // ─── Shared canvas / layer helpers ───────────────────────────────
@@ -2505,6 +2611,49 @@ namespace ProjectLink.EditorTools
         }
 
         // ─── Misc ─────────────────────────────────────────────────────────
+
+        // ─── FileID-stable save helpers ──────────────────────────────────
+        // Unity assigns new fileIDs every time objects are destroyed and recreated.
+        // These helpers detect whether a rebuild produced only fileID churn (no real
+        // structural change) and restore the original file in that case, so git diff
+        // only shows genuinely modified scenes/prefabs.
+
+        static bool ContentMatchesIgnoringFileIds(string newContent, string oldContent)
+            => NormalizeYamlFileIds(newContent) == NormalizeYamlFileIds(oldContent);
+
+        static string NormalizeYamlFileIds(string yaml)
+        {
+            var idMap = new System.Collections.Generic.Dictionary<string, string>();
+            int counter = 0;
+
+            string MapId(string id)
+            {
+                if (!idMap.TryGetValue(id, out var n))
+                    idMap[id] = n = (++counter).ToString();
+                return n;
+            }
+
+            // YAML anchors:  --- !u!NNN &1234567890
+            yaml = System.Text.RegularExpressions.Regex.Replace(
+                yaml, @"&(\d+)", m => $"&{MapId(m.Groups[1].Value)}");
+            // fileID references: {fileID: 1234567890, ...}
+            yaml = System.Text.RegularExpressions.Regex.Replace(
+                yaml, @"fileID: (-?\d+)", m => $"fileID: {MapId(m.Groups[1].Value)}");
+
+            return yaml;
+        }
+
+        static void RestoreIfUnchanged(string path, string previousContent)
+        {
+            if (previousContent == null || !System.IO.File.Exists(path)) return;
+            string current = System.IO.File.ReadAllText(path);
+            if (!ContentMatchesIgnoringFileIds(current, previousContent)) return;
+
+            System.IO.File.WriteAllText(path, previousContent);
+            AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
+        }
+
+        // ─────────────────────────────────────────────────────────────────
 
         static void EnsureFolder(string path)
         {

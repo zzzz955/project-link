@@ -79,6 +79,28 @@ MonoBehaviour:
     sprite: {fileID: 21300000, guid: 2d235c84e7ee2224e9e14082c015c97b, type: 3}
   - elementName: slot_streak_badge
     sprite: {fileID: 21300000, guid: 9c40f6dfa61f67c4a94fd73743191899, type: 3}
+  - elementName: btn_icon_info
+    sprite: {fileID: 0}
+  - elementName: btn_streak_claim
+    sprite: {fileID: 0}
+  - elementName: slot_streak_banner
+    sprite: {fileID: 0}
+  - elementName: slot_streak_info_panel
+    sprite: {fileID: 0}
+  - elementName: slot_streak_path_line
+    sprite: {fileID: 0}
+  - elementName: slot_streak_path_node
+    sprite: {fileID: 0}
+  - elementName: slot_streak_path_node_done
+    sprite: {fileID: 0}
+  - elementName: slot_streak_platform
+    sprite: {fileID: 0}
+  - elementName: slot_streak_prize_panel
+    sprite: {fileID: 0}
+  - elementName: slot_streak_reward_item
+    sprite: {fileID: 0}
+  - elementName: slot_streak_time_badge
+    sprite: {fileID: 0}
   - elementName: slot_toggle_off
     sprite: {fileID: 21300000, guid: 4fe0cb5d03416ed4290e0e4e32ba1eb3, type: 3}
   - elementName: slot_toggle_on

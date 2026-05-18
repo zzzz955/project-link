@@ -13,6 +13,8 @@ namespace ProjectLink.Data
         static OutgameStaminaConfig[] _staminaConfigs;
         static OutgameDailyReward[] _dailyRewards;
         static IngameItem[] _items;
+        static StreakChallengeLevel[] _streakLevels;
+        static StreakChallengeRewardItem[] _streakRewardItems;
 
         public static IReadOnlyList<OutgameAvatar> Avatars
         {
@@ -62,6 +64,39 @@ namespace ProjectLink.Data
             return _items;
         }
 
+        public static IReadOnlyList<StreakChallengeLevel> GetStreakChallengeLevels(int eventId = 0, int version = 0)
+        {
+            EnsureLoaded();
+            var result = new List<StreakChallengeLevel>();
+
+            foreach (var level in _streakLevels)
+            {
+                if (!level.isEnabled) continue;
+                if (eventId > 0 && level.eventId != eventId) continue;
+                if (version > 0 && level.version != version) continue;
+                result.Add(level);
+            }
+
+            result.Sort((a, b) => a.displayOrder.CompareTo(b.displayOrder));
+            return result;
+        }
+
+        public static IReadOnlyList<StreakChallengeRewardItem> GetStreakChallengeRewardItems(int rewardGroupId, int rewardGroupVersion = 1)
+        {
+            EnsureLoaded();
+            var result = new List<StreakChallengeRewardItem>();
+
+            foreach (var item in _streakRewardItems)
+            {
+                if (item.rewardGroupId != rewardGroupId) continue;
+                if (item.rewardGroupVersion != rewardGroupVersion) continue;
+                result.Add(item);
+            }
+
+            result.Sort((a, b) => a.displayOrder.CompareTo(b.displayOrder));
+            return result;
+        }
+
         public static IngameItem FindItem(int itemId)
         {
             EnsureLoaded();
@@ -90,6 +125,8 @@ namespace ProjectLink.Data
             _staminaConfigs = CsvLoader.Load<OutgameStaminaConfig>(OutgameStaminaConfig.ResourcePath);
             _dailyRewards = CsvLoader.Load<OutgameDailyReward>(OutgameDailyReward.ResourcePath);
             _items = CsvLoader.Load<IngameItem>(IngameItem.ResourcePath);
+            _streakLevels = CsvLoader.Load<StreakChallengeLevel>(StreakChallengeLevel.ResourcePath);
+            _streakRewardItems = CsvLoader.Load<StreakChallengeRewardItem>(StreakChallengeRewardItem.ResourcePath);
         }
     }
 }

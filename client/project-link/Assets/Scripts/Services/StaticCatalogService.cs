@@ -11,6 +11,8 @@ namespace ProjectLink.Services
         OutgameStaminaConfig StaminaConfig { get; }
         IReadOnlyList<OutgameDailyReward> DailyRewards { get; }
         IReadOnlyList<IngameItem> GetAllItems();
+        IReadOnlyList<StreakChallengeLevel> GetStreakChallengeLevels(int eventId = 0, int version = 0);
+        IReadOnlyList<StreakChallengeRewardItem> GetStreakChallengeRewardItems(int rewardGroupId, int rewardGroupVersion = 1);
         IngameItem FindItem(int itemId);
         OutgameAvatar FindAvatar(int avatarId);
         OutgameSeasonEvent FindSeasonEvent(int eventId);
@@ -30,6 +32,16 @@ namespace ProjectLink.Services
         public IReadOnlyList<IngameItem> GetAllItems()
         {
             return OutgameDataLoader.GetAllItems();
+        }
+
+        public IReadOnlyList<StreakChallengeLevel> GetStreakChallengeLevels(int eventId = 0, int version = 0)
+        {
+            return OutgameDataLoader.GetStreakChallengeLevels(eventId, version);
+        }
+
+        public IReadOnlyList<StreakChallengeRewardItem> GetStreakChallengeRewardItems(int rewardGroupId, int rewardGroupVersion = 1)
+        {
+            return OutgameDataLoader.GetStreakChallengeRewardItems(rewardGroupId, rewardGroupVersion);
         }
 
         public IngameItem FindItem(int itemId)

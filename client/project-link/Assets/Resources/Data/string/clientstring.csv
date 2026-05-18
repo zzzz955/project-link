@@ -196,3 +196,12 @@ item.obstacle_remover.desc,Highlight obstacle cells on the board and remove one 
 item.node_pair_eraser.desc,Highlight all nodes on the board and remove one pair by tapping a node.,보드의 모든 노드를 하이라이트하고 탭하여 노드 쌍 하나를 제거합니다.,高亮棋盘上所有节点，点击即可移除一对节点。,高亮棋盤上所有節點，點擊即可移除一對節點。,ไฮไลท์โหนดทั้งหมดบนบอร์ดและแตะเพื่อลบคู่โหนดหนึ่งคู่
 item.move_reducer.desc,Reduces your current move count by 3. Cannot be used if moves used is less than 3.,현재 이동 횟수를 3만큼 줄입니다. 이동 횟수가 3 미만이면 사용할 수 없습니다.,将当前移动次数减少3次。移动次数不足3次时无法使用。,將目前移動次數減少3次。移動次數少於3次時無法使用。,ลดจำนวนการเคลื่อนที่ปัจจุบัน 3 ครั้ง ไม่สามารถใช้ได้หากน้อยกว่า 3
 item.time_extender.desc,Adds 20 seconds to the remaining time.,남은 시간에 20초를 추가합니다.,为剩余时间增加20秒。,為剩餘時間增加20秒。,เพิ่ม 20 วินาทีให้กับเวลาที่เหลืออยู่
+streak.level_progress_fmt,Level {0}  {1}/{2},Level {0}  {1}/{2},Level {0}  {1}/{2},Level {0}  {1}/{2},Level {0}  {1}/{2}
+streak.grand_prize,GRAND PRIZE,GRAND PRIZE,GRAND PRIZE,GRAND PRIZE,GRAND PRIZE
+streak.remaining_fmt,{0:00}h {1:00}m,{0:00}h {1:00}m,{0:00}h {1:00}m,{0:00}h {1:00}m,{0:00}h {1:00}m
+streak.info_title,Event Rules,Event Rules,Event Rules,Event Rules,Event Rules
+streak.info_body,Clear main stages in order to fill the current level. Complete a level to unlock its reward before the event timer ends.,Clear main stages in order to fill the current level. Complete a level to unlock its reward before the event timer ends.,Clear main stages in order to fill the current level. Complete a level to unlock its reward before the event timer ends.,Clear main stages in order to fill the current level. Complete a level to unlock its reward before the event timer ends.,Clear main stages in order to fill the current level. Complete a level to unlock its reward before the event timer ends.
+streak.reward_soft_currency_fmt,{0},{0},{0},{0},{0}
+streak.reward_item_fmt,x{0} {1},x{0} {1},x{0} {1},x{0} {1},x{0} {1}
+streak.reward_item,Item,Item,Item,Item,Item
+streak.step_done,OK,OK,OK,OK,OK

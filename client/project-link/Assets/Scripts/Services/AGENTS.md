@@ -45,6 +45,8 @@
 | `UiDataRoutes.Ranking(string)` | method | maps UI ranking segment or `stage:{id}` to stable server endpoint |
 | `StaticCatalogService.GetEnabledShopProducts(string)` | method | reads enabled shop products from generated outgame CSV |
 | `StaticCatalogService.GetAllItems()` | method | returns all ingame items from generated CSV as `IReadOnlyList<IngameItem>` |
+| `StaticCatalogService.GetStreakChallengeLevels(int,int)` | method | exposes generated streak level planning rows to UI controllers |
+| `StaticCatalogService.GetStreakChallengeRewardItems(int,int)` | method | exposes generated streak reward rows to UI controllers |
 | `StaticCatalogService.FindItem(int)` | method | resolves item display metadata from generated ingame CSV |
 | `UiViewModelMapper.ToLobbyScreen(...)` | method | maps `LobbyStateResponse` + static avatar/event metadata |
 | `UiViewModelMapper.ToShopScreen(...)` | method | maps `ShopCatalogResponse` + item metadata |

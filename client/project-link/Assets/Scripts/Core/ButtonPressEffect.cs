@@ -10,32 +10,40 @@ namespace ProjectLink.Core
         const float AnimDur = 0.07f;
 
         Coroutine _anim;
-        float _restoreScale = 1f;
+        Vector3 _restoreScale;
+        bool _isPressed;
 
         public void OnPointerDown(PointerEventData _)
         {
-            _restoreScale = transform.localScale.x;
+            _isPressed = true;
+            _restoreScale = transform.localScale;
             Animate(_restoreScale * PressScaleMultiplier);
         }
 
-        public void OnPointerUp(PointerEventData _)   => Animate(_restoreScale);
-        public void OnPointerExit(PointerEventData _) => Animate(_restoreScale);
+        public void OnPointerUp(PointerEventData _) => RestoreIfPressed();
+        public void OnPointerExit(PointerEventData _) => RestoreIfPressed();
 
-        void Animate(float target)
+        void RestoreIfPressed()
+        {
+            if (!_isPressed) return;
+            _isPressed = false;
+            Animate(_restoreScale);
+        }
+
+        void Animate(Vector3 target)
         {
             if (_anim != null) StopCoroutine(_anim);
             _anim = StartCoroutine(ScaleTo(target));
         }
 
-        IEnumerator ScaleTo(float target)
+        IEnumerator ScaleTo(Vector3 target)
         {
-            float start = transform.localScale.x;
+            Vector3 start = transform.localScale;
             float t = 0f;
             while (t < 1f)
             {
                 t = Mathf.Min(1f, t + Time.unscaledDeltaTime / AnimDur);
-                float s = Mathf.Lerp(start, target, t);
-                transform.localScale = new Vector3(s, s, 1f);
+                transform.localScale = Vector3.Lerp(start, target, t);
                 yield return null;
             }
         }

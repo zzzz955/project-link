@@ -23,7 +23,7 @@
 | `SettingPopup.cs` | `SettingPopup` | Prefab controller; binds close/save hotspots |
 | `BuyItemPopup.cs` | `BuyItemPopup` | Prefab controller; binds close/buy hotspots |
 | `EnergyPopup.cs` | `EnergyPopup` | Prefab controller; binds close/watch/refill hotspots |
-| `StreakChallengePopup.cs` | `StreakChallengePopup` | Code popup; fetches streak state, builds vertical level list, handles activate/startLevel/claimReward |
+| `StreakChallengePopup.cs` | `StreakChallengePopup` | Popup controller; renders banner/timer/level/prize/path from streak state + CSV catalog, handles info/close/activate/startLevel/claimReward |
 | `StreakChallengeBadge.cs` | `StreakChallengeBadge` | MonoBehaviour badge in Carousel_Stages top-left; state-driven color, 5s bounce animation, opens StreakChallenge popup on tap |
 | `AccountPopup.cs` | `AccountPopup` | Prefab controller; binds account/profile server state |
 | `RewardPopup.cs` | `RewardPopup` | Prefab controller; claims reward through `IUiDataService` |
@@ -59,6 +59,7 @@
 | `LobbyWireframeController.Render()` | method | renders Lobby/Shop/Ranking viewmodel state and localized errors; stage carousel initial selection comes from Lobby API, bounds from CSV catalog, play/stars from server progress |
 | `LobbyWireframeController.RefreshStaminaTimer()` | method | shows "Full" (status.stamina_full) when `_staminaFull`; else "MM:SS" countdown; font applied separately via `ApplyFontsToAllLabels` |
 | `LobbyWireframeController.RenderCenterStarImages(int)` | method | updates Img_Star_0/1/2 in Group_Stars under StageNode_Center using starOnSprite/starOffSprite; fallback to yellow/dim color when sprites null |
+| `LobbyWireframeController.BindAvatarButton()` | method | adds runtime Account popup listener only when Slot_Avatar has no persistent OpenAccountPopup handler |
 | `LobbyWireframeController._staminaFull` | field | bool; set in ApplyLobby when StaminaCurrent >= StaminaMax; drives RefreshStaminaTimer display |
 | `LobbyWireframeController.AnimateCount(label,target,duration,formatter)` | coroutine | SmoothStep count-up from 0 → target over duration (unscaled time); used for stamina/coin on first lobby load |
 | `RepeatButton.Repeated` | event | fires after long-press delay at repeat interval while button remains pressed |
@@ -72,7 +73,9 @@
 | `SettingPopup.ToggleAnim(toggle,isOn)` | coroutine | scale-compress (0.82, 0.07 s) → swap `Img_Toggle` sprite (slot_toggle_on/off) at min scale → bounce-overshoot (1.10→1.0, 0.18 s) |
 | `BuyItemPopup.Init()` | method | binds close/buy hotspots |
 | `EnergyPopup.Init()` | method | binds close/watch/refill hotspots |
-| `StreakChallengePopup.Init()` | method | fetches `StreakChallengeStateResponse` and renders level list; idempotent |
+| `StreakChallengePopup.Init()` | method | binds close/info/action buttons, fetches `StreakChallengeStateResponse`, renders current level path/prize/timer; idempotent |
+| `StreakChallengePopup.RenderPrize(StreakChallengeStateResponse,int)` | method | resolves current level reward from `StaticCatalogService.GetStreakChallengeRewardItems` and displays soft currency/item reward |
+| `StreakChallengePopup.DrawPath(RectTransform,int,int)` | method | renders alternating left/right level clear platforms that converge toward center from `requiredClearCount` |
 | `StreakChallengeBadge.Apply(string?,bool,string)` | method | updates badge color/label/progress text and animation flag based on event state |
 | `AccountPopup.Init()` | method | fetches AccountMeResponse and renders profile/link state |
 | `RewardPopup.Init(string,string)` | method | prepares reward claim buttons |
@@ -103,7 +106,8 @@
 - Scene navigation uses `SceneLoader.LoadScene`; shared state uses `GameContext`.
 - Popup and lobby controllers expose serialized refs for Inspector assignment and fallback-find by child name.
 - Visible runtime-created strings must use `LocalizedText` or `LocalizationManager.Get(key)` with client string IDs; never hardcode user-facing Korean/EN text. Dynamic labels (e.g. streak button) use `LocalizationManager.Get` directly; static labels use `LocalizedText` component.
-- StreakChallengePopup dynamic button labels: `streak.activate`, `streak.start_level` (format arg: level 1-based int), `streak.claim`.
+- StreakChallengePopup strings: `streak.activate`, `streak.start_level`, `streak.claim`, `streak.level_progress_fmt`, `streak.grand_prize`, `streak.remaining_fmt`, `streak.info_title`, `streak.info_body`, reward format keys.
+- StreakChallengePopup sprite refs come from UIBuilder/UISpriteSkin keys: `btn_icon_info`, `slot_streak_banner`, `slot_streak_time_badge`, `slot_streak_prize_panel`, `slot_streak_info_panel`, `slot_streak_path_line`, `slot_streak_path_node`, `slot_streak_path_node_done`, `slot_streak_platform`, `slot_streak_reward_item`, `btn_streak_claim`.
 - Stamina timer text: `status.stamina_full` when full; else "MM:SS" countdown. Key added to clientstring.csv.
 - StageDetailPopup title: dynamic via `popup.stage.title_n_fmt` (format arg: stageId int). LocalizedText component disabled on Txt_Title before setting text.
 - "Guest" display name: use `LocalizationManager.Get("popup.account.guest")` (AccountPopup, SettingPopup, StageDetailPopup ranking display name fallback).

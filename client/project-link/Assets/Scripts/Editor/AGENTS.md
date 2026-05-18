@@ -12,9 +12,13 @@
 | symbol | kind | note |
 |---|---|---|
 | `ProjectLinkUIBuilder.BuildCurrentSceneUI()` | method | [MenuItem] rebuilds active scene UI matching `scenes.json` spec |
-| `ProjectLinkUIBuilder.BuildAllSceneUI()` | method | [MenuItem] rebuilds all scenes + popup prefabs matching design spec |
+| `ProjectLinkUIBuilder.BuildAllSceneUI()` | method | [MenuItem] rebuilds all scenes + popup prefabs matching design spec; restores unchanged files to avoid fileID churn in git diff |
+| `ProjectLinkUIBuilder.ContentMatchesIgnoringFileIds(newContent,oldContent)` | method | normalizes YAML fileID integers to sequential IDs and compares; used to detect fileID-only churn |
+| `ProjectLinkUIBuilder.NormalizeYamlFileIds(yaml)` | method | maps all `&NNNNN` anchors and `fileID: NNNNN` refs to sequential integers; order-of-appearance stable |
+| `ProjectLinkUIBuilder.RestoreIfUnchanged(path,previousContent)` | method | writes previousContent back to disk + ImportAsset if NormalizeYamlFileIds match; suppresses git diff noise |
 | `ProjectLinkUIBuilder.BuildAllSceneUIBatch()` | method | CI/batch variant; no dialogs |
 | `ProjectLinkUIBuilder.BuildPopupPrefabs()` | method | [MenuItem] creates all popup prefabs under `Assets/Resources/Prefabs/UI/` using standard popup shell (Overlay/Panel/Header/Content/Footer), including clear-next confirmation |
+| `ProjectLinkUIBuilder.BuildStreakChallengePopup()` | method | creates StreakChallenge popup hierarchy with Btn_Info/Btn_Close, event banner, HHh MMm timer, level progress, grand-prize panel, dynamic LevelPath root, claim action, and hidden InfoPopup |
 | `ProjectLinkUIBuilder.CreateUISpriteSkin()` | method | [MenuItem] creates/syncs `Assets/Editor/UISpriteSkin.asset`; scans source for `btn_*`/`slot_*` keys automatically |
 | `ProjectLinkUIBuilder.AssignIconAnimations()` | method | [MenuItem] scans all scenes + popup prefabs; adds `UIIconAnimator` to every `Icon_*`/`Icon` GO and any Image using a `btn_icon_*` skin key; auto-called from BuildScene/SavePopupPrefab |
 | `ProjectLinkUIBuilder.RegisterUntrackedSprites()` | method | [MenuItem] scans all scenes + popup prefabs for Image.sprite not tracked in UISpriteSkin; groups by Sprite reference; derives `slot_*`/`btn_*` keys and adds entries to UISpriteSkin.asset |
@@ -48,6 +52,7 @@
 - Editor-only folder; auto-excluded from player builds (Unity convention)
 - Scene builders must be idempotent: destroy existing generated roots before recreating
 - Stable root object names required for clean diffs
+- BuildAllSceneUI / SavePopupPrefab restore original file when only fileIDs changed (post-build YAML normalization); git diff only shows real structural changes
 - Scene/popup builders create wireframe placeholders by default; actual sprites are applied only when `UISpriteSkin.asset` is present and has an entry for the element name.
 - `UISpriteSkin.asset` lives in `Assets/Editor/` (never `Assets/Resources/`) to exclude it from player builds.
 - Prefer anchors/layout groups/ScrollRect over fixed-only placement for generated UI hierarchy.

@@ -42,6 +42,7 @@ PK,NN,NN,NN,NN,NN
 | `shop.` | Generated Shop tab labels |
 | `rank.` | Generated Ranking tab labels |
 | `popup.` | Generated popup labels |
+| `streak.` | Streak Challenge popup labels, info text, timer/reward formats |
 
 ## Cross-refs
 - Gen output: `client/generated/data/string/clientstring.csv`, `client/generated/data/string/error_messages.csv` (via `npm run gen:data`)

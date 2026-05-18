@@ -379,8 +379,18 @@ namespace ProjectLink.OutGame.UI
         void BindAvatarButton()
         {
             var avatarBtn = FindButton("Slot_Avatar");
-            if (avatarBtn != null)
+            if (avatarBtn != null && !HasPersistentOpenAccountHandler(avatarBtn))
                 avatarBtn.onClick.AddListener(() => PopupManager.Request(PopupId.Account));
+        }
+
+        static bool HasPersistentOpenAccountHandler(Button button)
+        {
+            for (int i = 0; i < button.onClick.GetPersistentEventCount(); i++)
+            {
+                if (button.onClick.GetPersistentMethodName(i) == nameof(RuntimeNavigationButtons.OpenAccountPopup))
+                    return true;
+            }
+            return false;
         }
 
         void BindStageNavigation()

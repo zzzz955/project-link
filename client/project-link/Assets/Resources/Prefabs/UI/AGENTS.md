@@ -6,7 +6,7 @@
 | `SettingPopup.prefab` | `SettingPopup` | Generated settings popup with toggle/dropdown/save hotspots |
 | `BuyItemPopup.prefab` | `BuyItemPopup` | Generated item purchase popup |
 | `EnergyPopup.prefab` | `EnergyPopup` | Generated stamina/ad/refill popup |
-| `StreakChallengePopup.prefab` | `StreakChallengePopup` | Generated 24H streak challenge popup |
+| `StreakChallengePopup.prefab` | `StreakChallengePopup` | Generated 24H streak challenge popup; banner/timer/level/prize/path/claim layout from UIBuilder |
 | `AccountPopup.prefab` | `AccountPopup` | Generated account/profile popup |
 | `RewardPopup.prefab` | `RewardPopup` | Generated reward claim popup |
 | `DailyReward.prefab` | `DailyRewardPopup` | Generated daily reward popup; static reward data-backed wireframe |

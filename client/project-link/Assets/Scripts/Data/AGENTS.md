@@ -5,7 +5,7 @@
 |---|---|---|
 | `StageData.cs` | `StageData` | Container: decoded grid maps + node color dictionary |
 | `StageLoader.cs` | `StageLoader` | Static; loads IngameStage + IngameNodeColors, decodes base36 maps |
-| `OutgameDataLoader.cs` | `OutgameDataLoader` | Static; loads generated outgame CSVs and ingame item metadata for UI binding |
+| `OutgameDataLoader.cs` | `OutgameDataLoader` | Static; loads generated outgame/streak CSVs and ingame item metadata for UI binding |
 
 ## Symbols
 | symbol | kind | note |
@@ -20,6 +20,8 @@
 | `StageLoader.Load(int)` | method | static; returns StageData or null (logs error if not found) |
 | `OutgameDataLoader.GetEnabledShopProducts(string)` | method | returns enabled shop products sorted by `sortOrder`, optional category filter |
 | `OutgameDataLoader.GetAllItems()` | method | returns all ingame items as `IReadOnlyList<IngameItem>` from `ingame_item.csv` |
+| `OutgameDataLoader.GetStreakChallengeLevels(int,int)` | method | returns enabled streak challenge level planning rows filtered by event/version and sorted by `displayOrder` |
+| `OutgameDataLoader.GetStreakChallengeRewardItems(int,int)` | method | returns streak challenge reward item planning rows for a reward group/version sorted by `displayOrder` |
 | `OutgameDataLoader.FindItem(int)` | method | resolves item display metadata from `ingame_item.csv` |
 | `OutgameDataLoader.StaminaConfig` | prop | returns global stamina planning config from `outgame_stamina_config.csv` |
 

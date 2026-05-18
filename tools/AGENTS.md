@@ -12,6 +12,7 @@
 | `run-gen-step.ps1` | Streams gen batch step output to console + `tools/logs/*.log` |
 | `start-stage-editor.bat` | Starts stage editor dev server (UI + API) with CRUD console logs |
 | `stage-tool/` | Local TypeScript web tool for stage CRUD, validation, and visualization |
+| `backup-db.sh` | MySQL dump → gzip to `/var/backups/madalang/`. Reads `.env.prod`. 30-day retention. |
 
 ## Rules
 - ALL scripts read config from `config-loader.js` - never hardcode paths

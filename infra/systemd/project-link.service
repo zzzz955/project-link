@@ -1,0 +1,48 @@
+# systemd service unit for the project-link Docker Compose stack.
+# Installation:
+#   1. Copy to /etc/systemd/system/project-link.service
+#   2. Edit WorkingDirectory to the actual project path
+#   3. systemctl daemon-reload
+#   4. systemctl enable project-link
+#   5. systemctl start project-link
+#
+# Start after platform.service since it joins madalang-net (created by platform).
+
+[Unit]
+Description=Madalang Project-Link Stack (game api + mysql + redis)
+Requires=docker.service platform.service
+After=docker.service platform.service network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+WorkingDirectory=/opt/madalang/project-link
+EnvironmentFile=/opt/madalang/project-link/.env.prod
+
+ExecStart=/usr/bin/docker compose --env-file .env.prod \
+    -f docker-compose.yml \
+    -f docker-compose.prod.yml \
+    up -d --remove-orphans
+
+ExecStop=/usr/bin/docker compose --env-file .env.prod \
+    -f docker-compose.yml \
+    -f docker-compose.prod.yml \
+    down
+
+ExecReload=/usr/bin/docker compose --env-file .env.prod \
+    -f docker-compose.yml \
+    -f docker-compose.prod.yml \
+    pull && \
+    /usr/bin/docker compose --env-file .env.prod \
+    -f docker-compose.yml \
+    -f docker-compose.prod.yml \
+    up -d --remove-orphans
+
+Restart=on-failure
+RestartSec=10s
+TimeoutStartSec=120s
+TimeoutStopSec=60s
+
+[Install]
+WantedBy=multi-user.target

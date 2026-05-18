@@ -66,7 +66,7 @@ namespace ProjectLink.Services
                     PriceIapSku = product.PriceIapSku,
                     SortOrder = product.SortOrder,
                     ItemName = item?.name,
-                    ItemDescription = item?.description,
+                    ItemDescription = item?.description_key,
                 });
             }
 

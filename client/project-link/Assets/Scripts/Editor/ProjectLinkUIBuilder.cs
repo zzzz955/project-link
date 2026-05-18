@@ -1222,16 +1222,39 @@ namespace ProjectLink.EditorTools
             toolHlg.childControlWidth = true; toolHlg.childControlHeight = true;
             toolHlg.childForceExpandWidth = true; toolHlg.childForceExpandHeight = true;
 
-            for (int i = 0; i < 3; i++)
+            var itemBtns   = new Button[4];
+            var itemCounts = new TextMeshProUGUI[4];
+            for (int i = 0; i < 4; i++)
             {
                 var slot = MakeChild(toolbar, $"ItemSlot_{i + 1}");
                 slot.sizeDelta = new Vector2(0, 140);
                 var slotImg = slot.gameObject.AddComponent<Image>();
                 slotImg.color = HexColor("#16213EE0");
+                var slotVlg = slot.gameObject.AddComponent<VerticalLayoutGroup>();
+                slotVlg.spacing = 4; slotVlg.padding = new RectOffset(8, 8, 8, 8);
+                slotVlg.childAlignment = TextAnchor.MiddleCenter;
+                slotVlg.childControlWidth = true; slotVlg.childControlHeight = true;
+                slotVlg.childForceExpandWidth = true; slotVlg.childForceExpandHeight = false;
                 var slotBtn = slot.gameObject.AddComponent<Button>();
                 slotBtn.targetGraphic = slotImg;
-                UnityEventTools.AddPersistentListener(slotBtn.onClick, router.OpenBuyItemPopup);
                 slot.gameObject.AddComponent<LayoutElement>().flexibleWidth = 1;
+
+                var iconGo = MakeChild(slot, "Img_Icon");
+                iconGo.gameObject.AddComponent<LayoutElement>().preferredHeight = 80;
+                var iconImg = iconGo.gameObject.AddComponent<Image>();
+                iconImg.preserveAspect = true; iconImg.raycastTarget = false;
+                ApplySkin(iconImg, $"btn_icon_item_{i + 1}");
+
+                var countGo = MakeChild(slot, "Txt_Count");
+                countGo.gameObject.AddComponent<LayoutElement>().preferredHeight = 28;
+                var countTmp = countGo.gameObject.AddComponent<TextMeshProUGUI>();
+                countTmp.text = "0"; countTmp.fontSize = 22; countTmp.fontStyle = FontStyles.Bold;
+                countTmp.color = TextCol; countTmp.alignment = TextAlignmentOptions.Midline;
+                countTmp.raycastTarget = false;
+                countGo.gameObject.AddComponent<LocalizedFont>();
+
+                itemBtns[i]   = slotBtn;
+                itemCounts[i] = countTmp;
             }
 
             // Layers
@@ -1242,6 +1265,14 @@ namespace ProjectLink.EditorTools
             var ctrl = safe.gameObject.AddComponent<GameWireframeController>();
             Assign(ctrl, "levelLabelText", stTmp);
             Assign(ctrl, "moveCounterText", moveTmp);
+            Assign(ctrl, "item1Button",    itemBtns[0]);
+            Assign(ctrl, "item2Button",    itemBtns[1]);
+            Assign(ctrl, "item3Button",    itemBtns[2]);
+            Assign(ctrl, "item4Button",    itemBtns[3]);
+            Assign(ctrl, "item1CountText", itemCounts[0]);
+            Assign(ctrl, "item2CountText", itemCounts[1]);
+            Assign(ctrl, "item3CountText", itemCounts[2]);
+            Assign(ctrl, "item4CountText", itemCounts[3]);
         }
 
         // ─── Popup prefab builders ─────────────────────────────────────────
@@ -1833,6 +1864,16 @@ namespace ProjectLink.EditorTools
             var (root, panel, content, footer) = CreatePopupShell<ShopItemConfirmPopup>(
                 "ShopItemConfirmPopup", "shop.confirm.title", dismissible: true);
 
+            // Description (localized from item.description_key)
+            var descGo = MakeChild(content, "Txt_Description");
+            descGo.gameObject.AddComponent<LayoutElement>().preferredHeight = 60;
+            var descTmp = descGo.gameObject.AddComponent<TextMeshProUGUI>();
+            descTmp.fontSize = 22; descTmp.color = TextMuted;
+            descTmp.alignment = TextAlignmentOptions.Midline;
+            descTmp.raycastTarget = false;
+            descTmp.enableWordWrapping = true;
+            descGo.gameObject.AddComponent<LocalizedFont>();
+
             // Item name row
             var nameRow = MakeChild(content, "Row_ItemName");
             nameRow.sizeDelta = new Vector2(0, 56);
@@ -1859,10 +1900,12 @@ namespace ProjectLink.EditorTools
             AddFooterButton(footer, "Btn_Buy",    "common.confirm", "btn_primary", isPrimary: true);
 
             var popup = root.GetComponent<ShopItemConfirmPopup>();
-            Assign(popup, "txtItemName", FindTmpInChildren(root.GetComponent<RectTransform>(), "Txt_ItemName"));
-            Assign(popup, "txtBalance",  FindTmpInChildren(root.GetComponent<RectTransform>(), "Txt_Balance"));
-            Assign(popup, "txtCost",     FindTmpInChildren(root.GetComponent<RectTransform>(), "Txt_Cost"));
-            Assign(popup, "txtAfter",    FindTmpInChildren(root.GetComponent<RectTransform>(), "Txt_After"));
+            var rootRect = root.GetComponent<RectTransform>();
+            Assign(popup, "txtDescription", FindTmpInChildren(rootRect, "Txt_Description"));
+            Assign(popup, "txtItemName", FindTmpInChildren(rootRect, "Txt_ItemName"));
+            Assign(popup, "txtBalance",  FindTmpInChildren(rootRect, "Txt_Balance"));
+            Assign(popup, "txtCost",     FindTmpInChildren(rootRect, "Txt_Cost"));
+            Assign(popup, "txtAfter",    FindTmpInChildren(rootRect, "Txt_After"));
             Assign(popup, "btnBuy",    FindButtonInChildren(root, "Btn_Buy"));
             Assign(popup, "btnCancel", FindButtonInChildren(root, "Btn_Cancel"));
             SavePopupPrefab(root, "ShopItemConfirmPopup");

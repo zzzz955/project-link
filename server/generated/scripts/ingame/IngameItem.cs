@@ -9,6 +9,5 @@ namespace ProjectLink.Generated.Data
     public string name { get; set; }
     public string type { get; set; }
     public int cost_soft { get; set; }
-    public string description { get; set; }
     }
 }

@@ -1,5 +1,5 @@
-id,name,type,cost_soft,description
-1,Obstacle Remover,OBSTACLE_REMOVE,30,Highlight obstacle cells on the board and remove one by tapping it.
-2,Node Pair Eraser,NODE_PAIR_REMOVE,50,Highlight all nodes on the board and remove one pair by tapping a node.
-3,Move Reducer,MOVE_REDUCE,20,Reduces your current move count by 3. Cannot be used if moves used is less than 3.
-4,Time Extender,TIME_EXTEND,30,Adds 20 seconds to the remaining time.
+id,name,type,cost_soft
+1,Obstacle Remover,OBSTACLE_REMOVE,30
+2,Node Pair Eraser,NODE_PAIR_REMOVE,50
+3,Move Reducer,MOVE_REDUCE,20
+4,Time Extender,TIME_EXTEND,30

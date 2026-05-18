@@ -9,13 +9,14 @@ namespace ProjectLink.OutGame.UI
     public class ShopItemConfirmModel
     {
         public ShopItemConfirmModel(int itemId, string itemName, int cost, long currentBalance,
-            System.Action<long> onPurchaseSuccess = null)
+            System.Action<long> onPurchaseSuccess = null, string descriptionKey = null)
         {
             ItemId = itemId;
             ItemName = itemName;
             Cost = cost;
             CurrentBalance = currentBalance;
             OnPurchaseSuccess = onPurchaseSuccess;
+            DescriptionKey = descriptionKey ?? "";
         }
 
         public int ItemId { get; }
@@ -23,10 +24,12 @@ namespace ProjectLink.OutGame.UI
         public int Cost { get; }
         public long CurrentBalance { get; }
         public System.Action<long> OnPurchaseSuccess { get; }
+        public string DescriptionKey { get; }
     }
 
     public class ShopItemConfirmPopup : PopupBase
     {
+        [SerializeField] TextMeshProUGUI txtDescription;
         [SerializeField] TextMeshProUGUI txtItemName;
         [SerializeField] TextMeshProUGUI txtBalance;
         [SerializeField] TextMeshProUGUI txtCost;
@@ -40,6 +43,7 @@ namespace ProjectLink.OutGame.UI
         {
             _model = model ?? new ShopItemConfirmModel(0, "", 0, 0);
 
+            txtDescription ??= FindTmp("Txt_Description");
             txtItemName ??= FindTmp("Txt_ItemName");
             txtBalance  ??= FindTmp("Txt_Balance");
             txtCost     ??= FindTmp("Txt_Cost");
@@ -49,6 +53,9 @@ namespace ProjectLink.OutGame.UI
 
             BindOverlayClose();
 
+            if (txtDescription != null)
+                txtDescription.text = string.IsNullOrEmpty(_model.DescriptionKey)
+                    ? "" : LocalizationManager.Get(_model.DescriptionKey);
             if (txtItemName != null) txtItemName.text = _model.ItemName;
             if (txtBalance  != null) txtBalance.text  = FormatNumber(_model.CurrentBalance);
             if (txtCost     != null) txtCost.text     = FormatNumber(_model.Cost);

@@ -13,6 +13,6 @@ namespace ProjectLink.Data.Generated
         public string name;
         public string type;
         public int cost_soft;
-        public string description;
+        public string description_key;
     }
 }

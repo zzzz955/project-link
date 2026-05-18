@@ -16,15 +16,17 @@ namespace ProjectLink.OutGame.UI
         int _itemId;
         string _itemName;
         int _cost;
+        string _descriptionKey;
         Func<long> _getBalance;
         Action<long> _onPurchaseSuccess;
 
         public void Init(int itemId, string itemName, int cost, Func<long> getBalance, Sprite icon,
-            Action<long> onPurchaseSuccess = null)
+            Action<long> onPurchaseSuccess = null, string descriptionKey = null)
         {
             _itemId = itemId;
             _itemName = itemName;
             _cost = cost;
+            _descriptionKey = descriptionKey ?? "";
             _getBalance = getBalance;
             _onPurchaseSuccess = onPurchaseSuccess;
 
@@ -49,7 +51,8 @@ namespace ProjectLink.OutGame.UI
         void OnTap()
         {
             PopupManager.Request(PopupId.ShopItemConfirm,
-                new ShopItemConfirmModel(_itemId, _itemName, _cost, _getBalance?.Invoke() ?? 0, _onPurchaseSuccess));
+                new ShopItemConfirmModel(_itemId, _itemName, _cost, _getBalance?.Invoke() ?? 0,
+                    _onPurchaseSuccess, _descriptionKey));
         }
 
         TextMeshProUGUI FindTmp(string n)

@@ -164,7 +164,8 @@ namespace ProjectLink.OutGame.UI
                     var card = Instantiate(shopProductCardPrefab, shopContent);
                     card.name = $"Product_{p.ProductId}";
                     card.Init(p.GrantItemId, p.ItemName ?? p.Name, p.PriceSoft,
-                        () => _currentSoftBalance, GetItemSprite(p.GrantItemId), OnItemPurchaseSuccess);
+                        () => _currentSoftBalance, GetItemSprite(p.GrantItemId), OnItemPurchaseSuccess,
+                        p.ItemDescription);
                 }
                 else
                 {

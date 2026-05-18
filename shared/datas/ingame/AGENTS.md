@@ -33,7 +33,7 @@
 - `name` string(64) NN — display name
 - `type` string(32) NN — `OBSTACLE_REMOVE` | `NODE_PAIR_REMOVE` | `MOVE_REDUCE` | `TIME_EXTEND`
 - `cost_soft` int32 NN — soft currency purchase price
-- `description` string(256) NN — UI tooltip text
+- `description_key` string(64) C — clientstring key for localized item description (e.g. `item.obstacle_remover.desc`); client-only, excluded from server CSV
 
 **ingame_stage_info**
 - Legacy table kept until client loader migration is complete.

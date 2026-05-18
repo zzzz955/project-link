@@ -84,11 +84,12 @@
 | `ShopItemConfirmModel.ItemId` | field | int; item id for PurchaseItem call |
 | `ShopItemConfirmModel.Cost` | field | int; soft currency cost |
 | `ShopItemConfirmModel.CurrentBalance` | field | long; balance at time of card tap |
-| `ShopItemConfirmPopup.Init(ShopItemConfirmModel)` | method | renders balance/cost/after rows; Btn_Buy calls PurchaseItem → ShopItemResult |
+| `ShopItemConfirmModel.DescriptionKey` | field | string; clientstring key for item description; empty string when not set |
+| `ShopItemConfirmPopup.Init(ShopItemConfirmModel)` | method | renders Txt_Description (localized via DescriptionKey), balance/cost/after rows; Btn_Buy calls PurchaseItem → ShopItemResult |
+| `ShopProductCard.Init(itemId,itemName,cost,getBalance,icon,onPurchaseSuccess,descriptionKey)` | method | populates card UI; Btn_Card → ShopItemConfirm popup with descriptionKey |
 | `ShopItemResultModel.Success` | field | bool |
 | `ShopItemResultModel.ErrorMessage` | field | string; shown on failure |
 | `ShopItemResultPopup.Init(ShopItemResultModel)` | method | updates Txt_Title with localized success/fail key; shows error text on failure |
-| `ShopProductCard.Init(itemId,itemName,cost,currentBalance,icon)` | method | populates card UI; Btn_Card -> ShopItemConfirm popup |
 | `ShopInventoryStrip.Refresh(IUiDataService,IStaticCatalogService,Sprite[])` | method | fetches inventory, renders all 4 items with count; dims alpha when count=0 |
 | `UIIconAnimator.intervalSeconds` | field | [SerializeField] default 5 s; controls bounce+glow cycle period |
 | `UIIconAnimator.EnsureGlow()` | method | creates `Img_Glow` child (RectTransform offset ±14, same sprite, `ProjectLink/UIGlow` additive shader, alpha 0) at runtime Awake |

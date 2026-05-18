@@ -31,7 +31,7 @@
 **ingame_item**
 - `id` int32 PK
 - `name` string(64) NN — display name
-- `type` string(32) NN — `OBSTACLE_REMOVE` | `NODE_PAIR_REMOVE`
+- `type` string(32) NN — `OBSTACLE_REMOVE` | `NODE_PAIR_REMOVE` | `MOVE_REDUCE` | `TIME_EXTEND`
 - `cost_soft` int32 NN — soft currency purchase price
 - `description` string(256) NN — UI tooltip text
 

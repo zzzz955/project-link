@@ -39,6 +39,7 @@
 | `InventoryController.Get` | method | `GET /api/inventory` |
 | `InventoryController.Purchase` | method | `POST /api/items/purchase` |
 | `InventoryController.Use` | method | `POST /api/items/use`; validates `StageSessionToken` and records item usage |
+| `InventoryController.UseIngame` | method | `POST /api/items/use-ingame`; validates session token, deducts item quantity; does NOT check `IsSetupPhase` (client never calls lock); returns `InGameItemUseResponse` |
 | `RankingController.GetStage` | method | `GET /api/ranking/stage/{stageId}` |
 | `RankingController.GetGlobalStages` | method | `GET /api/ranking/global/stages` |
 | `RankingController.GetGlobalScore` | method | `GET /api/ranking/global/score` |

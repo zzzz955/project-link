@@ -19,11 +19,30 @@ namespace ProjectLink.InGame.UI
         [SerializeField] TextMeshProUGUI timerText;
         [SerializeField] TextMeshProUGUI objectiveText;
 
+        [Header("Item Toolbar")]
+        [SerializeField] Button item1Button;
+        [SerializeField] Button item2Button;
+        [SerializeField] Button item3Button;
+        [SerializeField] Button item4Button;
+        [SerializeField] TextMeshProUGUI item1CountText;
+        [SerializeField] TextMeshProUGUI item2CountText;
+        [SerializeField] TextMeshProUGUI item3CountText;
+        [SerializeField] TextMeshProUGUI item4CountText;
+
         int _stageId;
 
         public TextMeshProUGUI MoveCounterText => moveCounterText;
         public TextMeshProUGUI TimerText => timerText;
         public TextMeshProUGUI ObjectiveText => objectiveText;
+
+        public Button Item1Button => item1Button;
+        public Button Item2Button => item2Button;
+        public Button Item3Button => item3Button;
+        public Button Item4Button => item4Button;
+        public TextMeshProUGUI Item1CountText => item1CountText;
+        public TextMeshProUGUI Item2CountText => item2CountText;
+        public TextMeshProUGUI Item3CountText => item3CountText;
+        public TextMeshProUGUI Item4CountText => item4CountText;
 
         void Awake()
         {

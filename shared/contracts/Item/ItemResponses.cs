@@ -26,4 +26,10 @@ public class ItemUseResponse
 {
     public List<InventorySlot> UpdatedSlots { get; set; } = new List<InventorySlot>();
 }
+
+public class InGameItemUseResponse
+{
+    public int ItemId { get; set; }
+    public int QuantityAfter { get; set; }
+}
 }

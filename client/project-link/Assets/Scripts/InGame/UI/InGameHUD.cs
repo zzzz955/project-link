@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using ProjectLink.Core;
 using TMPro;
 using UnityEngine;
@@ -16,6 +17,10 @@ namespace ProjectLink.InGame.UI
         Func<int> _getConnectedCount;
         int _totalColors;
 
+        readonly Button[] _itemButtons = new Button[4];
+        readonly TextMeshProUGUI[] _itemCountTexts = new TextMeshProUGUI[4];
+        Action<int> _onItemPressed;
+
         static readonly Color _timerNormal = Color.white;
         static readonly Color _timerUrgent = new(1f, 0.25f, 0.3f, 1f);
 
@@ -27,6 +32,67 @@ namespace ProjectLink.InGame.UI
             // Bind to DDL-generated elements first; fall back to runtime creation
             BindToDdlElements(stageId, timeLimitSeconds > 0);
             Refresh();
+        }
+
+        public void InitItemToolbar(Dictionary<int, int> counts, Action<int> onItemPressed)
+        {
+            _onItemPressed = onItemPressed;
+
+            var ctrl = UnityEngine.Object.FindFirstObjectByType<GameWireframeController>(FindObjectsInactive.Include);
+            if (ctrl != null)
+            {
+                TryBindItemButton(0, ctrl.Item1Button, ctrl.Item1CountText);
+                TryBindItemButton(1, ctrl.Item2Button, ctrl.Item2CountText);
+                TryBindItemButton(2, ctrl.Item3Button, ctrl.Item3CountText);
+                TryBindItemButton(3, ctrl.Item4Button, ctrl.Item4CountText);
+            }
+
+            for (int i = 0; i < 4; i++)
+            {
+                int itemId = i + 1;
+                counts.TryGetValue(itemId, out int count);
+                UpdateItemCount(itemId, count);
+                SetItemButtonInteractable(itemId, false);
+            }
+        }
+
+        public void UpdateItemCount(int itemId, int count)
+        {
+            int idx = itemId - 1;
+            if (idx < 0 || idx >= 4) return;
+            if (_itemCountTexts[idx] != null)
+                _itemCountTexts[idx].text = count.ToString();
+        }
+
+        public void SetItemButtonState(int itemId, int count, bool extraCondition)
+        {
+            int idx = itemId - 1;
+            if (idx < 0 || idx >= 4) return;
+            UpdateItemCount(itemId, count);
+            SetItemButtonInteractable(itemId, count > 0 && extraCondition);
+        }
+
+        public void SetTotalColors(int total)
+        {
+            _totalColors = total;
+            Refresh();
+        }
+
+        void TryBindItemButton(int index, Button btn, TextMeshProUGUI countText)
+        {
+            if (btn == null) return;
+            _itemButtons[index] = btn;
+            _itemCountTexts[index] = countText;
+            int itemId = index + 1;
+            btn.onClick.RemoveAllListeners();
+            btn.onClick.AddListener(() => _onItemPressed?.Invoke(itemId));
+        }
+
+        void SetItemButtonInteractable(int itemId, bool interactable)
+        {
+            int idx = itemId - 1;
+            if (idx >= 0 && idx < 4 && _itemButtons[idx] != null)
+                _itemButtons[idx].interactable = interactable;
         }
 
         public void Refresh()
@@ -93,11 +159,16 @@ namespace ProjectLink.InGame.UI
             var pause = AddHotspot(root, "PauseButton", new Vector2(425f, -78f), new Vector2(120f, 120f), true);
             pause.onClick.AddListener(() => OnPausePressed?.Invoke());
 
-            AddHotspot(root, "HintButton",    new Vector2(-405f, 56f), new Vector2(150f, 150f), false).onClick.AddListener(OpenBuyItemPopup);
-            AddHotspot(root, "UndoButton",    new Vector2(-225f, 56f), new Vector2(150f, 150f), false).onClick.AddListener(OpenBuyItemPopup);
-            AddHotspot(root, "ShuffleButton", new Vector2(120f,  56f), new Vector2(140f, 140f), false).onClick.AddListener(OpenBuyItemPopup);
-            AddHotspot(root, "HammerButton",  new Vector2(295f,  56f), new Vector2(140f, 140f), false).onClick.AddListener(OpenBuyItemPopup);
-            AddHotspot(root, "PaintButton",   new Vector2(470f,  56f), new Vector2(140f, 140f), false).onClick.AddListener(OpenBuyItemPopup);
+            float[] xPositions = { -270f, -90f, 90f, 270f };
+            for (int i = 0; i < 4; i++)
+            {
+                int itemId = i + 1;
+                var btn = AddHotspot(root, $"ItemButton_{itemId}", new Vector2(xPositions[i], 56f), new Vector2(140f, 140f), false);
+                var countText = AddDynamicLabel(root, "0", 24, new Vector2(xPositions[i], 150f), new Vector2(80f, 36f), false);
+                _itemButtons[i] = btn;
+                _itemCountTexts[i] = countText;
+                btn.onClick.AddListener(() => _onItemPressed?.Invoke(itemId));
+            }
 
             _pipeCounterText = AddDynamicLabel(root, "0 / 0",  60, new Vector2(42f,   -105f), new Vector2(150f, 80f),  true);
             _moveCounterText = AddDynamicLabel(root, "",        34, new Vector2(0f,    -42f),  new Vector2(260f, 56f),  true);

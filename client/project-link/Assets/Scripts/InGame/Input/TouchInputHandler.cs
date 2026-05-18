@@ -9,6 +9,7 @@ namespace ProjectLink.InGame.Input
         public event Action<Vector2> OnDragStart;
         public event Action<Vector2> OnDragMove;
         public event Action<Vector2> OnDragEnd;
+        public event Action<Vector2> OnTap;
         public event Action<Vector2> OnLongPressStart;
         public event Action          OnLongPressCanceled;
 
@@ -72,8 +73,10 @@ namespace ProjectLink.InGame.Input
 
                 if (_longPressFired)
                     OnLongPressCanceled?.Invoke();
-                else
+                else if (_isDragStarted)
                     OnDragEnd?.Invoke(worldPos);
+                else
+                    OnTap?.Invoke(_pressStartWorld);
             }
         }
 

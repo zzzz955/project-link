@@ -8,7 +8,7 @@
 ## Symbols
 | symbol | kind | note |
 |--------|------|------|
-| `StageService.StartAsync` | method | Deducts stamina, replaces any active session with a new paid attempt, returns `StageStartResponse` with item counts from static data |
+| `StageService.StartAsync` | method | Deducts stamina, replaces any active session with a new paid attempt, returns `StageStartResponse` with item counts for ALL item types (not filtered by type); quantity 0 items excluded |
 | `StageService.LockAsync` | method | Validates `sessionToken`, transitions session to locked state; must be called before EndAsync |
 | `StageService.EndAsync` | method | Validates sessionToken + move limit; delegates first-clear reward + clear stamina refund to `IStageEndTransaction`; calls `RankingService.OnStageEndAsync` on best record; calls `StreakChallengeService.ProcessStageResultAsync`; elapsed-ms tolerance uses `_rankingService.NetworkToleranceMs` |
 | `StageService.ExtendAsync` | method | Extends session TTL; validates sessionToken; deducts soft currency; works in both setup phase and in-game phase; cost from `IStaticDataService.GetTimeExtendConfig` |

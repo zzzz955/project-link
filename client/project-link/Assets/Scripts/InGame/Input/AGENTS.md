@@ -12,7 +12,8 @@
 |---|---|---|
 | `TouchInputHandler.OnDragStart` | event | `Action<Vector2>` — fires at _pressStartWorld when move confirmed |
 | `TouchInputHandler.OnDragMove` | event | `Action<Vector2>` — fires every frame while dragging |
-| `TouchInputHandler.OnDragEnd` | event | `Action<Vector2>` — fires on release (non-longpress path) |
+| `TouchInputHandler.OnDragEnd` | event | `Action<Vector2>` — fires on release only when drag was started (`_isDragStarted == true`) |
+| `TouchInputHandler.OnTap` | event | `Action<Vector2>` — fires with `_pressStartWorld` on release without drag or longpress; used for item selection mode taps |
 | `TouchInputHandler.OnLongPressStart` | event | `Action<Vector2>` — fires after 0.7 s stationary hold (unsubscribed; kept for compat) |
 | `TouchInputHandler.OnLongPressCanceled` | event | `Action` — fires on release after longpress confirmed (unsubscribed; kept for compat) |
 | `InputSnapper.Snap(Vector2,Board,float)` | method | static; clamps to board bounds; returns Cell reference |

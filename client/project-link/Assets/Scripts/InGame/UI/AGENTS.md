@@ -16,11 +16,17 @@
 | symbol | kind | note |
 |---|---|---|
 | `InGameHUD.Init(int,int,Func<int>,int)` | method | stageId, totalColors, connectedCount getter, timeLimitSeconds (0=no timer); rebuilds wireframe HUD |
+| `InGameHUD.InitItemToolbar(Dictionary<int,int>,Action<int>)` | method | binds item buttons (DDL or runtime fallback) and sets initial counts; call after Init |
 | `InGameHUD.Refresh()` | method | updates objective counter text via connectedCount getter |
 | `InGameHUD.SetTimerDisplay(float)` | method | remaining seconds -> `MM:SS` (zero-padded); color -> urgent red when <= 10 s |
 | `InGameHUD.SetMoveDisplay(int,int)` | method | localized move counter: `hud.moves_fmt` (limit) / `hud.moves_no_limit_fmt` (no limit) via `LocalizationManager.Get` |
+| `InGameHUD.UpdateItemCount(int,int)` | method | updates quantity text for given itemId (1-4) |
+| `InGameHUD.SetItemButtonState(int,int,bool)` | method | itemId, count, extraCondition → updates count text + interactable (count > 0 AND extraCondition) |
+| `InGameHUD.SetTotalColors(int)` | method | updates _totalColors and calls Refresh; used after node-pair eraser removes a group |
 | `GameWireframeController.SetStageLabel(int)` | method | updates levelLabelText via `popup.stage.title_n_fmt` LocalizationManager key; font handled automatically by `LocalizedFont` component on the label (added by UIBuilder) |
 | `GameWireframeController.SetToolButtonsInteractable(bool)` | method | toggles generated shell button refs |
+| `GameWireframeController.Item1Button..Item4Button` | props | Inspector-assignable item toolbar buttons (SerializeField) |
+| `GameWireframeController.Item1CountText..Item4CountText` | props | Inspector-assignable item count labels (SerializeField) |
 | `CircularGauge.Show(Vector3,Color)` | method | positions at world pos, sets arc color, enables |
 | `CircularGauge.SetProgress(float)` | method | t in [0,1] draws arc (0=empty, 1=full circle) |
 | `CircularGauge.Hide()` | method | disables gauge |

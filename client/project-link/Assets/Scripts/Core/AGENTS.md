@@ -31,8 +31,9 @@
 | symbol | kind | note |
 |---|---|---|
 | `GameContext.SelectedStageId` | prop | set before `SceneLoader.LoadScene("Game")` |
-| `GameContext.SetStageSession(string,int,int)` | method | stores server stage session token, move limit, time limit, start timestamp |
-| `GameContext.ClearStageSession()` | method | clears server stage-session state |
+| `GameContext.SetStageSession(string,int,int,Dictionary<int,int>)` | method | stores server stage session token, move limit, time limit, start timestamp, and item counts |
+| `GameContext.ItemCounts` | prop | `Dictionary<int,int>` — item quantities from last `SetStageSession`; reset by `ClearStageSession` |
+| `GameContext.ClearStageSession()` | method | clears server stage-session state including ItemCounts |
 | `GameContext.IsStreakChallengeActive` | prop | true when a 24H streak challenge cycle is active for the current session |
 | `GameContext.SuppressNextTitleSilentLogin()` | method | one-shot guard for intentional Lobby -> Title navigation |
 | `GameContext.ConsumeTitleSilentLoginSuppression()` | method | Title entry consumes the one-shot silent-login guard |
@@ -42,7 +43,14 @@
 | `InGameController.OpenPausePopup()` | method | opens PausePopup with timer pause/resume callbacks |
 | `InGameController.AbandonStageAndLoad(string)` | method | submits stage fail with active session token, clears context, then loads target scene |
 | `InGameController.ExtendTime(int)` | method | CloseAll popups + `_timer.Start(seconds)` (resets IsExpired) + SetInputEnabled(true); called by TimeoutPopup on successful extend API response |
-| `InGameController.HandleStageStarted(...)` | method | enables gameplay only after server stage-start success; insufficient stamina opens Energy popup and returns Lobby |
+| `InGameController.HandleStageStarted(...)` | method | enables gameplay only after server stage-start success; insufficient stamina opens Energy popup and returns Lobby; saves ItemCounts from response |
+| `InGameController.OnItemButtonPressed(int)` | method | routes to item-specific handler: OBSTACLE_REMOVE→ActivateObstacleRemover, NODE_PAIR_REMOVE→ActivateNodePairEraser, MOVE_REDUCE→UseMoveReducer, TIME_EXTEND→UseTimeExtender |
+| `InGameController.ActivateObstacleRemover()` | method | enters item-selection mode; highlights obstacle cells; tap removes obstacle and applies server response |
+| `InGameController.ActivateNodePairEraser()` | method | enters item-selection mode; highlights all node cells; tap removes node pair and checks cleared |
+| `InGameController.UseMoveReducer()` | method | instant use; calls server then decrements `_movesUsed` by 3; guarded by `_movesUsed >= 3` |
+| `InGameController.UseTimeExtender()` | method | instant use; calls server then adds 20 s to timer via `_timer.Start(remaining + 20)` |
+| `InGameController.CancelItemSelection()` | method | exits item-selection mode; restores drag event subscriptions; clears board highlights |
+| `InGameController.RefreshItemButtons()` | method | calls `_hud.SetItemButtonState` for all 4 items with current counts and extra conditions |
 | `UIManager.GetLayer(UILayer)` | method | returns canvas Transform for named layer |
 | `PopupId` | enum | popup ids: ReturnTitle, ExitGame, Settings, BuyItem, Energy, StreakChallenge, Account, Reward, StageClear, SessionExpired, Pause, ForceUpdate, Maintenance, StageDetail, ClearNextStageConfirm |
 | `PopupManager.Request(PopupId,object)` | method | static event-driven popup request entry point |
@@ -94,5 +102,5 @@
 - Popup T must extend `PopupBase`; use `UILayer.Popup` for all overlays.
 - New UI popups should be requested through `PopupManager.Request(PopupId, payload)` and loaded from `Resources/Prefabs/UI`.
 - `NetworkManager` owns Dev/Prod game/auth base URL selection through `AppEnvironment`.
-- FSM valid transitions only: Idle -> Drawing, Drawing -> Completed.
+- FSM valid transitions: Idle→Drawing, Drawing→Idle, Drawing→Completed, Idle→Completed (node-pair eraser may clear from Idle state).
 - Pause popup must call `_timer.Pause()` / `_timer.Resume()` around show/dismiss.

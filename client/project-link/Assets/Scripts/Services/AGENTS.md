@@ -27,6 +27,7 @@
 | `IUiDataService.ClaimStreakReward(int,string,...)` | method | claims level reward with correlationId; returns event state + inventory deltas |
 | `IUiDataService.StartStage(...)` | method | returns server stage session state |
 | `IUiDataService.EndStage(...)` | method | submits stage result and returns clear-popup reward/progress fields |
+| `IUiDataService.UseIngameItem(int,string,Action<ServiceResult<InGameItemUseResponse>>)` | method | `POST /api/items/use-ingame`; validates session token server-side, deducts item, returns updated quantity |
 | `IUiDataService.ClaimStaminaAdReward(...)` | method | calls stamina ad reward route and returns current/max/added data |
 | `IUiDataService.RefillStamina(...)` | method | calls paid stamina refill route and returns current/max/added/cost data |
 | `IUiDataService.PurchaseShopProduct(...)` | method | calls shop purchase route and returns balance/inventory updates |
@@ -39,6 +40,7 @@
 | `UiServiceLocator.UiData` | prop | resolves or creates the `IUiDataService` adapter used by UI controllers |
 | `UiServiceLocator.Catalog` | prop | shared planning-table catalog facade |
 | `UiDataRoutes.StageStart(int)` | method | builds stage start API route |
+| `UiDataRoutes.UseIngameItem` | const | `"/api/items/use-ingame"` |
 | `UiDataRoutes.Ranking(string)` | method | maps UI ranking segment or `stage:{id}` to stable server endpoint |
 | `StaticCatalogService.GetEnabledShopProducts(string)` | method | reads enabled shop products from generated outgame CSV |
 | `StaticCatalogService.FindItem(int)` | method | resolves item display metadata from generated ingame CSV |

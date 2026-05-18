@@ -7,6 +7,8 @@ namespace ProjectLink.InGame.Board
     {
         SpriteRenderer _renderer;
         Cell _cell;
+        bool _highlighted;
+        Color _highlightColor;
 
         static Sprite _sharedSprite;
 
@@ -20,8 +22,27 @@ namespace ProjectLink.InGame.Board
             Refresh();
         }
 
+        public void SetHighlight(bool highlighted, Color color = default)
+        {
+            _highlighted = highlighted;
+            _highlightColor = color;
+            Refresh();
+        }
+
+        public void ClearHighlight()
+        {
+            if (!_highlighted) return;
+            _highlighted = false;
+            Refresh();
+        }
+
         public void Refresh()
         {
+            if (_highlighted)
+            {
+                _renderer.color = _highlightColor;
+                return;
+            }
             if (_cell.IsObstacle)
                 _renderer.color = new Color(0.3f, 0.3f, 0.3f);
             else if (_cell.IsGimmick)

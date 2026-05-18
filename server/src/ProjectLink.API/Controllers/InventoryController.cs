@@ -61,4 +61,17 @@ public class InventoryController : ControllerBase
 
         return Ok(result);
     }
+
+    [HttpPost("api/items/use-ingame")]
+    public async Task<IActionResult> UseIngame([FromBody] InGameItemUseRequest req, CancellationToken ct)
+    {
+        var userId  = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+        var session = await _sessionCache.GetAsync(userId, ct)
+            ?? throw new StageSessionNotFoundException();
+
+        if (session.Token != req.StageSessionToken)
+            throw new StageSessionNotFoundException();
+
+        return Ok(await _inventory.UseIngameItemAsync(userId, req.ItemId, ct));
+    }
 }

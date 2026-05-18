@@ -62,12 +62,11 @@ public class StageService
         await _sessionCache.SetAsync(userId, session, TimeSpan.FromSeconds(buffer), ct);
 
         var allItems = await _inventory.GetAllAsync(userId, ct);
-        var powerUpIds = _staticData.GetAllItems()
-            .Where(i => i.Type == "POWER_UP")
+        var ingameItemIds = _staticData.GetAllItems()
             .Select(i => i.ItemId)
             .ToHashSet();
         var itemCounts = allItems
-            .Where(i => powerUpIds.Contains(i.ItemId) && i.Quantity > 0)
+            .Where(i => ingameItemIds.Contains(i.ItemId) && i.Quantity > 0)
             .ToDictionary(i => i.ItemId, i => i.Quantity);
 
         return new StageStartResponse

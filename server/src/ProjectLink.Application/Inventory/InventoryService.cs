@@ -1,4 +1,5 @@
 using ProjectLink.Contracts.Item;
+using ProjectLink.Domain.Exceptions;
 using ProjectLink.Domain.Interfaces;
 using ProjectLink.Domain.Utilities;
 
@@ -52,5 +53,14 @@ public class InventoryService
             updatedSlots.Add(new InventorySlot { ItemId = entry.ItemId, Quantity = qtyAfter });
         }
         return new ItemUseResponse { UpdatedSlots = updatedSlots };
+    }
+
+    public async Task<InGameItemUseResponse> UseIngameItemAsync(string userId, int itemId, CancellationToken ct)
+    {
+        var item = _staticData.GetItem(itemId)
+            ?? throw new InvalidStageResultException();
+
+        var qtyAfter = await _repo.DeductAsync(userId, itemId, 1, ct);
+        return new InGameItemUseResponse { ItemId = itemId, QuantityAfter = qtyAfter };
     }
 }

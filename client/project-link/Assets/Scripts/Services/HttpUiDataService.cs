@@ -138,6 +138,9 @@ namespace ProjectLink.Services
             }, onComplete);
         }
 
+        public void UseIngameItem(int itemId, string sessionToken, Action<ServiceResult<InGameItemUseResponse>> onComplete)
+            => Post(UiDataRoutes.UseIngameItem, new InGameItemUseRequest { ItemId = itemId, StageSessionToken = sessionToken }, onComplete);
+
         void Get<T>(string endpoint, Action<ServiceResult<T>> onComplete, bool requiresAuth = true)
         {
             if (!TryGetNetwork(out var network, onComplete)) return;

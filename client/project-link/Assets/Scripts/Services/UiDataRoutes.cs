@@ -27,6 +27,8 @@ namespace ProjectLink.Services
         public static string StageExtend(int stageId) => $"/api/stage/{stageId}/extend";
         public static string RankingStage(int stageId) => $"/api/ranking/stage/{stageId}";
 
+        public const string UseIngameItem = "/api/items/use-ingame";
+
         public static string Ranking(string category)
         {
             if (!string.IsNullOrEmpty(category) && category.StartsWith("stage:") && int.TryParse(category[6..], out var stageId))

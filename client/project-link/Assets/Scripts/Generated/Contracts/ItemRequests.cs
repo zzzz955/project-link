@@ -21,4 +21,10 @@ public class ItemUseRequest
     public string StageSessionToken { get; set; } = "";
     public List<ItemUseEntry> Items { get; set; } = new List<ItemUseEntry>();
 }
+
+public class InGameItemUseRequest
+{
+    public string StageSessionToken { get; set; } = "";
+    public int ItemId { get; set; }
+}
 }

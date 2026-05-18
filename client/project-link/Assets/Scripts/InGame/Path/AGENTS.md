@@ -27,6 +27,8 @@
 | `PathDrawer.GetPaths(int)` | method | returns IReadOnlyList<PathModel> for groupId; empty if none |
 | `PathDrawer.GetPath(int)` | method | compat; returns first path for groupId; null if none |
 | `PathDrawer.AllPaths()` | method | enumerates all (groupId, PathModel) pairs across all groups |
+| `PathDrawer.RemoveGroupPaths(int)` | method | releases board ownership of all path cells in group, removes group from internal dict; used by node-pair-eraser item |
+| `PathDrawer.CheckCleared()` | method | delegates to `PathValidator.IsCleared`; used after board mutation (node pair erase) to check win from Idle state |
 | `PathValidator.IsAdjacent(Cell,Cell)` | method | 4-way orthogonal only; no diagonal |
 | `PathValidator.CanMoveTo(Cell,int)` | method | true if cell.IsDrawable AND not a node from another group |
 | `PathValidator.IsCleared(Board,Dictionary)` | method | primary: all groups have every node as endpoint of a complete path |

@@ -44,5 +44,18 @@ namespace ProjectLink.InGame.Board
         }
 
         public CellView GetCellView(int x, int y) => _cellViews[x, y];
+
+        public void SetHighlights(System.Func<Cell, bool> predicate, Color color)
+        {
+            for (int x = 0; x < _board.Width; x++)
+            for (int y = 0; y < _board.Height; y++)
+                _cellViews[x, y]?.SetHighlight(predicate(_board.GetCell(x, y)), color);
+        }
+
+        public void ClearHighlights()
+        {
+            foreach (var cv in _cellViews)
+                cv?.ClearHighlight();
+        }
     }
 }

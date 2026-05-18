@@ -22,6 +22,7 @@
 | `Cell.SetNode(int)` | method | transition → Node with groupId |
 | `Cell.SetObstacle()` | method | transition → Obstacle |
 | `Cell.SetGimmick()` | method | transition → Gimmick |
+| `Cell.SetEmpty()` | method | transition → Empty; clears NodeGroupId and PathOwner |
 | `Cell.ClaimPath(int)` | method | sets PathOwner to groupId |
 | `Cell.ReleasePath()` | method | clears PathOwner (sets to 0) |
 | `Cell.Clear()` | method | compat alias for ReleasePath |
@@ -37,10 +38,16 @@
 | `Board.ClearGroupPaths(int)` | method | releases all path cells owned by groupId |
 | `Board.SetPath(int,int,int)` | method | compat alias for ClaimPath |
 | `Board.ClearPathCells(int)` | method | compat alias for ClearGroupPaths |
+| `Board.RemoveObstacle(int,int)` | method | converts obstacle cell at (x,y) to Empty; no-op if out of bounds or not obstacle |
+| `Board.RemoveNodePair(int)` | method | clears group paths, calls SetEmpty on all group nodes, removes groupId from GroupIds; PathValidator.IsCleared skips removed groups naturally |
 | `BoardView.Init(Board,float)` | method | instantiates CellView grid; call once after Board created |
 | `BoardView.Refresh()` | method | syncs all CellView colors from current Board state |
+| `BoardView.SetHighlights(Func<Cell,bool>,Color)` | method | sets highlight on CellViews matching predicate; used for item selection mode |
+| `BoardView.ClearHighlights()` | method | clears highlight on all CellViews |
 | `CellView.Init(Cell,float)` | method | binds to cell reference, sets sprite size |
-| `CellView.Refresh()` | method | repaints sprite: Obstacle=dark gray, Gimmick=cyan, Node=full color, Path=×0.65, Empty=gray(0.15) |
+| `CellView.Refresh()` | method | repaints sprite: Obstacle=dark gray, Gimmick=cyan, Node=full color, Path=×0.65, Empty=gray(0.15); highlight overrides normal color |
+| `CellView.SetHighlight(bool,Color)` | method | enables/disables highlight mode with given color; calls Refresh |
+| `CellView.ClearHighlight()` | method | disables highlight; calls Refresh; no-op if not highlighted |
 
 ## Cross-refs
 - Consumed by: client `Core.InGameController` (creates Board, drives BoardView.Init/Refresh)

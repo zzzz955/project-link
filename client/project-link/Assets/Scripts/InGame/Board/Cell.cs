@@ -26,6 +26,7 @@ namespace ProjectLink.InGame.Board
         public void SetNode(int groupId)   { Type = CellType.Node; NodeGroupId = groupId; }
         public void SetObstacle()          { Type = CellType.Obstacle; }
         public void SetGimmick()           { Type = CellType.Gimmick; }
+        public void SetEmpty()             { Type = CellType.Empty; NodeGroupId = 0; PathOwner = 0; }
         public void ClaimPath(int groupId) { PathOwner = groupId; }
         public void ReleasePath()          { PathOwner = 0; }
         public void Clear()                => ReleasePath();

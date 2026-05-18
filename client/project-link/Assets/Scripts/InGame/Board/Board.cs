@@ -67,6 +67,24 @@ namespace ProjectLink.InGame.Board
                     _cells[x, y].ReleasePath();
         }
 
+        public void RemoveObstacle(int x, int y)
+        {
+            if (!IsInBounds(x, y)) return;
+            var cell = _cells[x, y];
+            if (cell.IsObstacle) cell.SetEmpty();
+        }
+
+        public void RemoveNodePair(int groupId)
+        {
+            ClearGroupPaths(groupId);
+            if (_groupNodes.TryGetValue(groupId, out var nodes))
+            {
+                foreach (var node in nodes) node.SetEmpty();
+                _groupNodes.Remove(groupId);
+            }
+            _groupIds.Remove(groupId);
+        }
+
         // Compat aliases
         public void SetPath(int x, int y, int colorId)   => ClaimPath(x, y, colorId);
         public void ClearPathCells(int colorId)           => ClearGroupPaths(colorId);

@@ -238,6 +238,17 @@ namespace ProjectLink.InGame.Path
         public PathModel GetPath(int colorId) =>
             _paths.TryGetValue(colorId, out var list) && list.Count > 0 ? list[0] : null;
 
+        public void RemoveGroupPaths(int groupId)
+        {
+            if (!_paths.TryGetValue(groupId, out var group)) return;
+            foreach (var path in group)
+                foreach (var cell in path.Cells)
+                    if (!cell.IsNode) _board.ReleasePath(cell.X, cell.Y);
+            _paths.Remove(groupId);
+        }
+
+        public bool CheckCleared() => PathValidator.IsCleared(_board, _paths);
+
         public IEnumerable<(int groupId, PathModel path)> AllPaths()
         {
             foreach (var kv in _paths)

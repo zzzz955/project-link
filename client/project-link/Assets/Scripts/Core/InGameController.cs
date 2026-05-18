@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using ProjectLink.Data;
@@ -32,6 +33,9 @@ namespace ProjectLink.Core
         int               _movesUsed;
         bool              _stageEndSubmitted;
         bool              _pathMoved;
+
+        readonly Dictionary<int, int> _itemCounts = new();
+        int _activeItemId;
 
         readonly Dictionary<PathModel, PathView> _pathViewMap = new();
         int     _activeGroupId;
@@ -118,6 +122,166 @@ namespace ProjectLink.Core
             _touchInput.OnDragStart -= HandleDragStart;
             _touchInput.OnDragMove  -= HandleDragMove;
             _touchInput.OnDragEnd   -= HandleDragEnd;
+            _touchInput.OnTap       -= HandleItemTap;
+        }
+
+        // ---- Item system ----
+
+        void OnItemButtonPressed(int itemId)
+        {
+            if (_stageEndSubmitted) return;
+            switch (itemId)
+            {
+                case 1: ActivateObstacleRemover(); break;
+                case 2: ActivateNodePairEraser();  break;
+                case 3: UseMoveReducer();          break;
+                case 4: UseTimeExtender();         break;
+            }
+        }
+
+        void ActivateObstacleRemover()
+        {
+            if (!CanUseItem(1)) return;
+            if (_activeItemId == 1) { CancelItemSelection(); return; }
+            ActivateItemSelection(1, cell => cell.IsObstacle, new Color(1f, 0.7f, 0.1f));
+        }
+
+        void ActivateNodePairEraser()
+        {
+            if (!CanUseItem(2)) return;
+            if (_activeItemId == 2) { CancelItemSelection(); return; }
+            ActivateItemSelection(2, cell => cell.IsNode, new Color(0.3f, 0.85f, 1f));
+        }
+
+        void UseMoveReducer()
+        {
+            if (!CanUseItem(3) || _movesUsed < 3) return;
+            UseIngameItemOnServer(3, () =>
+            {
+                _movesUsed -= 3;
+                _hud?.SetMoveDisplay(_movesUsed, _moveLimit);
+                RefreshItemButtons();
+            });
+        }
+
+        void UseTimeExtender()
+        {
+            if (!CanUseItem(4) || !_timer.HasLimit) return;
+            UseIngameItemOnServer(4, () =>
+            {
+                _timer.Start(_timer.Remaining + 20f);
+                RefreshItemButtons();
+            });
+        }
+
+        void ActivateItemSelection(int itemId, Func<Cell, bool> predicate, Color highlight)
+        {
+            CancelItemSelection();
+            _activeItemId = itemId;
+            _touchInput.OnDragStart -= HandleDragStart;
+            _touchInput.OnDragMove  -= HandleDragMove;
+            _touchInput.OnDragEnd   -= HandleDragEnd;
+            _touchInput.OnTap       += HandleItemTap;
+            _boardView?.SetHighlights(predicate, highlight);
+        }
+
+        void CancelItemSelection()
+        {
+            if (_activeItemId == 0) return;
+            _activeItemId = 0;
+            _touchInput.OnTap       -= HandleItemTap;
+            _touchInput.OnDragStart += HandleDragStart;
+            _touchInput.OnDragMove  += HandleDragMove;
+            _touchInput.OnDragEnd   += HandleDragEnd;
+            _boardView?.ClearHighlights();
+        }
+
+        void HandleItemTap(Vector2 worldPos)
+        {
+            var cell = InputSnapper.Snap(worldPos, _board, _cellSize);
+            int itemId = _activeItemId;
+            CancelItemSelection();
+
+            if (itemId == 1)
+            {
+                if (!cell.IsObstacle) return;
+                UseIngameItemOnServer(1, () =>
+                {
+                    _board.RemoveObstacle(cell.X, cell.Y);
+                    _boardView.Refresh();
+                    RefreshItemButtons();
+                });
+            }
+            else if (itemId == 2)
+            {
+                if (!cell.IsNode) return;
+                int groupId = cell.NodeGroupId;
+                UseIngameItemOnServer(2, () =>
+                {
+                    _board.RemoveNodePair(groupId);
+                    _drawer.RemoveGroupPaths(groupId);
+                    CleanupStalePathViews();
+                    _boardView.Refresh();
+                    foreach (var pv in _pathViewMap.Values) pv.Refresh();
+                    _hud?.SetTotalColors(_board.GroupIds.Count);
+                    _hud?.Refresh();
+                    RefreshItemButtons();
+                    if (_stateMachine.Current != GameState.Completed && _drawer.CheckCleared())
+                    {
+                        HapticManager.PlayConnected();
+                        SubmitStageEnd("success");
+                    }
+                });
+            }
+        }
+
+        void UseIngameItemOnServer(int itemId, Action onSuccess)
+        {
+            if (_uiData == null || string.IsNullOrEmpty(GameContext.StageSessionToken))
+            {
+                Debug.LogWarning($"UseIngameItemOnServer({itemId}): no active session");
+                return;
+            }
+            _uiData.UseIngameItem(itemId, GameContext.StageSessionToken, result =>
+            {
+                if (!result.IsSuccess)
+                {
+                    Debug.LogWarning($"Ingame item {itemId} use failed: {result.ErrorCode}");
+                    return;
+                }
+                _itemCounts[itemId] = result.Value.QuantityAfter;
+                _hud?.UpdateItemCount(itemId, result.Value.QuantityAfter);
+                onSuccess?.Invoke();
+            });
+        }
+
+        bool CanUseItem(int itemId)
+        {
+            _itemCounts.TryGetValue(itemId, out int count);
+            return count > 0;
+        }
+
+        void RefreshItemButtons()
+        {
+            if (_hud == null || _board == null) return;
+
+            _itemCounts.TryGetValue(1, out int c1);
+            _itemCounts.TryGetValue(2, out int c2);
+            _itemCounts.TryGetValue(3, out int c3);
+            _itemCounts.TryGetValue(4, out int c4);
+
+            _hud.SetItemButtonState(1, c1, HasObstacleCells());
+            _hud.SetItemButtonState(2, c2, _board.GroupIds.Count > 0);
+            _hud.SetItemButtonState(3, c3, _movesUsed >= 3);
+            _hud.SetItemButtonState(4, c4, _timer != null && _timer.HasLimit);
+        }
+
+        bool HasObstacleCells()
+        {
+            for (int x = 0; x < _board.Width; x++)
+            for (int y = 0; y < _board.Height; y++)
+                if (_board.GetCell(x, y).IsObstacle) return true;
+            return false;
         }
 
         public void SetInputEnabled(bool enabled)
@@ -220,6 +384,7 @@ namespace ProjectLink.Core
             foreach (var pv in _pathViewMap.Values) pv.Refresh();
             _hud?.Refresh();
             _hud?.SetMoveDisplay(_movesUsed, _moveLimit);
+            RefreshItemButtons();
         }
 
         // Destroys PathView GameObjects for PathModels no longer tracked by PathDrawer.
@@ -268,7 +433,9 @@ namespace ProjectLink.Core
             }
 
             var response = result.Value;
-            GameContext.SetStageSession(response.SessionToken, response.MoveLimit, response.TimeLimitSeconds);
+            GameContext.SetStageSession(response.SessionToken, response.MoveLimit, response.TimeLimitSeconds, response.ItemCounts);
+            foreach (var kv in response.ItemCounts)
+                _itemCounts[kv.Key] = kv.Value;
             ApplyStageSession();
         }
 
@@ -276,7 +443,9 @@ namespace ProjectLink.Core
         {
             _moveLimit = GameContext.MoveLimit;
             _hud?.SetMoveDisplay(_movesUsed, _moveLimit);
+            _hud?.InitItemToolbar(_itemCounts, OnItemButtonPressed);
             SetInputEnabled(true);
+            RefreshItemButtons();
 
             if (GameContext.TimeLimitSeconds > 0 && GameContext.TimeLimitSeconds != _timer.Remaining)
             {

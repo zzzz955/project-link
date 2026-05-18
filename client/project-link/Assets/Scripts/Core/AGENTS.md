@@ -20,7 +20,8 @@
 | `PlayerPrefsTokenStorage.cs` | `PlayerPrefsTokenStorage` | Dev token storage backed by PlayerPrefs |
 | `SecureTokenStorage.cs` | `SecureTokenStorage` | Prod token storage: AES-encrypted PlayerPrefs using device ID as key |
 | `PlatformAuthService.cs` | `PlatformAuthService` | Real platform auth HTTP adapter for guest/google/refresh/logout; uses ITokenStorage |
-| `UiEventBus.cs` | `UiEventBus` | Typed event bus for UI busy/error/viewmodel/auth events |
+| `UiEventBus.cs` | `UiEventBus` | Typed event bus for UI busy/error/viewmodel/auth/balance/inventory events |
+| `UserDataCache.cs` | `UserDataCache` | DontDestroyOnLoad singleton; caches soft balance + item inventory across scenes; publishes BalanceChanged/InventoryChanged on mutation; cleared on Title scene start |
 | `ToastPresenter.cs` | `ToastPresenter` | Global top-stack toast renderer subscribed to `UiErrorRaised` |
 | `NetworkManager.cs` | `NetworkManager` | HTTP GET/POST/PATCH coroutines with client/protocol/auth headers; delegates auth to IAuthService; clears token on 401 |
 | `PoolManager.cs` | `PoolManager` | Keyed GameObject pool |
@@ -74,6 +75,14 @@
 | `UiErrorRaised` | struct | event payload for localized toast/popup error rendering |
 | `UiViewModelChanged` | struct | event payload for viewmodel-to-render notifications |
 | `AuthStateChanged` | struct | event payload for token/provider changes |
+| `BalanceChanged` | struct | event payload published by UserDataCache.SetBalance; carries SoftBalance |
+| `InventoryChanged` | struct | event payload published by UserDataCache.SetInventoryItem; carries ItemId + Quantity |
+| `UserDataCache.Instance` | prop | singleton; valid after Bootstrap |
+| `UserDataCache.SetBalance(long)` | method | updates cached SoftBalance and publishes BalanceChanged |
+| `UserDataCache.SetInventoryItem(int,int)` | method | updates cached item quantity and publishes InventoryChanged |
+| `UserDataCache.GetInventoryItem(int)` | method | returns cached quantity for itemId (0 if absent) |
+| `UserDataCache.GetInventory()` | method | returns IReadOnlyDictionary<int,int> snapshot |
+| `UserDataCache.Clear()` | method | resets balance to 0 and clears inventory dict; called on Title scene entry |
 | `ToastPresenter.OnError(UiErrorRaised)` | method | ignores blocking errors and renders localized non-critical errors as top toasts |
 | `NetworkManager.AuthService` | prop | active IAuthService; defaults to `PlatformAuthService` |
 | `NetworkManager.LoginGuest(Action<bool,string>)` | method | delegates explicit guest login to IAuthService |

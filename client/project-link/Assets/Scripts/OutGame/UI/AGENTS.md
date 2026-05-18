@@ -81,12 +81,12 @@
 | `MaintenancePopup.Init(string)` | method | sets Txt_Body text from server maintenance message |
 | `StageDetailPopup.Init(int)` | method | binds Btn_Close/Btn_Play; sets dynamic title via `popup.stage.title_n_fmt`; renders stars and top-10 stage ranking (score, descending); no MyRankPanel, no Txt_Best/Txt_MyRank |
 | `StreakRewardConfirmPopup.Init(StreakRewardConfirmModel)` | method | Btn_Lobby: sets `ShouldOpenStreakPopupOnLobby=true` + CloseAll + LoadScene("Lobby"); Btn_Continue: CloseAll + EnterStage if unlocked, else Lobby |
-| `ShopItemConfirmModel.ItemId` | field | int; item id for PurchaseItem call |
+| `ShopItemConfirmModel.ProductId` | field | int; shop product id for PurchaseShopProduct call |
 | `ShopItemConfirmModel.Cost` | field | int; soft currency cost |
 | `ShopItemConfirmModel.CurrentBalance` | field | long; balance at time of card tap |
 | `ShopItemConfirmModel.DescriptionKey` | field | string; clientstring key for item description; empty string when not set |
-| `ShopItemConfirmPopup.Init(ShopItemConfirmModel)` | method | renders Txt_Description (localized via DescriptionKey), balance/cost/after rows; Btn_Buy calls PurchaseItem → ShopItemResult |
-| `ShopProductCard.Init(itemId,itemName,cost,getBalance,icon,onPurchaseSuccess,descriptionKey)` | method | populates card UI; Btn_Card → ShopItemConfirm popup with descriptionKey |
+| `ShopItemConfirmPopup.Init(ShopItemConfirmModel)` | method | renders Txt_Description (localized via DescriptionKey), balance/cost/after rows; Btn_Buy calls PurchaseShopProduct → updates UserDataCache → ShopItemResult |
+| `ShopProductCard.Init(productId,itemName,cost,getBalance,icon,onPurchaseSuccess,descriptionKey)` | method | populates card UI; Btn_Card → ShopItemConfirm popup with descriptionKey |
 | `ShopItemResultModel.Success` | field | bool |
 | `ShopItemResultModel.ErrorMessage` | field | string; shown on failure |
 | `ShopItemResultPopup.Init(ShopItemResultModel)` | method | updates Txt_Title with localized success/fail key; shows error text on failure |

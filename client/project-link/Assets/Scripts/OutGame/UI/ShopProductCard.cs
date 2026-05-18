@@ -13,17 +13,17 @@ namespace ProjectLink.OutGame.UI
         [SerializeField] TextMeshProUGUI txtPrice;
         [SerializeField] Button btnCard;
 
-        int _itemId;
+        int _productId;
         string _itemName;
         int _cost;
         string _descriptionKey;
         Func<long> _getBalance;
         Action<long> _onPurchaseSuccess;
 
-        public void Init(int itemId, string itemName, int cost, Func<long> getBalance, Sprite icon,
+        public void Init(int productId, string itemName, int cost, Func<long> getBalance, Sprite icon,
             Action<long> onPurchaseSuccess = null, string descriptionKey = null)
         {
-            _itemId = itemId;
+            _productId = productId;
             _itemName = itemName;
             _cost = cost;
             _descriptionKey = descriptionKey ?? "";
@@ -51,7 +51,7 @@ namespace ProjectLink.OutGame.UI
         void OnTap()
         {
             PopupManager.Request(PopupId.ShopItemConfirm,
-                new ShopItemConfirmModel(_itemId, _itemName, _cost, _getBalance?.Invoke() ?? 0,
+                new ShopItemConfirmModel(_productId, _itemName, _cost, _getBalance?.Invoke() ?? 0,
                     _onPurchaseSuccess, _descriptionKey));
         }
 

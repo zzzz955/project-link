@@ -131,7 +131,6 @@ namespace ProjectLink.InGame.UI
                 ctrl.SetStageLabel(stageId);
                 _moveCounterText = ctrl.MoveCounterText;
                 _timerText = ctrl.TimerText;
-                _pipeCounterText = ctrl.ObjectiveText;
 
                 // Bind pause button from DDL
                 var pauseBtn = FindButtonInHud(hudLayer, "Btn_Pause");

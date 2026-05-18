@@ -98,7 +98,11 @@ namespace ProjectLink.Core
 
             SetInputEnabled(false);
             if (!string.IsNullOrEmpty(GameContext.StageSessionToken))
+            {
+                foreach (var kv in GameContext.ItemCounts)
+                    _itemCounts[kv.Key] = kv.Value;
                 ApplyStageSession();
+            }
             else
                 _uiData.StartStage(_stageId, HandleStageStarted);
         }
@@ -251,6 +255,7 @@ namespace ProjectLink.Core
                 }
                 _itemCounts[itemId] = result.Value.QuantityAfter;
                 _hud?.UpdateItemCount(itemId, result.Value.QuantityAfter);
+                UserDataCache.Instance?.SetInventoryItem(itemId, result.Value.QuantityAfter);
                 onSuccess?.Invoke();
             });
         }
@@ -295,11 +300,11 @@ namespace ProjectLink.Core
 
             SetInputEnabled(false);
             _timer?.Pause();
-            PopupManager.Instance.Open<PausePopup>().Init(() =>
+            PopupManager.Request(PopupId.Pause, (System.Action)(() =>
             {
                 SetInputEnabled(true);
                 _timer?.Resume();
-            });
+            }));
         }
 
         public void AbandonStageAndLoad(string sceneName)
@@ -435,7 +440,10 @@ namespace ProjectLink.Core
             var response = result.Value;
             GameContext.SetStageSession(response.SessionToken, response.MoveLimit, response.TimeLimitSeconds, response.ItemCounts);
             foreach (var kv in response.ItemCounts)
+            {
                 _itemCounts[kv.Key] = kv.Value;
+                UserDataCache.Instance?.SetInventoryItem(kv.Key, kv.Value);
+            }
             ApplyStageSession();
         }
 

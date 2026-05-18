@@ -178,7 +178,12 @@ namespace ProjectLink.Core
                     Open<ProjectLink.OutGame.UI.SessionExpiredPopup>().Init();
                     break;
                 case PopupId.Pause:
-                    OpenPrefab<ProjectLink.InGame.UI.PausePopup>("Prefabs/UI/PausePopup")?.Init();
+                    var resumeCallback = request.Payload as System.Action;
+                    var pausePopup = OpenPrefab<ProjectLink.InGame.UI.PausePopup>("Prefabs/UI/PausePopup");
+                    if (pausePopup != null)
+                        pausePopup.Init(resumeCallback);
+                    else
+                        Open<ProjectLink.InGame.UI.PausePopup>().Init(resumeCallback);
                     break;
                 case PopupId.ForceUpdate:
                     OpenPrefab<ProjectLink.OutGame.UI.ForceUpdatePopup>("Prefabs/UI/ForceUpdatePopup")?.Init();

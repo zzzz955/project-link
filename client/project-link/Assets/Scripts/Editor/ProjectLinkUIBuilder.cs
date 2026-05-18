@@ -1543,13 +1543,27 @@ namespace ProjectLink.EditorTools
         {
             var (root, panel, content, footer) = CreatePopupShell<PausePopup>(
                 "PausePopup", "popup.pause.title", dismissible: true);
-            // Pause popup footer is vertical
-            var fRect = footer.GetComponent<RectTransform>() ?? footer;
+
+            // Overlay fully opaque so board is not visible while paused
+            var overlayImg = root.transform.Find("Overlay")?.GetComponent<Image>();
+            if (overlayImg != null) overlayImg.color = new Color(0f, 0f, 0f, 1f);
+
+            // Footer: replace HLG with properly configured VLG
             Object.DestroyImmediate(footer.gameObject.GetComponent<HorizontalLayoutGroup>());
-            footer.gameObject.AddComponent<VerticalLayoutGroup>().spacing = 12;
-            AddFooterButton(footer, "Btn_Resume", "common.resume", "btn_primary", isPrimary: true, fullWidth: true);
-            AddFooterButton(footer, "Btn_Retry", "popup.pause.retry", "btn_secondary", fullWidth: true);
-            AddFooterButton(footer, "Btn_Lobby", "common.lobby", "btn_secondary", fullWidth: true);
+            var vlg = footer.gameObject.AddComponent<VerticalLayoutGroup>();
+            vlg.spacing = 12;
+            vlg.childControlWidth = true; vlg.childControlHeight = true;
+            vlg.childForceExpandWidth = true; vlg.childForceExpandHeight = false;
+
+            var btnResume = AddFooterButton(footer, "Btn_Resume", "common.resume", "btn_primary", isPrimary: true, fullWidth: true);
+            var btnRetry  = AddFooterButton(footer, "Btn_Retry",  "popup.pause.retry", "btn_secondary", fullWidth: true);
+            var btnLobby  = AddFooterButton(footer, "Btn_Lobby",  "common.lobby", "btn_secondary", fullWidth: true);
+
+            var popup = root.GetComponent<PausePopup>();
+            Assign(popup, "btnResume", btnResume);
+            Assign(popup, "btnRetry",  btnRetry);
+            Assign(popup, "btnLobby",  btnLobby);
+
             SavePopupPrefab(root, "PausePopup");
         }
 

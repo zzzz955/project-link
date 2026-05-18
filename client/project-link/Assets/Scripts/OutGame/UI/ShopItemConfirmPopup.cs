@@ -8,10 +8,10 @@ namespace ProjectLink.OutGame.UI
 {
     public class ShopItemConfirmModel
     {
-        public ShopItemConfirmModel(int itemId, string itemName, int cost, long currentBalance,
+        public ShopItemConfirmModel(int productId, string itemName, int cost, long currentBalance,
             System.Action<long> onPurchaseSuccess = null, string descriptionKey = null)
         {
-            ItemId = itemId;
+            ProductId = productId;
             ItemName = itemName;
             Cost = cost;
             CurrentBalance = currentBalance;
@@ -19,7 +19,7 @@ namespace ProjectLink.OutGame.UI
             DescriptionKey = descriptionKey ?? "";
         }
 
-        public int ItemId { get; }
+        public int ProductId { get; }
         public string ItemName { get; }
         public int Cost { get; }
         public long CurrentBalance { get; }
@@ -71,14 +71,18 @@ namespace ProjectLink.OutGame.UI
         void OnBuy()
         {
             btnBuy.interactable = false;
-            UiServiceLocator.UiData.PurchaseItem(_model.ItemId, 1, result =>
+            UiServiceLocator.UiData.PurchaseShopProduct(_model.ProductId, 1, null, result =>
             {
                 PopupManager.Instance.CloseTop();
                 if (result.IsSuccess)
                 {
+                    UserDataCache.Instance?.SetBalance(result.Value.SoftBalanceAfter);
+                    var update = result.Value.InventoryUpdates.Count > 0 ? result.Value.InventoryUpdates[0] : null;
+                    if (update != null)
+                        UserDataCache.Instance?.SetInventoryItem(update.ItemId, update.QuantityAfter);
                     _model.OnPurchaseSuccess?.Invoke(result.Value.SoftBalanceAfter);
                     PopupManager.Request(PopupId.ShopItemResult,
-                        new ShopItemResultModel(true, null, result.Value.QuantityAfter));
+                        new ShopItemResultModel(true, null, update?.QuantityAfter ?? 0));
                 }
                 else
                 {

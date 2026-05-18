@@ -1,29 +1,20 @@
 using ProjectLink.Core;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace ProjectLink.InGame.UI
 {
     public sealed class GameWireframeController : MonoBehaviour
     {
-        [SerializeField] Button backButton;
-        [SerializeField] Button settingsButton;
-        [SerializeField] Button hintButton;
-        [SerializeField] Button undoButton;
-        [SerializeField] Button paintItemButton;
-        [SerializeField] Button hammerButton;
-        [SerializeField] Button brushButton;
         [SerializeField] TextMeshProUGUI levelLabelText;
         [SerializeField] TextMeshProUGUI moveCounterText;
         [SerializeField] TextMeshProUGUI timerText;
-        [SerializeField] TextMeshProUGUI objectiveText;
 
         [Header("Item Toolbar")]
-        [SerializeField] Button item1Button;
-        [SerializeField] Button item2Button;
-        [SerializeField] Button item3Button;
-        [SerializeField] Button item4Button;
+        [SerializeField] UnityEngine.UI.Button item1Button;
+        [SerializeField] UnityEngine.UI.Button item2Button;
+        [SerializeField] UnityEngine.UI.Button item3Button;
+        [SerializeField] UnityEngine.UI.Button item4Button;
         [SerializeField] TextMeshProUGUI item1CountText;
         [SerializeField] TextMeshProUGUI item2CountText;
         [SerializeField] TextMeshProUGUI item3CountText;
@@ -33,12 +24,11 @@ namespace ProjectLink.InGame.UI
 
         public TextMeshProUGUI MoveCounterText => moveCounterText;
         public TextMeshProUGUI TimerText => timerText;
-        public TextMeshProUGUI ObjectiveText => objectiveText;
 
-        public Button Item1Button => item1Button;
-        public Button Item2Button => item2Button;
-        public Button Item3Button => item3Button;
-        public Button Item4Button => item4Button;
+        public UnityEngine.UI.Button Item1Button => item1Button;
+        public UnityEngine.UI.Button Item2Button => item2Button;
+        public UnityEngine.UI.Button Item3Button => item3Button;
+        public UnityEngine.UI.Button Item4Button => item4Button;
         public TextMeshProUGUI Item1CountText => item1CountText;
         public TextMeshProUGUI Item2CountText => item2CountText;
         public TextMeshProUGUI Item3CountText => item3CountText;
@@ -47,9 +37,29 @@ namespace ProjectLink.InGame.UI
         void Awake()
         {
             timerText ??= FindText("Txt_Timer");
-            objectiveText ??= FindText("Txt_Objective");
             if (moveCounterText == null)
                 moveCounterText = FindText("Txt_Moves");
+            ResolveItemSlots();
+        }
+
+        void ResolveItemSlots()
+        {
+            var toolbar = FindRect("Toolbar_Items");
+            if (toolbar == null) return;
+            for (int i = 0; i < 4; i++)
+            {
+                var slot = toolbar.Find($"ItemSlot_{i + 1}");
+                if (slot == null) continue;
+                var btn = slot.GetComponent<UnityEngine.UI.Button>();
+                var txt = slot.Find("Txt_Count")?.GetComponent<TextMeshProUGUI>();
+                switch (i)
+                {
+                    case 0: item1Button ??= btn; item1CountText ??= txt; break;
+                    case 1: item2Button ??= btn; item2CountText ??= txt; break;
+                    case 2: item3Button ??= btn; item3CountText ??= txt; break;
+                    case 3: item4Button ??= btn; item4CountText ??= txt; break;
+                }
+            }
         }
 
         void Start()
@@ -69,21 +79,17 @@ namespace ProjectLink.InGame.UI
             SetText(levelLabelText, string.Format(LocalizationManager.Get("popup.stage.title_n_fmt"), stageId));
         }
 
-        public void SetToolButtonsInteractable(bool interactable)
-        {
-            if (backButton != null) backButton.interactable = interactable;
-            if (settingsButton != null) settingsButton.interactable = interactable;
-            if (hintButton != null) hintButton.interactable = interactable;
-            if (undoButton != null) undoButton.interactable = interactable;
-            if (paintItemButton != null) paintItemButton.interactable = interactable;
-            if (hammerButton != null) hammerButton.interactable = interactable;
-            if (brushButton != null) brushButton.interactable = interactable;
-        }
-
         TextMeshProUGUI FindText(string childName)
         {
             foreach (var t in GetComponentsInChildren<TextMeshProUGUI>(true))
                 if (t.name == childName) return t;
+            return null;
+        }
+
+        RectTransform FindRect(string childName)
+        {
+            foreach (var r in GetComponentsInChildren<RectTransform>(true))
+                if (r.name == childName) return r;
             return null;
         }
 

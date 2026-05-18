@@ -16,6 +16,7 @@ namespace ProjectLink.Core
             CreateManager<ToastPresenter>("ToastPresenter");
             CreateManager<NetworkManager>("NetworkManager");
             CreateManager<PoolManager>("PoolManager");
+            CreateManager<UserDataCache>("UserDataCache");
             CreateManager<SceneLoader>("SceneLoader");
         }
 

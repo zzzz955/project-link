@@ -22,6 +22,8 @@ namespace ProjectLink.OutGame.UI
 
         void Start()
         {
+            UserDataCache.Instance?.Clear();
+
             BindButton(btnTapToStart, OnTapToStart);
             BindButton(btnGoogle, OnGoogle);
             BindButton(btnApple, OnApple);

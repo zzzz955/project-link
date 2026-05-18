@@ -85,4 +85,17 @@ namespace ProjectLink.Core
         public bool IsAuthenticated { get; }
         public string Provider { get; }
     }
+
+    public readonly struct BalanceChanged
+    {
+        public BalanceChanged(long softBalance) => SoftBalance = softBalance;
+        public long SoftBalance { get; }
+    }
+
+    public readonly struct InventoryChanged
+    {
+        public InventoryChanged(int itemId, int quantity) { ItemId = itemId; Quantity = quantity; }
+        public int ItemId { get; }
+        public int Quantity { get; }
+    }
 }

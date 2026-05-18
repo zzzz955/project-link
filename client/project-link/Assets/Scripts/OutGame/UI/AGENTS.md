@@ -32,6 +32,10 @@
 | `MaintenancePopup.cs` | `MaintenancePopup` | Prefab popup; non-dismissible; displays server maintenance message in Txt_Body |
 | `StageDetailPopup.cs` | `StageDetailPopup` | Prefab popup; dismissible; shows stage title (popup.stage.title_n_fmt) + stars + top-10 ranking; Btn_Play -> Game scene; no Txt_Best/Txt_MyRank |
 | `StreakRewardConfirmPopup.cs` | `StreakRewardConfirmPopup`, `StreakRewardConfirmModel` | Code popup; confirms whether to go Lobby (claim streak reward) or continue to next stage after OPEN_REWARD_POPUP directive |
+| `ShopItemConfirmPopup.cs` | `ShopItemConfirmPopup`, `ShopItemConfirmModel` | Prefab popup; shows item name, current balance, cost, post-purchase balance; Btn_Buy calls PurchaseItem API |
+| `ShopItemResultPopup.cs` | `ShopItemResultPopup`, `ShopItemResultModel` | Prefab popup; shows dynamic title (success/fail), error message on fail, Btn_Confirm |
+| `ShopProductCard.cs` | `ShopProductCard` | Prefab MonoBehaviour; renders one ingame item card (icon + title + price); tap opens ShopItemConfirm popup |
+| `ShopInventoryStrip.cs` | `ShopInventoryStrip` | MonoBehaviour; calls GetInventory, renders 4 item cells (icon + count) above shop viewport; dims cell at alpha 0.4 when count=0 |
 
 ## Symbols
 | symbol | kind | note |
@@ -77,6 +81,15 @@
 | `MaintenancePopup.Init(string)` | method | sets Txt_Body text from server maintenance message |
 | `StageDetailPopup.Init(int)` | method | binds Btn_Close/Btn_Play; sets dynamic title via `popup.stage.title_n_fmt`; renders stars and top-10 stage ranking (score, descending); no MyRankPanel, no Txt_Best/Txt_MyRank |
 | `StreakRewardConfirmPopup.Init(StreakRewardConfirmModel)` | method | Btn_Lobby: sets `ShouldOpenStreakPopupOnLobby=true` + CloseAll + LoadScene("Lobby"); Btn_Continue: CloseAll + EnterStage if unlocked, else Lobby |
+| `ShopItemConfirmModel.ItemId` | field | int; item id for PurchaseItem call |
+| `ShopItemConfirmModel.Cost` | field | int; soft currency cost |
+| `ShopItemConfirmModel.CurrentBalance` | field | long; balance at time of card tap |
+| `ShopItemConfirmPopup.Init(ShopItemConfirmModel)` | method | renders balance/cost/after rows; Btn_Buy calls PurchaseItem → ShopItemResult |
+| `ShopItemResultModel.Success` | field | bool |
+| `ShopItemResultModel.ErrorMessage` | field | string; shown on failure |
+| `ShopItemResultPopup.Init(ShopItemResultModel)` | method | updates Txt_Title with localized success/fail key; shows error text on failure |
+| `ShopProductCard.Init(itemId,itemName,cost,currentBalance,icon)` | method | populates card UI; Btn_Card -> ShopItemConfirm popup |
+| `ShopInventoryStrip.Refresh(IUiDataService,IStaticCatalogService,Sprite[])` | method | fetches inventory, renders all 4 items with count; dims alpha when count=0 |
 | `UIIconAnimator.intervalSeconds` | field | [SerializeField] default 5 s; controls bounce+glow cycle period |
 | `UIIconAnimator.EnsureGlow()` | method | creates `Img_Glow` child (RectTransform offset ±14, same sprite, `ProjectLink/UIGlow` additive shader, alpha 0) at runtime Awake |
 

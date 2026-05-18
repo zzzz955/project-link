@@ -48,6 +48,7 @@ namespace ProjectLink.OutGame.UI
         readonly HashSet<int> _unlockedStages = new();
         bool _progressLoaded;
         bool _staminaFull;
+        long _currentSoftBalance;
         bool _firstLobbyApply = true;
         Coroutine _energyAnim;
         Coroutine _coinAnim;
@@ -55,6 +56,9 @@ namespace ProjectLink.OutGame.UI
         [SerializeField] Sprite starOffSprite;
         [SerializeField] Sprite[] difficultySprites;
         [SerializeField] Sprite lockSprite;
+        [SerializeField] ShopProductCard shopProductCardPrefab;
+        [SerializeField] ShopInventoryStrip shopInventoryStrip;
+        [SerializeField] Sprite[] itemIconSprites;
         DateTimeOffset? _nextRechargeAt;
         float _nextTimerRefreshAt;
         RectTransform _centerStageNode;
@@ -155,12 +159,44 @@ namespace ProjectLink.OutGame.UI
             for (int i = 0; i < model.Products.Count; i++)
             {
                 var p = model.Products[i];
-                var title = p.Category == "COIN" && p.GrantQuantity > 0
-                    ? FormatNumber(p.GrantQuantity)
-                    : p.ItemName ?? p.Name;
-                var price = p.PriceSoft > 0 ? FormatNumber(p.PriceSoft) : p.PriceIapSku;
-                AddProductCard(shopContent, $"Product_{p.ProductId}", title, price, i == 1);
+                if (p.Category == "ITEM" && shopProductCardPrefab != null)
+                {
+                    var card = Instantiate(shopProductCardPrefab, shopContent);
+                    card.name = $"Product_{p.ProductId}";
+                    card.Init(p.GrantItemId, p.ItemName ?? p.Name, p.PriceSoft,
+                        () => _currentSoftBalance, GetItemSprite(p.GrantItemId), OnItemPurchaseSuccess);
+                }
+                else
+                {
+                    var title = p.Category == "COIN" && p.GrantQuantity > 0
+                        ? FormatNumber(p.GrantQuantity)
+                        : p.ItemName ?? p.Name;
+                    var price = p.PriceSoft > 0 ? FormatNumber(p.PriceSoft) : p.PriceIapSku;
+                    AddProductCard(shopContent, $"Product_{p.ProductId}", title, price, i == 1);
+                }
             }
+
+            RefreshInventoryStrip();
+        }
+
+        void OnItemPurchaseSuccess(long softBalanceAfter)
+        {
+            _currentSoftBalance = softBalanceAfter;
+            SetText(coinText, FormatNumber(softBalanceAfter));
+            SetText(shopBalanceText, FormatNumber(softBalanceAfter));
+            RefreshInventoryStrip();
+        }
+
+        void RefreshInventoryStrip()
+        {
+            if (shopInventoryStrip == null) return;
+            shopInventoryStrip.Refresh(_uiData, _catalog, itemIconSprites);
+        }
+
+        Sprite GetItemSprite(int itemId)
+        {
+            if (itemIconSprites == null || itemId <= 0 || itemId > itemIconSprites.Length) return null;
+            return itemIconSprites[itemId - 1];
         }
 
         void ConfigureShopGrid()
@@ -205,6 +241,7 @@ namespace ProjectLink.OutGame.UI
             _nextRechargeAt = ParseDateTime(lobby.NextRechargeAt);
 
             _staminaFull = lobby.StaminaCurrent >= lobby.StaminaMax;
+            _currentSoftBalance = lobby.SoftCurrency;
             if (_firstLobbyApply)
             {
                 _firstLobbyApply = false;
@@ -309,6 +346,7 @@ namespace ProjectLink.OutGame.UI
             _pinnedRankText ??= FindTextInParent("Row_MyRank_Pinned", "Txt_Rank");
             _pinnedYouText ??= FindTextInParent("Row_MyRank_Pinned", "Txt_You");
             _pinnedScoreText ??= FindTextInParent("Row_MyRank_Pinned", "Txt_Score");
+            shopInventoryStrip ??= GetComponentInChildren<ShopInventoryStrip>(true);
             EnsureSideStageNodes();
         }
 

@@ -19,6 +19,7 @@
 | `StageLoader.MaxStageId` | prop | max implemented stage id from `ingame_stage.csv` |
 | `StageLoader.Load(int)` | method | static; returns StageData or null (logs error if not found) |
 | `OutgameDataLoader.GetEnabledShopProducts(string)` | method | returns enabled shop products sorted by `sortOrder`, optional category filter |
+| `OutgameDataLoader.GetAllItems()` | method | returns all ingame items as `IReadOnlyList<IngameItem>` from `ingame_item.csv` |
 | `OutgameDataLoader.FindItem(int)` | method | resolves item display metadata from `ingame_item.csv` |
 | `OutgameDataLoader.StaminaConfig` | prop | returns global stamina planning config from `outgame_stamina_config.csv` |
 

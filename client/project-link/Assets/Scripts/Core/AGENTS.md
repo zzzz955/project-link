@@ -52,7 +52,7 @@
 | `InGameController.CancelItemSelection()` | method | exits item-selection mode; restores drag event subscriptions; clears board highlights |
 | `InGameController.RefreshItemButtons()` | method | calls `_hud.SetItemButtonState` for all 4 items with current counts and extra conditions |
 | `UIManager.GetLayer(UILayer)` | method | returns canvas Transform for named layer |
-| `PopupId` | enum | popup ids: ReturnTitle, ExitGame, Settings, BuyItem, Energy, StreakChallenge, Account, Reward, StageClear, SessionExpired, Pause, ForceUpdate, Maintenance, StageDetail, ClearNextStageConfirm |
+| `PopupId` | enum | popup ids: ReturnTitle, ExitGame, Settings, BuyItem, Energy, StreakChallenge, Account, Reward, StageClear, SessionExpired, Pause, ForceUpdate, Maintenance, StageDetail, ClearNextStageConfirm, DailyReward, Timeout, StreakRewardConfirm, ShopItemConfirm, ShopItemResult |
 | `PopupManager.Request(PopupId,object)` | method | static event-driven popup request entry point |
 | `PopupManager.Open<T>()` | method | code-instantiates legacy popup T on Popup layer, pushes stack |
 | `PopupManager.CloseTop()` | method | destroys top popup, re-shows previous |

@@ -139,6 +139,9 @@ namespace ProjectLink.EditorTools
                 EditorSceneManager.MarkSceneDirty(scene);
                 EditorSceneManager.SaveScene(scene);
             }
+
+            if (!Application.isBatchMode)
+                EditorSceneManager.OpenScene("Assets/Scenes/Bootstrap.unity", OpenSceneMode.Single);
         }
 
         public static void BuildAllSceneUIBatch() => BuildAllSceneUI();
@@ -170,6 +173,9 @@ namespace ProjectLink.EditorTools
             BuildClearPopup();
             BuildPausePopup();
             BuildTimeoutPopup();
+            BuildShopItemConfirmPopup();
+            BuildShopItemResultPopup();
+            CreateShopProductCardPrefab();
 
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
@@ -679,6 +685,21 @@ namespace ProjectLink.EditorTools
             Assign(lobbyCtrl, "shopContent",          FindRectInChildren(tabShop, "Content"));
             Assign(lobbyCtrl, "rankingContent",       FindRectInChildren(tabRanking, "Content"));
 
+            // ShopProductCard prefab + inventory strip + item icon sprites
+            var cardPrefab = AssetDatabase.LoadAssetAtPath<ShopProductCard>($"{PopupPrefabRoot}/ShopProductCard.prefab");
+            if (cardPrefab != null)
+                Assign(lobbyCtrl, "shopProductCardPrefab", cardPrefab);
+            var inventoryStrip = FindRectInChildren(tabShop, "Row_InventoryStrip")?.GetComponent<ShopInventoryStrip>();
+            if (inventoryStrip != null)
+                Assign(lobbyCtrl, "shopInventoryStrip", inventoryStrip);
+            AssignSpriteArray(lobbyCtrl, "itemIconSprites", new[]
+            {
+                LoadSkin()?.Get("slot_item_1"),
+                LoadSkin()?.Get("slot_item_2"),
+                LoadSkin()?.Get("slot_item_3"),
+                LoadSkin()?.Get("slot_item_4"),
+            });
+
             AddLobbyTabController(safe.gameObject,
                 shopTabBtn, homeTabBtn, rankTabBtn,
                 tabShop.gameObject, tabHome.gameObject, tabRanking.gameObject);
@@ -919,11 +940,23 @@ namespace ProjectLink.EditorTools
             Stretch(tab);
             tab.gameObject.SetActive(false);
 
+            // Inventory strip — anchored at top, above the scroll viewport
+            var strip = MakeChild(tab, "Row_InventoryStrip");
+            SetAnchor(strip, new Vector2(0, 1), new Vector2(1, 1), new Vector2(0.5f, 1));
+            strip.sizeDelta = new Vector2(0, 120);
+            strip.anchoredPosition = Vector2.zero;
+            var stripHlg = strip.gameObject.AddComponent<HorizontalLayoutGroup>();
+            stripHlg.spacing = 8; stripHlg.padding = new RectOffset(16, 16, 8, 8);
+            stripHlg.childAlignment = TextAnchor.MiddleCenter;
+            stripHlg.childControlWidth = false; stripHlg.childControlHeight = true;
+            strip.gameObject.AddComponent<ShopInventoryStrip>();
+
             var scroll = tab.gameObject.AddComponent<ScrollRect>();
             scroll.vertical = true; scroll.horizontal = false;
 
+            // Viewport sits below the inventory strip (top offset = 120 strip + 8 padding)
             var viewport = MakeChild(tab, "Viewport");
-            Stretch(viewport, 16, 16, 16, 16);
+            Stretch(viewport, 0, 128, 0, 8);
             viewport.gameObject.AddComponent<Image>().color = new Color(0, 0, 0, 1f);
             viewport.gameObject.AddComponent<Mask>().showMaskGraphic = false;
 
@@ -1793,6 +1826,154 @@ namespace ProjectLink.EditorTools
             var linkBtnComp = linkBtn.gameObject.AddComponent<Button>();
             linkBtnComp.targetGraphic = linkImg;
             linkBtn.gameObject.AddComponent<LayoutElement>().preferredWidth = 200;
+        }
+
+        static void BuildShopItemConfirmPopup()
+        {
+            var (root, panel, content, footer) = CreatePopupShell<ShopItemConfirmPopup>(
+                "ShopItemConfirmPopup", "shop.confirm.title", dismissible: true);
+
+            // Item name row
+            var nameRow = MakeChild(content, "Row_ItemName");
+            nameRow.sizeDelta = new Vector2(0, 56);
+            nameRow.gameObject.AddComponent<LayoutElement>().preferredHeight = 56;
+            var nameRowHlg = nameRow.gameObject.AddComponent<HorizontalLayoutGroup>();
+            nameRowHlg.spacing = 8; nameRowHlg.childControlWidth = true; nameRowHlg.childControlHeight = true;
+            var nameTxt = MakeChild(nameRow, "Txt_ItemName");
+            nameTxt.sizeDelta = new Vector2(0, 48);
+            var nameTmp = nameTxt.gameObject.AddComponent<TextMeshProUGUI>();
+            nameTmp.fontSize = 30; nameTmp.fontStyle = FontStyles.Bold;
+            nameTmp.color = TextCol; nameTmp.alignment = TextAlignmentOptions.Midline;
+            nameTmp.raycastTarget = false;
+            nameTxt.gameObject.AddComponent<LayoutElement>().flexibleWidth = 1;
+            nameTxt.gameObject.AddComponent<LocalizedFont>();
+
+            // Balance row
+            AddShopConfirmRow(content, "Row_Balance", "shop.confirm.balance_label", "Txt_Balance");
+            // Cost row
+            AddShopConfirmRow(content, "Row_Cost", "shop.confirm.cost_label", "Txt_Cost");
+            // After row
+            AddShopConfirmRow(content, "Row_After", "shop.confirm.after_label", "Txt_After");
+
+            AddFooterButton(footer, "Btn_Cancel", "common.cancel",  "btn_secondary");
+            AddFooterButton(footer, "Btn_Buy",    "common.confirm", "btn_primary", isPrimary: true);
+
+            var popup = root.GetComponent<ShopItemConfirmPopup>();
+            Assign(popup, "txtItemName", FindTmpInChildren(root.GetComponent<RectTransform>(), "Txt_ItemName"));
+            Assign(popup, "txtBalance",  FindTmpInChildren(root.GetComponent<RectTransform>(), "Txt_Balance"));
+            Assign(popup, "txtCost",     FindTmpInChildren(root.GetComponent<RectTransform>(), "Txt_Cost"));
+            Assign(popup, "txtAfter",    FindTmpInChildren(root.GetComponent<RectTransform>(), "Txt_After"));
+            Assign(popup, "btnBuy",    FindButtonInChildren(root, "Btn_Buy"));
+            Assign(popup, "btnCancel", FindButtonInChildren(root, "Btn_Cancel"));
+            SavePopupPrefab(root, "ShopItemConfirmPopup");
+        }
+
+        static void AddShopConfirmRow(RectTransform parent, string rowName, string labelKey, string valueName)
+        {
+            var row = MakeChild(parent, rowName);
+            row.sizeDelta = new Vector2(0, 56);
+            row.gameObject.AddComponent<LayoutElement>().preferredHeight = 56;
+            var hlg = row.gameObject.AddComponent<HorizontalLayoutGroup>();
+            hlg.spacing = 8; hlg.padding = new RectOffset(0, 0, 4, 4);
+            hlg.childAlignment = TextAnchor.MiddleLeft;
+            hlg.childControlWidth = true; hlg.childControlHeight = true;
+
+            var lbl = MakeChild(row, $"Lbl_{labelKey.Replace(".", "_")}");
+            lbl.sizeDelta = new Vector2(0, 40);
+            var lblTmp = lbl.gameObject.AddComponent<TextMeshProUGUI>();
+            lblTmp.fontSize = 24; lblTmp.color = TextMuted; lblTmp.alignment = TextAlignmentOptions.MidlineLeft;
+            lblTmp.raycastTarget = false;
+            lbl.gameObject.AddComponent<LocalizedText>().SetStringId(labelKey);
+            lbl.gameObject.AddComponent<LayoutElement>().flexibleWidth = 1;
+
+            var val = MakeChild(row, valueName);
+            val.sizeDelta = new Vector2(220, 40);
+            var valTmp = val.gameObject.AddComponent<TextMeshProUGUI>();
+            valTmp.fontSize = 26; valTmp.fontStyle = FontStyles.Bold;
+            valTmp.color = TextCol; valTmp.alignment = TextAlignmentOptions.MidlineRight;
+            valTmp.raycastTarget = false;
+            val.gameObject.AddComponent<LayoutElement>().preferredWidth = 220;
+            val.gameObject.AddComponent<LocalizedFont>();
+        }
+
+        static void BuildShopItemResultPopup()
+        {
+            var (root, panel, content, footer) = CreatePopupShell<ShopItemResultPopup>(
+                "ShopItemResultPopup", "shop.result.success_title", dismissible: true);
+
+            AddPopupBodyText(content, null);
+            // Rename body text for reliable ref assignment
+            var bodyGo = FindTmpInChildren(root.GetComponent<RectTransform>(), "Txt_Body");
+
+            AddFooterButton(footer, "Btn_Confirm", "common.confirm", "btn_primary", isPrimary: true);
+
+            var popup = root.GetComponent<ShopItemResultPopup>();
+            Assign(popup, "txtTitle",   FindTmpInChildren(root.GetComponent<RectTransform>(), "Txt_Title"));
+            if (bodyGo != null) Assign(popup, "txtBody", bodyGo);
+            Assign(popup, "btnConfirm", FindButtonInChildren(root, "Btn_Confirm"));
+            SavePopupPrefab(root, "ShopItemResultPopup");
+        }
+
+        static void CreateShopProductCardPrefab()
+        {
+            EnsureFolder("Assets/Resources/Prefabs");
+            EnsureFolder("Assets/Resources/Prefabs/UI");
+
+            var root = new GameObject("ShopProductCard", typeof(RectTransform), typeof(Image), typeof(Button), typeof(LayoutElement));
+            var rootRect = root.GetComponent<RectTransform>();
+            SetAnchor(rootRect, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f));
+            rootRect.sizeDelta = new Vector2(280f, 500f);
+            root.GetComponent<Image>().color = new Color(0.06f, 0.16f, 0.28f, 0.9f);
+            var rootBtn = root.GetComponent<Button>();
+            rootBtn.targetGraphic = root.GetComponent<Image>();
+            var rootLe = root.GetComponent<LayoutElement>();
+            rootLe.preferredWidth = 280f; rootLe.preferredHeight = 500f;
+
+            // Txt_Title — top
+            var titleGo = MakeChild(rootRect, "Txt_Title");
+            SetAnchor(titleGo, new Vector2(0, 1), new Vector2(1, 1), new Vector2(0.5f, 1));
+            titleGo.sizeDelta = new Vector2(0, 88f);
+            titleGo.anchoredPosition = new Vector2(0, -36f);
+            var titleTmp = titleGo.gameObject.AddComponent<TextMeshProUGUI>();
+            titleTmp.fontSize = 46; titleTmp.fontStyle = FontStyles.Bold;
+            titleTmp.color = new Color(1f, 0.82f, 0.08f, 1f);
+            titleTmp.alignment = TextAlignmentOptions.Midline;
+            titleTmp.raycastTarget = false;
+            titleGo.gameObject.AddComponent<LocalizedFont>();
+
+            // Img_ItemIcon — center
+            var iconGo = MakeChild(rootRect, "Img_ItemIcon");
+            SetAnchor(iconGo, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f));
+            iconGo.sizeDelta = new Vector2(190f, 190f);
+            iconGo.anchoredPosition = new Vector2(0, 16f);
+            var iconImg = iconGo.gameObject.AddComponent<Image>();
+            iconImg.color = new Color(1f, 0.75f, 0.02f, 0.8f);
+            iconImg.preserveAspect = true;
+            ApplySkin(iconImg, "slot_item_icon");
+
+            // Txt_Price — bottom
+            var priceGo = MakeChild(rootRect, "Txt_Price");
+            SetAnchor(priceGo, new Vector2(0, 0), new Vector2(1, 0), new Vector2(0.5f, 0));
+            priceGo.sizeDelta = new Vector2(-36f, 96f);
+            priceGo.anchoredPosition = new Vector2(0, 26f);
+            var priceTmp = priceGo.gameObject.AddComponent<TextMeshProUGUI>();
+            priceTmp.fontSize = 36; priceTmp.fontStyle = FontStyles.Bold;
+            priceTmp.color = Color.white;
+            priceTmp.alignment = TextAlignmentOptions.Midline;
+            priceTmp.raycastTarget = false;
+            priceGo.gameObject.AddComponent<LocalizedFont>();
+
+            var card = root.AddComponent<ShopProductCard>();
+            Assign(card, "txtTitle",    FindTmpInChildren(rootRect, "Txt_Title"));
+            var iconImgRef = FindRectInChildren(rootRect, "Img_ItemIcon");
+            if (iconImgRef != null) Assign(card, "imgItemIcon", iconImgRef.GetComponent<Image>());
+            Assign(card, "txtPrice",    FindTmpInChildren(rootRect, "Txt_Price"));
+            Assign(card, "btnCard",     rootBtn);
+
+            EnsureLocalizedFonts(root);
+            AddAnimatorToIconImages(root);
+            PrefabUtility.SaveAsPrefabAsset(root, $"{PopupPrefabRoot}/ShopProductCard.prefab");
+            Object.DestroyImmediate(root);
         }
 
         static void SavePopupPrefab(GameObject root, string prefabName)

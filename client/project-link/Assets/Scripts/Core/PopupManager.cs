@@ -24,7 +24,9 @@ namespace ProjectLink.Core
         ClearNextStageConfirm,
         DailyReward,
         Timeout,
-        StreakRewardConfirm
+        StreakRewardConfirm,
+        ShopItemConfirm,
+        ShopItemResult
     }
 
     public readonly struct PopupRequest
@@ -214,6 +216,14 @@ namespace ProjectLink.Core
                         streakConfirmPopup.Init(streakModel);
                     else
                         Open<ProjectLink.OutGame.UI.StreakRewardConfirmPopup>().Init(streakModel);
+                    break;
+                case PopupId.ShopItemConfirm:
+                    var shopConfirmModel = request.Payload as ProjectLink.OutGame.UI.ShopItemConfirmModel;
+                    OpenPrefab<ProjectLink.OutGame.UI.ShopItemConfirmPopup>("Prefabs/UI/ShopItemConfirmPopup")?.Init(shopConfirmModel);
+                    break;
+                case PopupId.ShopItemResult:
+                    var shopResultModel = request.Payload as ProjectLink.OutGame.UI.ShopItemResultModel;
+                    OpenPrefab<ProjectLink.OutGame.UI.ShopItemResultPopup>("Prefabs/UI/ShopItemResultPopup")?.Init(shopResultModel);
                     break;
             }
         }

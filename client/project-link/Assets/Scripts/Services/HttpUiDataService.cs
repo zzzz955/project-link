@@ -141,6 +141,13 @@ namespace ProjectLink.Services
         public void UseIngameItem(int itemId, string sessionToken, Action<ServiceResult<InGameItemUseResponse>> onComplete)
             => Post(UiDataRoutes.UseIngameItem, new InGameItemUseRequest { ItemId = itemId, StageSessionToken = sessionToken }, onComplete);
 
+        public void PurchaseItem(int itemId, int quantity, Action<ServiceResult<ItemPurchaseResponse>> onComplete)
+            => Post(UiDataRoutes.ItemPurchase, new ItemPurchaseRequest
+            {
+                ItemId = itemId,
+                Quantity = Math.Max(1, quantity),
+            }, onComplete, InvalidateInventoryCaches);
+
         void Get<T>(string endpoint, Action<ServiceResult<T>> onComplete, bool requiresAuth = true)
         {
             if (!TryGetNetwork(out var network, onComplete)) return;
@@ -392,6 +399,12 @@ namespace ProjectLink.Services
 
             onComplete?.Invoke(new ServiceResult<T>(value));
             return true;
+        }
+
+        void InvalidateInventoryCaches()
+        {
+            _cache.Remove(UiDataRoutes.Inventory);
+            _cache.Remove(UiDataRoutes.LobbyState);
         }
 
         void InvalidateLobbyCaches()

@@ -28,6 +28,7 @@ namespace ProjectLink.Services
         public static string RankingStage(int stageId) => $"/api/ranking/stage/{stageId}";
 
         public const string UseIngameItem = "/api/items/use-ingame";
+        public const string ItemPurchase = "/api/items/purchase";
 
         public static string Ranking(string category)
         {

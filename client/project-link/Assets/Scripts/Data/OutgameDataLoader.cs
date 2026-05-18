@@ -56,6 +56,12 @@ namespace ProjectLink.Data
             return result;
         }
 
+        public static IReadOnlyList<IngameItem> GetAllItems()
+        {
+            EnsureLoaded();
+            return _items;
+        }
+
         public static IngameItem FindItem(int itemId)
         {
             EnsureLoaded();

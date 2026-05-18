@@ -64,5 +64,6 @@ namespace ProjectLink.Services
         void UpdatePlayerSettings(PlayerSettingsUpdateRequest request, Action<ServiceResult<PlayerSettingsResponse>> onComplete);
         void ClaimReward(string rewardSource, string rewardToken, int multiplier, Action<ServiceResult<RewardClaimResponse>> onComplete);
         void UseIngameItem(int itemId, string sessionToken, Action<ServiceResult<InGameItemUseResponse>> onComplete);
+        void PurchaseItem(int itemId, int quantity, Action<ServiceResult<ItemPurchaseResponse>> onComplete);
     }
 }

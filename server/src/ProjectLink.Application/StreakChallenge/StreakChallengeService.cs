@@ -93,6 +93,9 @@ public class StreakChallengeService
         if (level.LevelStatus != "READY")
             return BuildStateResponse(state, levels, exclusion: "INVALID_EVENT_STATE");
 
+        if (levels.Any(l => l.RewardState == "PENDING"))
+            return BuildStateResponse(state, levels, exclusion: "PENDING_REWARD_EXISTS");
+
         await _tx.StartLevelAsync(new StreakChallengeStartLevelCommand
         {
             UserId     = userId,
@@ -441,10 +444,11 @@ public class StreakChallengeService
                 actions.Add("ACTIVATE");
                 break;
             case "ACTIVE":
-                var current = levels.FirstOrDefault(l => l.LevelIndex == state.CurrentLevel);
-                if (current?.LevelStatus == "READY")      actions.Add("START_LEVEL");
-                if (current?.LevelStatus == "STARTED")    actions.Add("CONTINUE_LEVEL");
-                if (levels.Any(l => l.RewardState == "PENDING"))
+                var current        = levels.FirstOrDefault(l => l.LevelIndex == state.CurrentLevel);
+                var hasPendingReward = levels.Any(l => l.RewardState == "PENDING");
+                if (!hasPendingReward && current?.LevelStatus == "READY")   actions.Add("START_LEVEL");
+                if (current?.LevelStatus == "STARTED")                      actions.Add("CONTINUE_LEVEL");
+                if (hasPendingReward)
                 {
                     actions.Add("CLAIM_REWARD");
                     actions.Add("WATCH_AD");

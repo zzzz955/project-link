@@ -201,9 +201,6 @@ public class StageService
         if (session.StageId != stageId || session.Token != sessionToken)
             throw new StageSessionNotFoundException();
 
-        if (session.IsSetupPhase)
-            throw new StageNotInSetupPhaseException();
-
         var nextCount  = session.ExtensionCount + 1;
         var extConfig  = _staticData.GetTimeExtendConfig(nextCount)
             ?? throw new InvalidStageResultException();

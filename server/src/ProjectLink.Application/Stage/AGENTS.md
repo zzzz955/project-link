@@ -11,7 +11,7 @@
 | `StageService.StartAsync` | method | Deducts stamina, replaces any active session with a new paid attempt, returns `StageStartResponse` with item counts from static data |
 | `StageService.LockAsync` | method | Validates `sessionToken`, transitions session to locked state; must be called before EndAsync |
 | `StageService.EndAsync` | method | Validates sessionToken + move limit; delegates first-clear reward + clear stamina refund to `IStageEndTransaction`; calls `RankingService.OnStageEndAsync` on best record; calls `StreakChallengeService.ProcessStageResultAsync`; elapsed-ms tolerance uses `_rankingService.NetworkToleranceMs` |
-| `StageService.ExtendAsync` | method | Refunds stamina on stage-fail; validates sessionToken; cost from `IStaticDataService.GetStaminaConfig()` |
+| `StageService.ExtendAsync` | method | Extends session TTL; validates sessionToken; deducts soft currency; works in both setup phase and in-game phase; cost from `IStaticDataService.GetTimeExtendConfig` |
 
 ## Cross-refs
 - Depends on: `IStageSessionCache`, `IStaminaRepository`, `IInventoryRepository`, `IStageEndTransaction`, `IStaticDataService`, `RankingService`, `StreakChallengeService`

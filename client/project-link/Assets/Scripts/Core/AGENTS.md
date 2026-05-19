@@ -64,7 +64,6 @@
 | `ButtonPressEffect.OnPointerDown/Up/Exit` | methods | animate current localScale * 0.88 on press, restore captured Vector3 only after active press; uses `Time.unscaledDeltaTime` |
 | `AppEnvironment` | enum | `Dev` / `Prod` |
 | `AppConfig.DevGameServerUrl` | const | `http://localhost:20101` |
-| `AppConfig.DevPlatformAuthUrl` | const | `http://localhost:20001` — server-side only; client routes auth via game server |
 | `IAuthService.EnsureAuth(Action<bool,string>)` | method | ensures a valid access token exists; refreshes or guest-logins through active auth service |
 | `IAuthService.LoginGuest(Action<bool,string>)` | method | creates/restores platform guest session |
 | `IAuthService.LoginGoogle(string,string,Action<bool,string>)` | method | submits native Google ID token to platform auth |

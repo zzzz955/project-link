@@ -17,11 +17,9 @@ namespace ProjectLink.Core
         [SerializeField] bool httpLogging = true;
 
         string _baseUrl;
-        string _authBaseUrl;
         IAuthService _authService;
 
         public string BaseUrl { get => _baseUrl; set => _baseUrl = value; }
-        public string AuthBaseUrl => _authBaseUrl;
         public AppEnvironment Environment => environment;
 
         public IAuthService AuthService
@@ -161,7 +159,6 @@ namespace ProjectLink.Core
         void ApplyEnvironment()
         {
             _baseUrl = environment == AppEnvironment.Prod ? AppConfig.ProdGameServerUrl : AppConfig.DevGameServerUrl;
-            _authBaseUrl = environment == AppEnvironment.Prod ? AppConfig.ProdPlatformAuthUrl : AppConfig.DevPlatformAuthUrl;
         }
 
     }

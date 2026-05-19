@@ -20,6 +20,7 @@
 | `ForceUpdatePopup.prefab` | `ForceUpdatePopup` | Generated non-dismissible force-update popup |
 | `MaintenancePopup.prefab` | `MaintenancePopup` | Generated non-dismissible maintenance popup |
 | `StageDetailPopup.prefab` | `StageDetailPopup` | Generated stage detail/start popup |
+| `RankingCard.prefab` | `RankingCard` | Generated lobby ranking row card used by Tab_Ranking list and pinned my-rank |
 
 ## Symbols
 | symbol | kind | note |
@@ -38,6 +39,7 @@
 | `Prefabs/UI/ForceUpdatePopup` | Resources path | loaded by `PopupManager` for `PopupId.ForceUpdate` |
 | `Prefabs/UI/MaintenancePopup` | Resources path | loaded by `PopupManager` for `PopupId.Maintenance` |
 | `Prefabs/UI/StageDetailPopup` | Resources path | loaded by `PopupManager` when stage detail flow is wired |
+| `Prefabs/UI/RankingCard` | Resources path | assigned by `ProjectLinkUIBuilder` to `LobbyWireframeController.rankingCardPrefab` |
 
 ## Rules
 - Regenerate via `Tools/Project Link/UI Build/Build Popup Prefabs`.

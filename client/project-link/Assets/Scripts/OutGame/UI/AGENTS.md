@@ -35,6 +35,7 @@
 | `ShopItemConfirmPopup.cs` | `ShopItemConfirmPopup`, `ShopItemConfirmModel` | Prefab popup; shows item name, current balance, cost, post-purchase balance; Btn_Buy calls PurchaseItem API |
 | `ShopItemResultPopup.cs` | `ShopItemResultPopup`, `ShopItemResultModel` | Prefab popup; shows dynamic title (success/fail), error message on fail, Btn_Confirm |
 | `ShopProductCard.cs` | `ShopProductCard` | Prefab MonoBehaviour; renders one ingame item card (icon + title + price); tap opens ShopItemConfirm popup |
+| `RankingCard.cs` | `RankingCard` | Prefab MonoBehaviour; renders ranking row/pinned-my-rank card with rank/medal, display name, avatar, and level/value |
 | `ShopInventoryStrip.cs` | `ShopInventoryStrip` | MonoBehaviour; calls GetInventory, renders 4 item cells (icon + count) above shop viewport; dims cell at alpha 0.4 when count=0 |
 
 ## Symbols
@@ -57,6 +58,7 @@
 | `LobbyTabController.Configure(...)` | method | assigns tab buttons and tab panels from generated UI builder |
 | `LobbyWireframeController.RefreshRanking(string)` | method | clears current ranking rows and requests selected ranking segment through `LobbyViewModel` |
 | `LobbyWireframeController.Render()` | method | renders Lobby/Shop/Ranking viewmodel state and localized errors; stage carousel initial selection comes from Lobby API, bounds from CSV catalog, play/stars from server progress |
+| `LobbyWireframeController.AddRankingCard(parent,entry,pinned)` | method | instantiates `RankingCard` prefab for list rows and pinned my-rank; rank >=1000 displays `1000+` |
 | `LobbyWireframeController.RefreshStaminaTimer()` | method | shows "Full" (status.stamina_full) when `_staminaFull`; else "MM:SS" countdown; font applied separately via `ApplyFontsToAllLabels` |
 | `LobbyWireframeController.RenderCenterStarImages(int)` | method | updates Img_Star_0/1/2 in Group_Stars under StageNode_Center using starOnSprite/starOffSprite; fallback to yellow/dim color when sprites null |
 | `LobbyWireframeController.BindAvatarButton()` | method | adds runtime Account popup listener only when Slot_Avatar has no persistent OpenAccountPopup handler |
@@ -90,6 +92,7 @@
 | `ShopItemConfirmModel.DescriptionKey` | field | string; clientstring key for item description; empty string when not set |
 | `ShopItemConfirmPopup.Init(ShopItemConfirmModel)` | method | renders Txt_Description (localized via DescriptionKey), balance/cost/after rows; Btn_Buy calls PurchaseShopProduct → updates UserDataCache → ShopItemResult |
 | `ShopProductCard.Init(productId,itemName,cost,getBalance,icon,onPurchaseSuccess,descriptionKey)` | method | populates card UI; Btn_Card → ShopItemConfirm popup with descriptionKey |
+| `RankingCard.Init(rank,displayName,level,rankSprite,avatarSprite,pinned)` | method | populates rank text/medal image, display name fallback, localized rank.level, level/value, avatar, and pinned background |
 | `ShopItemResultModel.Success` | field | bool |
 | `ShopItemResultModel.ErrorMessage` | field | string; shown on failure |
 | `ShopItemResultPopup.Init(ShopItemResultModel)` | method | updates Txt_Title with localized success/fail key; shows error text on failure |
@@ -111,5 +114,6 @@
 - Stamina timer text: `status.stamina_full` when full; else "MM:SS" countdown. Key added to clientstring.csv.
 - StageDetailPopup title: dynamic via `popup.stage.title_n_fmt` (format arg: stageId int). LocalizedText component disabled on Txt_Title before setting text.
 - "Guest" display name: use `LocalizationManager.Get("popup.account.guest")` (AccountPopup, SettingPopup, StageDetailPopup ranking display name fallback).
+- Ranking tab strings: `rank.title`, `rank.level`; top 1/2/3 sprites come from UISpriteSkin `slot_rank_medal_1/2/3`, card/frame keys from `slot_ranking_card` and `slot_rank_avatar_frame`.
 - Toggle visuals: single `Img_Toggle` child of the Toggle transform; sprite swaps between `[SerializeField] toggleOnSprite`/`toggleOffSprite` (assigned by UIBuilder from UISpriteSkin `slot_toggle_on`/`slot_toggle_off`). No `Img_Off`/`Img_On`/`Handle`/`Track` children.
 - LobbyTabController.SetTabVisual: Indicator find is null-safe; Indicator no longer exists in generated TabBar.

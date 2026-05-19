@@ -13,11 +13,12 @@
 |---|---|---|
 | `ProjectLinkUIBuilder.BuildCurrentSceneUI()` | method | [MenuItem] rebuilds active scene UI matching `scenes.json` spec |
 | `ProjectLinkUIBuilder.BuildAllSceneUI()` | method | [MenuItem] rebuilds all scenes + popup prefabs matching design spec; restores unchanged files to avoid fileID churn in git diff |
-| `ProjectLinkUIBuilder.ContentMatchesIgnoringFileIds(newContent,oldContent)` | method | normalizes YAML fileID integers to sequential IDs and compares; used to detect fileID-only churn |
-| `ProjectLinkUIBuilder.NormalizeYamlFileIds(yaml)` | method | maps all `&NNNNN` anchors and `fileID: NNNNN` refs to sequential integers; order-of-appearance stable |
-| `ProjectLinkUIBuilder.RestoreIfUnchanged(path,previousContent)` | method | writes previousContent back to disk + ImportAsset if NormalizeYamlFileIds match; suppresses git diff noise |
+| `ProjectLinkUIBuilder.ContentMatchesIgnoringFileIds(newContent,oldContent)` | method | splits YAML into per-object blocks, replaces all fileID integers with stable placeholder, sorts blocks, compares; order-independent so random fileID sort order doesn't cause false positives |
+| `ProjectLinkUIBuilder.GetSortedBlockSignatures(yaml)` | method | splits YAML on `\n--- ` separator, normalizes `&NNNNN` anchors and `fileID: NNNNN` refs to `&ID`/`fileID: ID`, returns sorted list |
+| `ProjectLinkUIBuilder.RestoreIfUnchanged(path,previousContent)` | method | writes previousContent back to disk + ImportAsset if ContentMatchesIgnoringFileIds match; suppresses git diff noise |
 | `ProjectLinkUIBuilder.BuildAllSceneUIBatch()` | method | CI/batch variant; no dialogs |
 | `ProjectLinkUIBuilder.BuildPopupPrefabs()` | method | [MenuItem] creates all popup prefabs under `Assets/Resources/Prefabs/UI/` using standard popup shell (Overlay/Panel/Header/Content/Footer), including clear-next confirmation |
+| `ProjectLinkUIBuilder.CreateRankingCardPrefab()` | method | creates `RankingCard.prefab` with rank/medal slot, avatar frame, display name, and localized level/value labels |
 | `ProjectLinkUIBuilder.BuildStreakChallengePopup()` | method | creates StreakChallenge popup hierarchy with Btn_Info/Btn_Close, event banner, HHh MMm timer, level progress, grand-prize panel, dynamic LevelPath root, claim action, and hidden InfoPopup |
 | `ProjectLinkUIBuilder.CreateUISpriteSkin()` | method | [MenuItem] creates/syncs `Assets/Editor/UISpriteSkin.asset`; scans source for `btn_*`/`slot_*` keys automatically |
 | `ProjectLinkUIBuilder.AssignIconAnimations()` | method | [MenuItem] scans all scenes + popup prefabs; adds `UIIconAnimator` to every `Icon_*`/`Icon` GO and any Image using a `btn_icon_*` skin key; auto-called from BuildScene/SavePopupPrefab |
@@ -29,7 +30,8 @@
 | `ProjectLinkUIBuilder.EnsureLocalizedFonts(root)` | method | adds `LocalizedFont` component to every TMP child that lacks `LocalizedText`; called in `SavePopupPrefab` and at end of `BuildScene`; idempotent (skips if already present) |
 | `ProjectLinkUIBuilder.BuildBootstrap(...)` | method | Slot_Logo + ProgressBar(Slider+Fill) + Btn_Retry + Txt_NetworkError + PopupLayer; wires BootstrapWireframeController |
 | `ProjectLinkUIBuilder.BuildTitle(...)` | method | Btn_Settings + Slot_Logo + Group_AuthButtons(Btn_Google+Btn_Apple) + Btn_TapToStart + Txt_Version; wires TitleWireframeController |
-| `ProjectLinkUIBuilder.BuildLobby(...)` | method | HUD_Strip(single HLG h=120 transparent: Slot_Avatar+Group_Stamina+Group_Currency+Btn_Menu) + MenuDropdown + Group_TabBodies(Tab_Home+Tab_Shop+Tab_Ranking) + TabBar; wires LobbyWireframeController + LobbyTabController |
+| `ProjectLinkUIBuilder.BuildLobby(...)` | method | HUD_Strip(single HLG h=120 transparent: Slot_Avatar+Group_Stamina+Group_Currency+Btn_Menu) + MenuDropdown + Group_TabBodies(Tab_Home+Tab_Shop+Tab_Ranking) + TabBar; wires LobbyWireframeController + LobbyTabController, including RankingCard prefab refs |
+| `ProjectLinkUIBuilder.BuildRankingTab(...)` | method | creates Ranking title, existing ranking segment buttons, scroll content, and pinned my-rank container |
 | `ProjectLinkUIBuilder.AddStaminaGroup(hud,router)` | method | Group_Stamina (flexibleWidth=1, h=80) + slot_resource_bg bg Image + Stack_Stamina(Icon_Stamina+Txt_StaminaCount overlay) + Txt_StaminaTimer(MidlineLeft) |
 | `ProjectLinkUIBuilder.AddCurrencyGroup(hud)` | method | Group_Currency (w=160, h=80) + slot_resource_bg bg Image + Icon_Currency + Txt_CurrencyCount(MidlineLeft) |
 | `ProjectLinkUIBuilder.BuildGame(...)` | method | HUD_Top(Row_TopBar+Row_Objectives) + Toolbar_Items (4 ItemSlot_1..4 each with Img_Icon+Txt_Count+Button); Row_Objectives contains Txt_Pipe (pipe counter, flexibleWidth=1) + Txt_Moves; assigns pipeCounterText, levelLabelText, moveCounterText, item1..4Button and item1..4CountText to GameWireframeController; no persistent onClick listener (InGameHUD.InitItemToolbar handles binding) |
@@ -63,3 +65,4 @@
 - TabBar buttons: no `Indicator` child. Selected state driven entirely by `LobbyTabController.SetTabVisual` (bold + scale). VLG has 8 px bottom padding to prevent text descender clipping.
 - All builder-created TMP center alignment uses `TextAlignmentOptions.Midline` (geometry center, TMP 3.x); left/right variants use `MidlineLeft`/`MidlineRight`. Never use bare `Center` (= bounding-box Middle, visually different).
 - Star images in popup Group_Stars use skin keys `slot_star_on` (earned) / `slot_star_off` (empty). Builder pre-creates three `Img_Star_0/1/2` Image slots; runtime popups update them in-place or fallback to dynamic creation. Popups expose `[SerializeField] Sprite starOnSprite, starOffSprite` assigned by builder from UISpriteSkin.
+- Ranking tab/cards use UISpriteSkin keys `slot_ranking_card`, `slot_rank_avatar_frame`, `slot_rank_segment_bg`, `slot_rank_segment_selected`, `slot_rank_segment_idle`, and `slot_rank_medal_1/2/3`.

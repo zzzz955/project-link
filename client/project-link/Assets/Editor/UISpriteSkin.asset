@@ -63,6 +63,22 @@ MonoBehaviour:
     sprite: {fileID: 0}
   - elementName: slot_progress_track
     sprite: {fileID: 21300000, guid: 735b46c0a8560584692f9334eebce80f, type: 3}
+  - elementName: slot_rank_avatar_frame
+    sprite: {fileID: 0}
+  - elementName: slot_rank_medal_1
+    sprite: {fileID: 0}
+  - elementName: slot_rank_medal_2
+    sprite: {fileID: 0}
+  - elementName: slot_rank_medal_3
+    sprite: {fileID: 0}
+  - elementName: slot_rank_segment_bg
+    sprite: {fileID: 0}
+  - elementName: slot_rank_segment_idle
+    sprite: {fileID: 0}
+  - elementName: slot_rank_segment_selected
+    sprite: {fileID: 0}
+  - elementName: slot_ranking_card
+    sprite: {fileID: 0}
   - elementName: slot_provider_apple
     sprite: {fileID: 21300000, guid: f82a12c6bbcdb4a4e8c364cfbd504c0f, type: 3}
   - elementName: slot_provider_google

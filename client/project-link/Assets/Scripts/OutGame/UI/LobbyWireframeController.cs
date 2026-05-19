@@ -31,6 +31,7 @@ namespace ProjectLink.OutGame.UI
         [SerializeField] TextMeshProUGUI rankingErrorText;
         [SerializeField] RectTransform shopContent;
         [SerializeField] RectTransform rankingContent;
+        [SerializeField] RectTransform rankingPinnedRoot;
         [SerializeField] Button playButton;
         [SerializeField] Button refillButton;
         [SerializeField] Button previousStageButton;
@@ -59,6 +60,9 @@ namespace ProjectLink.OutGame.UI
         [SerializeField] ShopProductCard shopProductCardPrefab;
         [SerializeField] ShopInventoryStrip shopInventoryStrip;
         [SerializeField] Sprite[] itemIconSprites;
+        [SerializeField] RankingCard rankingCardPrefab;
+        [SerializeField] Sprite[] rankingTopSprites;
+        [SerializeField] Sprite defaultRankingAvatarSprite;
         DateTimeOffset? _nextRechargeAt;
         float _nextTimerRefreshAt;
         RectTransform _centerStageNode;
@@ -116,6 +120,8 @@ namespace ProjectLink.OutGame.UI
         {
             RefreshStaminaTimer();
             RefreshPlayState(_viewModel?.Lobby);
+            if (_viewModel?.Ranking != null)
+                ApplyRanking(_viewModel.Ranking);
         }
 
         void Update()
@@ -305,24 +311,70 @@ namespace ProjectLink.OutGame.UI
             for (int i = 0; i < ranking.Entries.Count; i++)
             {
                 var entry = ranking.Entries[i];
-                AddRow(rankingContent, $"Rank_{entry.Rank}", $"#{entry.Rank} {entry.DisplayName}", FormatNumber(entry.Value), entry.IsMe);
+                AddRankingCard(rankingContent, entry, false);
             }
 
             if (ranking.MyRank != null)
             {
-                SetText(_pinnedRankText, $"#{ranking.MyRank.Rank}");
-                SetText(_pinnedScoreText, FormatNumber(ranking.MyRank.Value));
-                var name = ranking.MyRank.DisplayName;
-                SetText(_pinnedYouText, string.IsNullOrEmpty(name)
-                    ? LocalizationManager.Get("popup.account.guest")
-                    : name);
+                RenderPinnedRank(ranking.MyRank);
             }
             else
             {
+                ClearChildren(rankingPinnedRoot);
                 SetText(_pinnedRankText, "#--");
                 SetText(_pinnedScoreText, "0");
                 SetText(_pinnedYouText, LocalizationManager.Get("popup.account.guest"));
             }
+        }
+
+        void AddRankingCard(RectTransform parent, RankingEntry entry, bool pinned)
+        {
+            if (parent == null) return;
+
+            if (rankingCardPrefab == null)
+            {
+                AddRow(parent, $"Rank_{entry.Rank}", FormatRank(entry.Rank), $"{entry.DisplayName}  {FormatNumber(entry.Value)}", entry.IsMe || pinned);
+                return;
+            }
+
+            var card = Instantiate(rankingCardPrefab, parent);
+            card.name = pinned ? "Rank_My" : $"Rank_{entry.Rank}";
+            card.Init(entry.Rank, entry.DisplayName, entry.Value, GetRankSprite(entry.Rank), GetAvatarSprite(entry.AvatarId), entry.IsMe || pinned);
+        }
+
+        void RenderPinnedRank(RankingEntry entry)
+        {
+            if (rankingPinnedRoot != null && rankingCardPrefab != null)
+            {
+                ClearChildren(rankingPinnedRoot);
+                AddRankingCard(rankingPinnedRoot, entry, true);
+                return;
+            }
+
+            SetText(_pinnedRankText, FormatRank(entry.Rank));
+            SetText(_pinnedScoreText, FormatNumber(entry.Value));
+            SetText(_pinnedYouText, string.IsNullOrEmpty(entry.DisplayName)
+                ? LocalizationManager.Get("popup.account.guest")
+                : entry.DisplayName);
+        }
+
+        Sprite GetRankSprite(int rank)
+        {
+            if (rankingTopSprites == null || rank < 1 || rank > rankingTopSprites.Length)
+                return null;
+            return rankingTopSprites[rank - 1];
+        }
+
+        Sprite GetAvatarSprite(int avatarId)
+        {
+            var avatar = _catalog?.FindAvatar(avatarId);
+            if (!string.IsNullOrEmpty(avatar?.iconPath))
+            {
+                var sprite = Resources.Load<Sprite>(avatar.iconPath);
+                if (sprite != null)
+                    return sprite;
+            }
+            return defaultRankingAvatarSprite;
         }
 
         void ResolveMissingReferences()
@@ -336,10 +388,11 @@ namespace ProjectLink.OutGame.UI
             streakBadge ??= GetComponentInChildren<StreakChallengeBadge>(true);
             playDisabledReasonText ??= FindText("Txt_PlayDisabled");
             shopBalanceText ??= FindTextInParent("Row_Balance", "Txt_Balance") ?? FindText("Txt_Balance");
-            rankingMetricText ??= FindText("Txt_Score");
             rankingErrorText ??= FindText("Txt_RankError");
             shopContent ??= FindRectInPanel("Tab_Shop", "Content") ?? FindRect("Content");
             rankingContent ??= FindRectInPanel("Tab_Ranking", "Content") ?? FindRect("Content");
+            rankingPinnedRoot ??= FindRectInPanel("Tab_Ranking", "Row_MyRank_Pinned");
+            rankingCardPrefab ??= Resources.Load<RankingCard>("Prefabs/UI/RankingCard");
             playButton ??= FindButton("Btn_Play");
             refillButton ??= FindButton("Btn_Refill");
             previousStageButton ??= FindButton("Btn_Prev");
@@ -350,7 +403,55 @@ namespace ProjectLink.OutGame.UI
             _pinnedYouText ??= FindTextInParent("Row_MyRank_Pinned", "Txt_You");
             _pinnedScoreText ??= FindTextInParent("Row_MyRank_Pinned", "Txt_Score");
             shopInventoryStrip ??= GetComponentInChildren<ShopInventoryStrip>(true);
+            EnsureRankingRuntimeLayout();
             EnsureSideStageNodes();
+        }
+
+        void EnsureRankingRuntimeLayout()
+        {
+            var rankingTab = FindRectInPanel("Tab_Ranking", "Tab_Ranking") ?? FindRect("Tab_Ranking");
+            if (rankingTab == null)
+                return;
+
+            if (rankingTab.Find("Txt_RankingTitle") == null)
+            {
+                var title = new GameObject("Txt_RankingTitle", typeof(RectTransform), typeof(TextMeshProUGUI));
+                title.transform.SetParent(rankingTab, false);
+                var rect = title.GetComponent<RectTransform>();
+                rect.anchorMin = new Vector2(0f, 1f);
+                rect.anchorMax = new Vector2(1f, 1f);
+                rect.pivot = new Vector2(0.5f, 1f);
+                rect.sizeDelta = new Vector2(0f, 88f);
+                rect.anchoredPosition = new Vector2(0f, -28f);
+                var text = title.GetComponent<TextMeshProUGUI>();
+                text.fontSize = 58f;
+                text.fontStyle = FontStyles.Bold;
+                text.color = Color.white;
+                text.alignment = TextAlignmentOptions.Midline;
+                text.raycastTarget = false;
+                title.AddComponent<LocalizedText>().SetStringId("rank.title");
+            }
+
+            var seg = rankingTab.Find("Seg_Mode") as RectTransform;
+            if (seg != null)
+                seg.anchoredPosition = new Vector2(0f, -124f);
+
+            if (rankingErrorText != null)
+                rankingErrorText.rectTransform.anchoredPosition = new Vector2(0f, -216f);
+
+            var scrollList = rankingTab.Find("ScrollList") as RectTransform;
+            if (scrollList != null)
+            {
+                scrollList.offsetMin = new Vector2(16f, 160f);
+                scrollList.offsetMax = new Vector2(-16f, -232f);
+            }
+
+            if (rankingPinnedRoot != null)
+            {
+                rankingPinnedRoot.sizeDelta = new Vector2(0f, 184f);
+                rankingPinnedRoot.offsetMin = new Vector2(16f, 16f);
+                rankingPinnedRoot.offsetMax = new Vector2(-16f, 200f);
+            }
         }
 
         void AddLobbyPressEffects()
@@ -751,6 +852,17 @@ namespace ProjectLink.OutGame.UI
             return null;
         }
 
+        static bool IsChildOf(Transform transform, string parentName)
+        {
+            while (transform != null)
+            {
+                if (transform.name == parentName)
+                    return true;
+                transform = transform.parent;
+            }
+            return false;
+        }
+
         static void AddSectionHeader(RectTransform parent, string name, string label)
         {
             if (parent == null) return;
@@ -912,6 +1024,12 @@ namespace ProjectLink.OutGame.UI
         static string FormatNumber(long value)
         {
             return value.ToString("N0", CultureInfo.InvariantCulture);
+        }
+
+        static string FormatRank(int rank)
+        {
+            if (rank <= 0) return "--";
+            return rank >= 1000 ? "1000+" : rank.ToString(CultureInfo.InvariantCulture);
         }
 
         IEnumerator AnimateCount(TextMeshProUGUI label, long target, float duration, Func<long, string> formatter)

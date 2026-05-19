@@ -36,6 +36,8 @@ shop.section_stamina,Stamina,스태미나,体力,體力,สตามินา
 rank.tab_clear,Stages Cleared,클리어한 스테이지,已通关关卡,已通關關卡,ด่านที่ผ่านแล้ว
 rank.tab_score,Total Score,총점,总分,總分,คะแนนรวม
 rank.you,You,나,你,你,คุณ
+rank.title,RANKING,랭킹,排行榜,排行榜,อันดับ
+rank.level,Level,레벨,等级,等級,เลเวล
 popup.force_update.title,Update Required,업데이트 필요,需要更新,需要更新,จำเป็นต้องอัปเดต
 popup.force_update.body,A new version is required to continue.,계속하려면 새 버전이 필요합니다.,需要新版本才能继续。,需要新版本才能繼續。,ต้องใช้เวอร์ชันใหม่เพื่อดำเนินการต่อ
 popup.force_update.cta,Update Now,지금 업데이트,立即更新,立即更新,อัปเดตตอนนี้

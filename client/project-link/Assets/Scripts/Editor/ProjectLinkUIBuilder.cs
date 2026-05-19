@@ -187,6 +187,7 @@ namespace ProjectLink.EditorTools
             BuildShopItemConfirmPopup();
             BuildShopItemResultPopup();
             CreateShopProductCardPrefab();
+            CreateRankingCardPrefab();
 
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
@@ -692,10 +693,10 @@ namespace ProjectLink.EditorTools
             Assign(lobbyCtrl, "colorCupTimerText",    FindTmpInChildren(tabHome, "Txt_Ends"));
             Assign(lobbyCtrl, "playDisabledReasonText", FindTmpInChildren(tabHome, "Txt_PlayDisabled"));
             Assign(lobbyCtrl, "shopBalanceText",      FindTmpInChildren(tabShop, "Txt_Balance"));
-            Assign(lobbyCtrl, "rankingMetricText",    FindTmpInChildren(tabRanking, "Txt_Score"));
             Assign(lobbyCtrl, "rankingErrorText",     FindTmpInChildren(tabRanking, "Txt_RankError"));
             Assign(lobbyCtrl, "shopContent",          FindRectInChildren(tabShop, "Content"));
             Assign(lobbyCtrl, "rankingContent",       FindRectInChildren(tabRanking, "Content"));
+            Assign(lobbyCtrl, "rankingPinnedRoot",    FindRectInChildren(tabRanking, "Row_MyRank_Pinned"));
 
             // ShopProductCard prefab + inventory strip + item icon sprites
             var cardPrefab = AssetDatabase.LoadAssetAtPath<ShopProductCard>($"{PopupPrefabRoot}/ShopProductCard.prefab");
@@ -711,6 +712,16 @@ namespace ProjectLink.EditorTools
                 LoadSkin()?.Get("slot_item_3"),
                 LoadSkin()?.Get("slot_item_4"),
             });
+            var rankingPrefab = AssetDatabase.LoadAssetAtPath<RankingCard>($"{PopupPrefabRoot}/RankingCard.prefab");
+            if (rankingPrefab != null)
+                Assign(lobbyCtrl, "rankingCardPrefab", rankingPrefab);
+            AssignSpriteArray(lobbyCtrl, "rankingTopSprites", new[]
+            {
+                LoadSkin()?.Get("slot_rank_medal_1"),
+                LoadSkin()?.Get("slot_rank_medal_2"),
+                LoadSkin()?.Get("slot_rank_medal_3"),
+            });
+            Assign(lobbyCtrl, "defaultRankingAvatarSprite", LoadSkin()?.Get("slot_avatar"));
 
             AddLobbyTabController(safe.gameObject,
                 shopTabBtn, homeTabBtn, rankTabBtn,
@@ -1032,13 +1043,28 @@ namespace ProjectLink.EditorTools
             Stretch(tab);
             tab.gameObject.SetActive(false);
 
+            var title = MakeChild(tab, "Txt_RankingTitle");
+            SetAnchor(title, new Vector2(0, 1), new Vector2(1, 1), new Vector2(0.5f, 1));
+            title.sizeDelta = new Vector2(0, 88);
+            title.anchoredPosition = new Vector2(0, -28);
+            var titleTmp = title.gameObject.AddComponent<TextMeshProUGUI>();
+            titleTmp.fontSize = 58;
+            titleTmp.fontStyle = FontStyles.Bold;
+            titleTmp.color = TextCol;
+            titleTmp.alignment = TextAlignmentOptions.Midline;
+            titleTmp.raycastTarget = false;
+            title.gameObject.AddComponent<LocalizedText>().SetStringId("rank.title");
+
             // Seg_Mode
             var seg = MakeChild(tab, "Seg_Mode");
             SetAnchor(seg, new Vector2(0, 1), new Vector2(1, 1), new Vector2(0.5f, 1));
             seg.sizeDelta = new Vector2(0, 80);
+            seg.anchoredPosition = new Vector2(0, -124);
             seg.offsetMin = new Vector2(80, seg.offsetMin.y);
             seg.offsetMax = new Vector2(-80, seg.offsetMax.y);
-            seg.gameObject.AddComponent<Image>().color = HexColor("#FFFFFF11");
+            var segImg = seg.gameObject.AddComponent<Image>();
+            segImg.color = HexColor("#1D83CDEE");
+            ApplySkin(segImg, "slot_rank_segment_bg", false);
             var segHlg = seg.gameObject.AddComponent<HorizontalLayoutGroup>();
             segHlg.spacing = 0; segHlg.childAlignment = TextAnchor.MiddleCenter;
             segHlg.childControlWidth = true; segHlg.childControlHeight = true;
@@ -1050,7 +1076,7 @@ namespace ProjectLink.EditorTools
             var rankError = MakeChild(tab, "Txt_RankError");
             SetAnchor(rankError, new Vector2(0.5f, 1), new Vector2(0.5f, 1), new Vector2(0.5f, 1));
             rankError.sizeDelta = new Vector2(600, 48);
-            rankError.anchoredPosition = new Vector2(0, -96);
+            rankError.anchoredPosition = new Vector2(0, -216);
             var reTmp = rankError.gameObject.AddComponent<TextMeshProUGUI>();
             reTmp.text = ""; reTmp.fontSize = 22; reTmp.color = Danger;
             reTmp.alignment = TextAlignmentOptions.Midline;
@@ -1059,21 +1085,23 @@ namespace ProjectLink.EditorTools
             // ScrollList
             var scrollList = MakeChild(tab, "ScrollList");
             SetAnchor(scrollList, Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f));
-            scrollList.offsetMin = new Vector2(16, 120);
-            scrollList.offsetMax = new Vector2(-16, -96);
+            scrollList.offsetMin = new Vector2(16, 160);
+            scrollList.offsetMax = new Vector2(-16, -232);
             var scrollRect = scrollList.gameObject.AddComponent<ScrollRect>();
             scrollRect.vertical = true; scrollRect.horizontal = false;
 
             var viewport = MakeChild(scrollList, "Viewport");
             Stretch(viewport);
-            viewport.gameObject.AddComponent<Image>().color = new Color(0, 0, 0, 1f);
+            viewport.gameObject.AddComponent<Image>().color = new Color(0, 0, 0, 255);
             viewport.gameObject.AddComponent<Mask>().showMaskGraphic = false;
 
             var content = MakeChild(viewport, "Content");
             SetAnchor(content, new Vector2(0, 1), new Vector2(1, 1), new Vector2(0.5f, 1));
             content.offsetMin = Vector2.zero; content.offsetMax = Vector2.zero;
             var contentVlg = content.gameObject.AddComponent<VerticalLayoutGroup>();
-            contentVlg.spacing = 8; contentVlg.childControlWidth = true; contentVlg.childControlHeight = true;
+            contentVlg.spacing = 16;
+            contentVlg.padding = new RectOffset(0, 0, 8, 8);
+            contentVlg.childControlWidth = true; contentVlg.childControlHeight = true;
             content.gameObject.AddComponent<ContentSizeFitter>().verticalFit =
                 ContentSizeFitter.FitMode.PreferredSize;
 
@@ -1083,38 +1111,37 @@ namespace ProjectLink.EditorTools
             // Row_MyRank_Pinned
             var myRank = MakeChild(tab, "Row_MyRank_Pinned");
             SetAnchor(myRank, new Vector2(0, 0), new Vector2(1, 0), new Vector2(0.5f, 0));
-            myRank.sizeDelta = new Vector2(0, 96);
+            myRank.sizeDelta = new Vector2(0, 184);
             myRank.offsetMin = new Vector2(16, 16);
-            myRank.offsetMax = new Vector2(-16, 112);
-            var mrImg = myRank.gameObject.AddComponent<Image>();
-            mrImg.color = HexColor("#7B2FBE40");
-            var mrHlg = myRank.gameObject.AddComponent<HorizontalLayoutGroup>();
-            mrHlg.spacing = 16; mrHlg.padding = new RectOffset(16, 16, 8, 8);
-            mrHlg.childAlignment = TextAnchor.MiddleLeft;
-            mrHlg.childControlWidth = true; mrHlg.childControlHeight = true;
+            myRank.offsetMax = new Vector2(-16, 200);
+            var myVlg = myRank.gameObject.AddComponent<VerticalLayoutGroup>();
+            myVlg.spacing = 0;
+            myVlg.padding = new RectOffset(0, 0, 0, 0);
+            myVlg.childAlignment = TextAnchor.MiddleCenter;
+            myVlg.childControlWidth = true;
+            myVlg.childControlHeight = true;
 
             var rankTxt = MakeChild(myRank, "Txt_Rank");
-            rankTxt.sizeDelta = new Vector2(64, 48);
+            rankTxt.sizeDelta = new Vector2(0, 0);
             var rtTmp = rankTxt.gameObject.AddComponent<TextMeshProUGUI>();
-            rtTmp.text = "#--"; rtTmp.fontSize = 28; rtTmp.fontStyle = FontStyles.Bold; rtTmp.color = TextCol;
+            rtTmp.text = "#--"; rtTmp.fontSize = 1; rtTmp.fontStyle = FontStyles.Bold; rtTmp.color = TextCol;
             rtTmp.alignment = TextAlignmentOptions.MidlineLeft;
-            rankTxt.gameObject.AddComponent<LayoutElement>().preferredWidth = 64;
+            rankTxt.gameObject.SetActive(false);
 
             var youTxt = MakeChild(myRank, "Txt_You");
-            youTxt.sizeDelta = new Vector2(0, 48);
+            youTxt.sizeDelta = new Vector2(0, 0);
             var ytTmp = youTxt.gameObject.AddComponent<TextMeshProUGUI>();
-            ytTmp.fontSize = 28; ytTmp.fontStyle = FontStyles.Bold; ytTmp.color = AccentB;
+            ytTmp.fontSize = 1; ytTmp.fontStyle = FontStyles.Bold; ytTmp.color = AccentB;
             ytTmp.alignment = TextAlignmentOptions.MidlineLeft;
             youTxt.gameObject.AddComponent<LocalizedFont>();
-            var youLE = youTxt.gameObject.AddComponent<LayoutElement>();
-            youLE.flexibleWidth = 1;
+            youTxt.gameObject.SetActive(false);
 
             var scoreTxt = MakeChild(myRank, "Txt_Score");
-            scoreTxt.sizeDelta = new Vector2(140, 48);
+            scoreTxt.sizeDelta = new Vector2(0, 0);
             var stTmp = scoreTxt.gameObject.AddComponent<TextMeshProUGUI>();
-            stTmp.text = "0"; stTmp.fontSize = 28; stTmp.color = TextCol;
+            stTmp.text = "0"; stTmp.fontSize = 1; stTmp.color = TextCol;
             stTmp.alignment = TextAlignmentOptions.MidlineRight;
-            scoreTxt.gameObject.AddComponent<LayoutElement>().preferredWidth = 140;
+            scoreTxt.gameObject.SetActive(false);
 
             return tab;
         }
@@ -1125,6 +1152,7 @@ namespace ProjectLink.EditorTools
             Stretch(go);
             var img = go.gameObject.AddComponent<Image>();
             img.color = new Color(0, 0, 0, 0);
+            ApplySkin(img, name == "Seg_Clear" ? "slot_rank_segment_selected" : "slot_rank_segment_idle", false);
             go.gameObject.AddComponent<Button>().targetGraphic = img;
             // TMP must be on a child — Image and TextMeshProUGUI cannot share a GO
             var lbl = MakeChild(go, "Lbl");
@@ -2164,6 +2192,119 @@ namespace ProjectLink.EditorTools
             RestoreIfUnchanged(cardPath, prevCard);
         }
 
+        static void CreateRankingCardPrefab()
+        {
+            EnsureFolder("Assets/Resources/Prefabs");
+            EnsureFolder("Assets/Resources/Prefabs/UI");
+
+            var root = new GameObject("RankingCard", typeof(RectTransform), typeof(Image), typeof(HorizontalLayoutGroup), typeof(LayoutElement));
+            var rootRect = root.GetComponent<RectTransform>();
+            SetAnchor(rootRect, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f));
+            rootRect.sizeDelta = new Vector2(1000f, 168f);
+            var rootImg = root.GetComponent<Image>();
+            rootImg.color = new Color(0.98f, 0.91f, 0.82f, 0.96f);
+            ApplySkin(rootImg, "slot_ranking_card", false);
+            var rootLayout = root.GetComponent<HorizontalLayoutGroup>();
+            rootLayout.spacing = 18f;
+            rootLayout.padding = new RectOffset(18, 22, 16, 16);
+            rootLayout.childAlignment = TextAnchor.MiddleLeft;
+            rootLayout.childControlWidth = true;
+            rootLayout.childControlHeight = true;
+            var rootLe = root.GetComponent<LayoutElement>();
+            rootLe.preferredHeight = 168f;
+            rootLe.flexibleWidth = 1f;
+
+            var rankSlot = MakeChild(rootRect, "Slot_Rank");
+            rankSlot.sizeDelta = new Vector2(76f, 112f);
+            var rankLe = rankSlot.gameObject.AddComponent<LayoutElement>();
+            rankLe.preferredWidth = 76f;
+            rankLe.preferredHeight = 112f;
+
+            var rankImage = MakeChild(rankSlot, "Img_Rank");
+            Stretch(rankImage);
+            var rankImg = rankImage.gameObject.AddComponent<Image>();
+            rankImg.color = new Color(1f, 1f, 1f, 0f);
+            rankImg.preserveAspect = true;
+
+            var rankText = MakeChild(rankSlot, "Txt_Rank");
+            Stretch(rankText);
+            var rankTmp = rankText.gameObject.AddComponent<TextMeshProUGUI>();
+            rankTmp.text = "--";
+            rankTmp.fontSize = 38f;
+            rankTmp.fontStyle = FontStyles.Bold;
+            rankTmp.color = HexColor("#5E4B57");
+            rankTmp.alignment = TextAlignmentOptions.Midline;
+            rankTmp.raycastTarget = false;
+            rankText.gameObject.AddComponent<LocalizedFont>();
+
+            var nameText = MakeChild(rootRect, "Txt_DisplayName");
+            nameText.sizeDelta = new Vector2(0, 88f);
+            var nameTmp = nameText.gameObject.AddComponent<TextMeshProUGUI>();
+            nameTmp.text = "Player";
+            nameTmp.fontSize = 36f;
+            nameTmp.fontStyle = FontStyles.Bold;
+            nameTmp.color = HexColor("#073653");
+            nameTmp.alignment = TextAlignmentOptions.MidlineLeft;
+            nameTmp.enableAutoSizing = true;
+            nameTmp.fontSizeMin = 36f;
+            nameTmp.fontSizeMax = 48f;
+            nameTmp.raycastTarget = false;
+            var nameLe = nameText.gameObject.AddComponent<LayoutElement>();
+            nameLe.minWidth = 100f;
+            nameLe.preferredWidth = 400f;
+            nameLe.flexibleWidth = 1f;
+            nameText.gameObject.AddComponent<LocalizedFont>();
+
+            var levelGroup = MakeChild(rootRect, "Group_Level");
+            levelGroup.sizeDelta = new Vector2(176f, 112f);
+            levelGroup.gameObject.AddComponent<LayoutElement>().preferredWidth = 176f;
+            var levelVlg = levelGroup.gameObject.AddComponent<VerticalLayoutGroup>();
+            levelVlg.spacing = 0;
+            levelVlg.childAlignment = TextAnchor.MiddleRight;
+            levelVlg.childControlWidth = true;
+            levelVlg.childControlHeight = true;
+
+            var levelLabel = MakeChild(levelGroup, "Txt_LevelLabel");
+            levelLabel.sizeDelta = new Vector2(176f, 42f);
+            var levelLabelTmp = levelLabel.gameObject.AddComponent<TextMeshProUGUI>();
+            levelLabelTmp.fontSize = 26f;
+            levelLabelTmp.fontStyle = FontStyles.Bold;
+            levelLabelTmp.color = HexColor("#073653");
+            levelLabelTmp.alignment = TextAlignmentOptions.MidlineRight;
+            levelLabelTmp.raycastTarget = false;
+            levelLabel.gameObject.AddComponent<LocalizedFont>();
+
+            var levelValue = MakeChild(levelGroup, "Txt_LevelValue");
+            levelValue.sizeDelta = new Vector2(176f, 64f);
+            var levelValueTmp = levelValue.gameObject.AddComponent<TextMeshProUGUI>();
+            levelValueTmp.text = "0";
+            levelValueTmp.fontSize = 44f;
+            levelValueTmp.fontStyle = FontStyles.Bold;
+            levelValueTmp.color = HexColor("#7B5560");
+            levelValueTmp.alignment = TextAlignmentOptions.MidlineRight;
+            levelValueTmp.enableAutoSizing = true;
+            levelValueTmp.fontSizeMin = 24f;
+            levelValueTmp.fontSizeMax = 44f;
+            levelValueTmp.raycastTarget = false;
+            levelValue.gameObject.AddComponent<LocalizedFont>();
+
+            var card = root.AddComponent<RankingCard>();
+            Assign(card, "rankText",        FindTmpInChildren(rootRect, "Txt_Rank"));
+            Assign(card, "rankImage",       rankImg);
+            Assign(card, "displayNameText", nameTmp);
+            Assign(card, "levelLabelText",  levelLabelTmp);
+            Assign(card, "levelValueText",  levelValueTmp);
+            Assign(card, "backgroundImage", rootImg);
+
+            EnsureLocalizedFonts(root);
+
+            string cardPath = $"{PopupPrefabRoot}/RankingCard.prefab";
+            string prevCard = System.IO.File.Exists(cardPath) ? System.IO.File.ReadAllText(cardPath) : null;
+            PrefabUtility.SaveAsPrefabAsset(root, cardPath);
+            Object.DestroyImmediate(root);
+            RestoreIfUnchanged(cardPath, prevCard);
+        }
+
         static void SavePopupPrefab(GameObject root, string prefabName)
         {
             NormalizeLayoutText(root);
@@ -2613,34 +2754,43 @@ namespace ProjectLink.EditorTools
         // ─── Misc ─────────────────────────────────────────────────────────
 
         // ─── FileID-stable save helpers ──────────────────────────────────
-        // Unity assigns new fileIDs every time objects are destroyed and recreated.
-        // These helpers detect whether a rebuild produced only fileID churn (no real
-        // structural change) and restore the original file in that case, so git diff
-        // only shows genuinely modified scenes/prefabs.
+        // Unity assigns new fileIDs every time objects are destroyed and recreated,
+        // and serializes objects sorted by fileID (ascending). Because fileIDs are
+        // random, the same logical hierarchy produces a different object ORDER in
+        // the YAML each build. A simple line-by-line comparison therefore fails
+        // even when nothing structural changed.
+        //
+        // Fix: split the YAML into per-object blocks, replace all numeric fileID
+        // values (anchors & refs) with a stable placeholder, sort the blocks, then
+        // compare the sorted lists. Order-independence means the same structure
+        // always produces the same sorted signature regardless of fileID values.
 
         static bool ContentMatchesIgnoringFileIds(string newContent, string oldContent)
-            => NormalizeYamlFileIds(newContent) == NormalizeYamlFileIds(oldContent);
-
-        static string NormalizeYamlFileIds(string yaml)
         {
-            var idMap = new System.Collections.Generic.Dictionary<string, string>();
-            int counter = 0;
+            var a = GetSortedBlockSignatures(newContent);
+            var b = GetSortedBlockSignatures(oldContent);
+            if (a.Count != b.Count) return false;
+            for (int i = 0; i < a.Count; i++)
+                if (a[i] != b[i]) return false;
+            return true;
+        }
 
-            string MapId(string id)
+        static System.Collections.Generic.List<string> GetSortedBlockSignatures(string yaml)
+        {
+            yaml = yaml.Replace("\r\n", "\n").Replace("\r", "\n");
+            var sigs = new System.Collections.Generic.List<string>();
+            // "\n--- " is the Unity YAML block separator; splitting on it gives one
+            // part per object block (the header line loses the "--- " prefix, which
+            // is fine — the class ID !u!NNN is still present and stable).
+            foreach (var part in yaml.Split(new[] { "\n--- " }, System.StringSplitOptions.None))
             {
-                if (!idMap.TryGetValue(id, out var n))
-                    idMap[id] = n = (++counter).ToString();
-                return n;
+                if (string.IsNullOrWhiteSpace(part)) continue;
+                var sig = System.Text.RegularExpressions.Regex.Replace(part, @"&\d+", "&ID");
+                sig = System.Text.RegularExpressions.Regex.Replace(sig, @"fileID: -?\d+", "fileID: ID");
+                sigs.Add(sig.Trim());
             }
-
-            // YAML anchors:  --- !u!NNN &1234567890
-            yaml = System.Text.RegularExpressions.Regex.Replace(
-                yaml, @"&(\d+)", m => $"&{MapId(m.Groups[1].Value)}");
-            // fileID references: {fileID: 1234567890, ...}
-            yaml = System.Text.RegularExpressions.Regex.Replace(
-                yaml, @"fileID: (-?\d+)", m => $"fileID: {MapId(m.Groups[1].Value)}");
-
-            return yaml;
+            sigs.Sort(System.StringComparer.Ordinal);
+            return sigs;
         }
 
         static void RestoreIfUnchanged(string path, string previousContent)

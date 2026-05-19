@@ -7,6 +7,11 @@
 | `ProjectLinkUIImageResourceExtractor.cs` | `ProjectLinkUIImageResourceExtractor` | [MenuItem] batch-loads transparent UI images in a scrollable editor window, parses alpha-connected resource elements, previews them, saves numbered PNG sprites |
 | `ClearPlayerPrefs.cs` | `PlayerPrefsResetMenu` | [MenuItem] clears all PlayerPrefs for local reset/debug |
 | `UISpriteSkin.cs` | `UISpriteSkin` | ScriptableObject; maps element names → Sprite for all static UI images; asset lives at `Assets/Editor/UISpriteSkin.asset` |
+| `UIBaselineSnapshot.cs` | `UIBaselineSnapshot` | ScriptableObject; clean-build hierarchy snapshot (target/path/comp/key→val); `Assets/Editor/UIBaselineSnapshot.asset` |
+| `UIOverrideManifest.cs` | `UIOverrideManifest` | ScriptableObject; pending/promoted override entries; also writes `Assets/Editor/UIOverrideManifest.json` for AI agent |
+| `UIPropertySerializer.cs` | `UIPropertySerializer` | Static; get/set tracked component properties (RectTransform, Image, TMP, LayoutGroup, etc.) as strings |
+| `ProjectLinkUIOverrideCapture.cs` | `ProjectLinkUIOverrideCapture` | [MenuItem] CaptureAllOverrides, ClearPromoted |
+| `ProjectLinkUIOverrideCapture.cs` | `ProjectLinkUIOverrideApply` | Called by Builder; SnapshotAndApplyScene/Prefab — save baseline then re-apply pending prop overrides |
 
 ## Symbols
 | symbol | kind | note |
@@ -45,6 +50,16 @@
 | `ProjectLinkUIImageResourceExtractor.ParseAllSources()` | method | parses every added image into alpha-connected resource components |
 | `ProjectLinkUIImageResourceExtractor.AddDraggedItems()` | method | accepts multiple dragged Texture assets, image files, or image folders |
 | `ProjectLinkUIImageResourceExtractor.SaveResources()` | method | saves parsed previews as `baseFileName_1.png` style PNG files |
+| `ProjectLinkUIOverrideCapture.CaptureAllOverrides()` | method | [MenuItem] diffs all scenes+prefabs vs baseline → writes manifest; replaces all pending entries fresh each run |
+| `ProjectLinkUIOverrideCapture.ClearPromoted()` | method | [MenuItem] removes entries with status="promoted" from manifest |
+| `ProjectLinkUIOverrideApply.SnapshotAndApplyScene(sceneName)` | method | called by BuildScene; saves clean-build baseline then applies pending prop overrides to active scene |
+| `ProjectLinkUIOverrideApply.SnapshotAndApplyPrefab(root,prefabName)` | method | called by SavePopupPrefab; saves clean-build baseline then applies pending prop overrides to in-memory prefab root |
+| `UIBaselineSnapshot.TryGet(target,path,comp,key,val)` | method | lookup in index; returns false if not found |
+| `UIBaselineSnapshot.ContainsPath(target,path)` | method | true if any record exists for target+path (new_go detection) |
+| `UIBaselineSnapshot.GetPathsForTarget(target)` | method | returns all GO paths in baseline for a target (remove_go detection) |
+| `UIOverrideManifest.WriteJson()` | method | writes `Assets/Editor/UIOverrideManifest.json` — AI-readable manifest with id/target/method/path/op/comp/key/baseVal/currVal/status |
+| `UIPropertySerializer.Get(comp,key)` | method | serializes component property to string; returns null if comp/key not tracked |
+| `UIPropertySerializer.Set(comp,key,val)` | method | deserializes and applies string value to component property; returns false on failure |
 
 ## Cross-refs
 - Consumed by: Unity Editor only (not included in player builds)
@@ -66,3 +81,6 @@
 - All builder-created TMP center alignment uses `TextAlignmentOptions.Midline` (geometry center, TMP 3.x); left/right variants use `MidlineLeft`/`MidlineRight`. Never use bare `Center` (= bounding-box Middle, visually different).
 - Star images in popup Group_Stars use skin keys `slot_star_on` (earned) / `slot_star_off` (empty). Builder pre-creates three `Img_Star_0/1/2` Image slots; runtime popups update them in-place or fallback to dynamic creation. Popups expose `[SerializeField] Sprite starOnSprite, starOffSprite` assigned by builder from UISpriteSkin.
 - Ranking tab/cards use UISpriteSkin keys `slot_ranking_card`, `slot_rank_avatar_frame`, `slot_rank_segment_bg`, `slot_rank_segment_selected`, `slot_rank_segment_idle`, and `slot_rank_medal_1/2/3`.
+- UI Override system: BuildAllSceneUI saves clean-build baseline then re-applies manifest overrides — manual UI changes persist across builds automatically (prop ops only). new_go/remove_go ops require AI or manual promotion to builder code.
+- Override workflow: manual edit → CaptureAllOverrides → manifest updated → AI reads manifest+method hint → updates builder code → marks entry promoted → ClearPromoted.
+- Baseline (UIBaselineSnapshot.asset) + Manifest (UIOverrideManifest.asset/json) live in `Assets/Editor/`; never edit them directly.

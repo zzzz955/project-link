@@ -151,6 +151,7 @@ namespace ProjectLink.EditorTools
                 }
             }
 
+            AssetDatabase.SaveAssets();
             if (!Application.isBatchMode)
                 EditorSceneManager.OpenScene("Assets/Scenes/Bootstrap.unity", OpenSceneMode.Single);
         }
@@ -428,6 +429,7 @@ namespace ProjectLink.EditorTools
             NormalizeLayoutText(canvas);
             EnsureLocalizedFonts(canvas);
             AddAnimatorToIconImages(canvas);
+            ProjectLinkUIOverrideApply.SnapshotAndApplyScene(sceneName);
         }
 
         // ─── Bootstrap ────────────────────────────────────────────────────
@@ -2333,6 +2335,7 @@ namespace ProjectLink.EditorTools
             string path = $"{PopupPrefabRoot}/{prefabName}.prefab";
             string prev = System.IO.File.Exists(path) ? System.IO.File.ReadAllText(path) : null;
 
+            ProjectLinkUIOverrideApply.SnapshotAndApplyPrefab(root, prefabName);
             PrefabUtility.SaveAsPrefabAsset(root, path);
             Object.DestroyImmediate(root);
 

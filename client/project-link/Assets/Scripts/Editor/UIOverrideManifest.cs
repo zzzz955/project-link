@@ -23,6 +23,7 @@ namespace ProjectLink.EditorTools
         public class Entry
         {
             public string id;
+            public string stableId;   // hash(target+path) — stable across path renames if marker persists
             public string target;     // "Scene:Lobby" | "Prefab:SettingPopup"
             public string method;     // builder method name — grep target for AI
             public string path;       // full hierarchy path, "/" separator

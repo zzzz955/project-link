@@ -9003,6 +9003,571 @@ MonoBehaviour:
     comp: TextMeshProUGUI
     key: text
     val: popup.pause.title
+  - target: Prefab:RankingCard
+    path: RankingCard
+    comp: HorizontalLayoutGroup
+    key: childAlignment
+    val: 3
+  - target: Prefab:RankingCard
+    path: RankingCard
+    comp: HorizontalLayoutGroup
+    key: childForceExpandHeight
+    val: True
+  - target: Prefab:RankingCard
+    path: RankingCard
+    comp: HorizontalLayoutGroup
+    key: childForceExpandWidth
+    val: True
+  - target: Prefab:RankingCard
+    path: RankingCard
+    comp: HorizontalLayoutGroup
+    key: paddingBottom
+    val: 16
+  - target: Prefab:RankingCard
+    path: RankingCard
+    comp: HorizontalLayoutGroup
+    key: paddingLeft
+    val: 18
+  - target: Prefab:RankingCard
+    path: RankingCard
+    comp: HorizontalLayoutGroup
+    key: paddingRight
+    val: 22
+  - target: Prefab:RankingCard
+    path: RankingCard
+    comp: HorizontalLayoutGroup
+    key: paddingTop
+    val: 16
+  - target: Prefab:RankingCard
+    path: RankingCard
+    comp: HorizontalLayoutGroup
+    key: spacing
+    val: 18.00
+  - target: Prefab:RankingCard
+    path: RankingCard
+    comp: Image
+    key: color
+    val: '#FAE8D1F5'
+  - target: Prefab:RankingCard
+    path: RankingCard
+    comp: Image
+    key: preserveAspect
+    val: False
+  - target: Prefab:RankingCard
+    path: RankingCard
+    comp: Image
+    key: raycastTarget
+    val: True
+  - target: Prefab:RankingCard
+    path: RankingCard
+    comp: LayoutElement
+    key: flexibleHeight
+    val: -1.00
+  - target: Prefab:RankingCard
+    path: RankingCard
+    comp: LayoutElement
+    key: flexibleWidth
+    val: 1.00
+  - target: Prefab:RankingCard
+    path: RankingCard
+    comp: LayoutElement
+    key: ignoreLayout
+    val: False
+  - target: Prefab:RankingCard
+    path: RankingCard
+    comp: LayoutElement
+    key: minHeight
+    val: -1.00
+  - target: Prefab:RankingCard
+    path: RankingCard
+    comp: LayoutElement
+    key: minWidth
+    val: -1.00
+  - target: Prefab:RankingCard
+    path: RankingCard
+    comp: LayoutElement
+    key: preferredHeight
+    val: 168.00
+  - target: Prefab:RankingCard
+    path: RankingCard
+    comp: LayoutElement
+    key: preferredWidth
+    val: -1.00
+  - target: Prefab:RankingCard
+    path: RankingCard
+    comp: RectTransform
+    key: anchorMax
+    val: (0.5000,0.5000)
+  - target: Prefab:RankingCard
+    path: RankingCard
+    comp: RectTransform
+    key: anchorMin
+    val: (0.5000,0.5000)
+  - target: Prefab:RankingCard
+    path: RankingCard
+    comp: RectTransform
+    key: anchoredPosition
+    val: (0.0000,0.0000)
+  - target: Prefab:RankingCard
+    path: RankingCard
+    comp: RectTransform
+    key: pivot
+    val: (0.5000,0.5000)
+  - target: Prefab:RankingCard
+    path: RankingCard
+    comp: RectTransform
+    key: sizeDelta
+    val: (1000.0000,168.0000)
+  - target: Prefab:RankingCard
+    path: RankingCard/Group_Level
+    comp: LayoutElement
+    key: flexibleHeight
+    val: -1.00
+  - target: Prefab:RankingCard
+    path: RankingCard/Group_Level
+    comp: LayoutElement
+    key: flexibleWidth
+    val: -1.00
+  - target: Prefab:RankingCard
+    path: RankingCard/Group_Level
+    comp: LayoutElement
+    key: ignoreLayout
+    val: False
+  - target: Prefab:RankingCard
+    path: RankingCard/Group_Level
+    comp: LayoutElement
+    key: minHeight
+    val: -1.00
+  - target: Prefab:RankingCard
+    path: RankingCard/Group_Level
+    comp: LayoutElement
+    key: minWidth
+    val: -1.00
+  - target: Prefab:RankingCard
+    path: RankingCard/Group_Level
+    comp: LayoutElement
+    key: preferredHeight
+    val: -1.00
+  - target: Prefab:RankingCard
+    path: RankingCard/Group_Level
+    comp: LayoutElement
+    key: preferredWidth
+    val: 176.00
+  - target: Prefab:RankingCard
+    path: RankingCard/Group_Level
+    comp: RectTransform
+    key: anchorMax
+    val: (0.5000,0.5000)
+  - target: Prefab:RankingCard
+    path: RankingCard/Group_Level
+    comp: RectTransform
+    key: anchorMin
+    val: (0.5000,0.5000)
+  - target: Prefab:RankingCard
+    path: RankingCard/Group_Level
+    comp: RectTransform
+    key: anchoredPosition
+    val: (0.0000,0.0000)
+  - target: Prefab:RankingCard
+    path: RankingCard/Group_Level
+    comp: RectTransform
+    key: pivot
+    val: (0.5000,0.5000)
+  - target: Prefab:RankingCard
+    path: RankingCard/Group_Level
+    comp: RectTransform
+    key: sizeDelta
+    val: (176.0000,112.0000)
+  - target: Prefab:RankingCard
+    path: RankingCard/Group_Level
+    comp: VerticalLayoutGroup
+    key: childAlignment
+    val: 5
+  - target: Prefab:RankingCard
+    path: RankingCard/Group_Level
+    comp: VerticalLayoutGroup
+    key: childForceExpandHeight
+    val: True
+  - target: Prefab:RankingCard
+    path: RankingCard/Group_Level
+    comp: VerticalLayoutGroup
+    key: childForceExpandWidth
+    val: True
+  - target: Prefab:RankingCard
+    path: RankingCard/Group_Level
+    comp: VerticalLayoutGroup
+    key: paddingBottom
+    val: 0
+  - target: Prefab:RankingCard
+    path: RankingCard/Group_Level
+    comp: VerticalLayoutGroup
+    key: paddingLeft
+    val: 0
+  - target: Prefab:RankingCard
+    path: RankingCard/Group_Level
+    comp: VerticalLayoutGroup
+    key: paddingRight
+    val: 0
+  - target: Prefab:RankingCard
+    path: RankingCard/Group_Level
+    comp: VerticalLayoutGroup
+    key: paddingTop
+    val: 0
+  - target: Prefab:RankingCard
+    path: RankingCard/Group_Level
+    comp: VerticalLayoutGroup
+    key: spacing
+    val: 0.00
+  - target: Prefab:RankingCard
+    path: RankingCard/Group_Level/Txt_LevelLabel
+    comp: RectTransform
+    key: anchorMax
+    val: (0.5000,0.5000)
+  - target: Prefab:RankingCard
+    path: RankingCard/Group_Level/Txt_LevelLabel
+    comp: RectTransform
+    key: anchorMin
+    val: (0.5000,0.5000)
+  - target: Prefab:RankingCard
+    path: RankingCard/Group_Level/Txt_LevelLabel
+    comp: RectTransform
+    key: anchoredPosition
+    val: (0.0000,0.0000)
+  - target: Prefab:RankingCard
+    path: RankingCard/Group_Level/Txt_LevelLabel
+    comp: RectTransform
+    key: pivot
+    val: (0.5000,0.5000)
+  - target: Prefab:RankingCard
+    path: RankingCard/Group_Level/Txt_LevelLabel
+    comp: RectTransform
+    key: sizeDelta
+    val: (176.0000,42.0000)
+  - target: Prefab:RankingCard
+    path: RankingCard/Group_Level/Txt_LevelLabel
+    comp: TextMeshProUGUI
+    key: alignment
+    val: 4100
+  - target: Prefab:RankingCard
+    path: RankingCard/Group_Level/Txt_LevelLabel
+    comp: TextMeshProUGUI
+    key: color
+    val: '#073653FF'
+  - target: Prefab:RankingCard
+    path: RankingCard/Group_Level/Txt_LevelLabel
+    comp: TextMeshProUGUI
+    key: enableWordWrapping
+    val: True
+  - target: Prefab:RankingCard
+    path: RankingCard/Group_Level/Txt_LevelLabel
+    comp: TextMeshProUGUI
+    key: fontSize
+    val: 26.00
+  - target: Prefab:RankingCard
+    path: RankingCard/Group_Level/Txt_LevelLabel
+    comp: TextMeshProUGUI
+    key: fontStyle
+    val: 1
+  - target: Prefab:RankingCard
+    path: RankingCard/Group_Level/Txt_LevelValue
+    comp: RectTransform
+    key: anchorMax
+    val: (0.5000,0.5000)
+  - target: Prefab:RankingCard
+    path: RankingCard/Group_Level/Txt_LevelValue
+    comp: RectTransform
+    key: anchorMin
+    val: (0.5000,0.5000)
+  - target: Prefab:RankingCard
+    path: RankingCard/Group_Level/Txt_LevelValue
+    comp: RectTransform
+    key: anchoredPosition
+    val: (0.0000,0.0000)
+  - target: Prefab:RankingCard
+    path: RankingCard/Group_Level/Txt_LevelValue
+    comp: RectTransform
+    key: pivot
+    val: (0.5000,0.5000)
+  - target: Prefab:RankingCard
+    path: RankingCard/Group_Level/Txt_LevelValue
+    comp: RectTransform
+    key: sizeDelta
+    val: (176.0000,64.0000)
+  - target: Prefab:RankingCard
+    path: RankingCard/Group_Level/Txt_LevelValue
+    comp: TextMeshProUGUI
+    key: alignment
+    val: 4100
+  - target: Prefab:RankingCard
+    path: RankingCard/Group_Level/Txt_LevelValue
+    comp: TextMeshProUGUI
+    key: color
+    val: '#7B5560FF'
+  - target: Prefab:RankingCard
+    path: RankingCard/Group_Level/Txt_LevelValue
+    comp: TextMeshProUGUI
+    key: enableWordWrapping
+    val: True
+  - target: Prefab:RankingCard
+    path: RankingCard/Group_Level/Txt_LevelValue
+    comp: TextMeshProUGUI
+    key: fontSize
+    val: 44.00
+  - target: Prefab:RankingCard
+    path: RankingCard/Group_Level/Txt_LevelValue
+    comp: TextMeshProUGUI
+    key: fontStyle
+    val: 1
+  - target: Prefab:RankingCard
+    path: RankingCard/Group_Level/Txt_LevelValue
+    comp: TextMeshProUGUI
+    key: text
+    val: 0
+  - target: Prefab:RankingCard
+    path: RankingCard/Slot_Rank
+    comp: LayoutElement
+    key: flexibleHeight
+    val: -1.00
+  - target: Prefab:RankingCard
+    path: RankingCard/Slot_Rank
+    comp: LayoutElement
+    key: flexibleWidth
+    val: -1.00
+  - target: Prefab:RankingCard
+    path: RankingCard/Slot_Rank
+    comp: LayoutElement
+    key: ignoreLayout
+    val: False
+  - target: Prefab:RankingCard
+    path: RankingCard/Slot_Rank
+    comp: LayoutElement
+    key: minHeight
+    val: -1.00
+  - target: Prefab:RankingCard
+    path: RankingCard/Slot_Rank
+    comp: LayoutElement
+    key: minWidth
+    val: -1.00
+  - target: Prefab:RankingCard
+    path: RankingCard/Slot_Rank
+    comp: LayoutElement
+    key: preferredHeight
+    val: 112.00
+  - target: Prefab:RankingCard
+    path: RankingCard/Slot_Rank
+    comp: LayoutElement
+    key: preferredWidth
+    val: 76.00
+  - target: Prefab:RankingCard
+    path: RankingCard/Slot_Rank
+    comp: RectTransform
+    key: anchorMax
+    val: (0.5000,0.5000)
+  - target: Prefab:RankingCard
+    path: RankingCard/Slot_Rank
+    comp: RectTransform
+    key: anchorMin
+    val: (0.5000,0.5000)
+  - target: Prefab:RankingCard
+    path: RankingCard/Slot_Rank
+    comp: RectTransform
+    key: anchoredPosition
+    val: (0.0000,0.0000)
+  - target: Prefab:RankingCard
+    path: RankingCard/Slot_Rank
+    comp: RectTransform
+    key: pivot
+    val: (0.5000,0.5000)
+  - target: Prefab:RankingCard
+    path: RankingCard/Slot_Rank
+    comp: RectTransform
+    key: sizeDelta
+    val: (76.0000,112.0000)
+  - target: Prefab:RankingCard
+    path: RankingCard/Slot_Rank/Img_Rank
+    comp: Image
+    key: color
+    val: '#FFFFFF00'
+  - target: Prefab:RankingCard
+    path: RankingCard/Slot_Rank/Img_Rank
+    comp: Image
+    key: preserveAspect
+    val: True
+  - target: Prefab:RankingCard
+    path: RankingCard/Slot_Rank/Img_Rank
+    comp: Image
+    key: raycastTarget
+    val: True
+  - target: Prefab:RankingCard
+    path: RankingCard/Slot_Rank/Img_Rank
+    comp: RectTransform
+    key: anchorMax
+    val: (1.0000,1.0000)
+  - target: Prefab:RankingCard
+    path: RankingCard/Slot_Rank/Img_Rank
+    comp: RectTransform
+    key: anchorMin
+    val: (0.0000,0.0000)
+  - target: Prefab:RankingCard
+    path: RankingCard/Slot_Rank/Img_Rank
+    comp: RectTransform
+    key: anchoredPosition
+    val: (0.0000,0.0000)
+  - target: Prefab:RankingCard
+    path: RankingCard/Slot_Rank/Img_Rank
+    comp: RectTransform
+    key: pivot
+    val: (0.5000,0.5000)
+  - target: Prefab:RankingCard
+    path: RankingCard/Slot_Rank/Img_Rank
+    comp: RectTransform
+    key: sizeDelta
+    val: (0.0000,0.0000)
+  - target: Prefab:RankingCard
+    path: RankingCard/Slot_Rank/Txt_Rank
+    comp: RectTransform
+    key: anchorMax
+    val: (1.0000,1.0000)
+  - target: Prefab:RankingCard
+    path: RankingCard/Slot_Rank/Txt_Rank
+    comp: RectTransform
+    key: anchorMin
+    val: (0.0000,0.0000)
+  - target: Prefab:RankingCard
+    path: RankingCard/Slot_Rank/Txt_Rank
+    comp: RectTransform
+    key: anchoredPosition
+    val: (0.0000,0.0000)
+  - target: Prefab:RankingCard
+    path: RankingCard/Slot_Rank/Txt_Rank
+    comp: RectTransform
+    key: pivot
+    val: (0.5000,0.5000)
+  - target: Prefab:RankingCard
+    path: RankingCard/Slot_Rank/Txt_Rank
+    comp: RectTransform
+    key: sizeDelta
+    val: (0.0000,0.0000)
+  - target: Prefab:RankingCard
+    path: RankingCard/Slot_Rank/Txt_Rank
+    comp: TextMeshProUGUI
+    key: alignment
+    val: 4098
+  - target: Prefab:RankingCard
+    path: RankingCard/Slot_Rank/Txt_Rank
+    comp: TextMeshProUGUI
+    key: color
+    val: '#5E4B57FF'
+  - target: Prefab:RankingCard
+    path: RankingCard/Slot_Rank/Txt_Rank
+    comp: TextMeshProUGUI
+    key: enableWordWrapping
+    val: True
+  - target: Prefab:RankingCard
+    path: RankingCard/Slot_Rank/Txt_Rank
+    comp: TextMeshProUGUI
+    key: fontSize
+    val: 38.00
+  - target: Prefab:RankingCard
+    path: RankingCard/Slot_Rank/Txt_Rank
+    comp: TextMeshProUGUI
+    key: fontStyle
+    val: 1
+  - target: Prefab:RankingCard
+    path: RankingCard/Slot_Rank/Txt_Rank
+    comp: TextMeshProUGUI
+    key: text
+    val: --
+  - target: Prefab:RankingCard
+    path: RankingCard/Txt_DisplayName
+    comp: LayoutElement
+    key: flexibleHeight
+    val: -1.00
+  - target: Prefab:RankingCard
+    path: RankingCard/Txt_DisplayName
+    comp: LayoutElement
+    key: flexibleWidth
+    val: 1.00
+  - target: Prefab:RankingCard
+    path: RankingCard/Txt_DisplayName
+    comp: LayoutElement
+    key: ignoreLayout
+    val: False
+  - target: Prefab:RankingCard
+    path: RankingCard/Txt_DisplayName
+    comp: LayoutElement
+    key: minHeight
+    val: -1.00
+  - target: Prefab:RankingCard
+    path: RankingCard/Txt_DisplayName
+    comp: LayoutElement
+    key: minWidth
+    val: 100.00
+  - target: Prefab:RankingCard
+    path: RankingCard/Txt_DisplayName
+    comp: LayoutElement
+    key: preferredHeight
+    val: -1.00
+  - target: Prefab:RankingCard
+    path: RankingCard/Txt_DisplayName
+    comp: LayoutElement
+    key: preferredWidth
+    val: 400.00
+  - target: Prefab:RankingCard
+    path: RankingCard/Txt_DisplayName
+    comp: RectTransform
+    key: anchorMax
+    val: (0.5000,0.5000)
+  - target: Prefab:RankingCard
+    path: RankingCard/Txt_DisplayName
+    comp: RectTransform
+    key: anchorMin
+    val: (0.5000,0.5000)
+  - target: Prefab:RankingCard
+    path: RankingCard/Txt_DisplayName
+    comp: RectTransform
+    key: anchoredPosition
+    val: (0.0000,0.0000)
+  - target: Prefab:RankingCard
+    path: RankingCard/Txt_DisplayName
+    comp: RectTransform
+    key: pivot
+    val: (0.5000,0.5000)
+  - target: Prefab:RankingCard
+    path: RankingCard/Txt_DisplayName
+    comp: RectTransform
+    key: sizeDelta
+    val: (0.0000,88.0000)
+  - target: Prefab:RankingCard
+    path: RankingCard/Txt_DisplayName
+    comp: TextMeshProUGUI
+    key: alignment
+    val: 4097
+  - target: Prefab:RankingCard
+    path: RankingCard/Txt_DisplayName
+    comp: TextMeshProUGUI
+    key: color
+    val: '#073653FF'
+  - target: Prefab:RankingCard
+    path: RankingCard/Txt_DisplayName
+    comp: TextMeshProUGUI
+    key: enableWordWrapping
+    val: True
+  - target: Prefab:RankingCard
+    path: RankingCard/Txt_DisplayName
+    comp: TextMeshProUGUI
+    key: fontSize
+    val: 36.00
+  - target: Prefab:RankingCard
+    path: RankingCard/Txt_DisplayName
+    comp: TextMeshProUGUI
+    key: fontStyle
+    val: 1
+  - target: Prefab:RankingCard
+    path: RankingCard/Txt_DisplayName
+    comp: TextMeshProUGUI
+    key: text
+    val: Player
   - target: Prefab:ReturnTitlePopup
     path: Pop_ReturnTitlePopup
     comp: RectTransform

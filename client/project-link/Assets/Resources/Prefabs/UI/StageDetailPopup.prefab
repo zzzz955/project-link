@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 7566702393544742515}
   - component: {fileID: 8087547391934064600}
   - component: {fileID: 2538289509046926406}
+  - component: {fileID: 1705957965004937649}
   m_Layer: 0
   m_Name: Overlay
   m_TagString: Untagged
@@ -120,6 +121,19 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &1705957965004937649
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 216143087002128041}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0a80c20dfecbaf4197b8b375e7e6381, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectLink.GeneratedUIMarker
+  stableId: 05ee8cfc
 --- !u!1 &999601122446686100
 GameObject:
   m_ObjectHideFlags: 0
@@ -131,6 +145,7 @@ GameObject:
   - component: {fileID: 1435177834431990552}
   - component: {fileID: 406166766151487794}
   - component: {fileID: 6745630583126775398}
+  - component: {fileID: 1312870504159556200}
   m_Layer: 0
   m_Name: Footer
   m_TagString: Untagged
@@ -198,6 +213,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.ContentSizeFitter
   m_HorizontalFit: 0
   m_VerticalFit: 2
+--- !u!114 &1312870504159556200
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 999601122446686100}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0a80c20dfecbaf4197b8b375e7e6381, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectLink.GeneratedUIMarker
+  stableId: c3f9c250
 --- !u!1 &1131678769287702740
 GameObject:
   m_ObjectHideFlags: 0
@@ -210,6 +238,7 @@ GameObject:
   - component: {fileID: 278330073697923869}
   - component: {fileID: 7817959294826584816}
   - component: {fileID: 5313770210813314475}
+  - component: {fileID: 393423916225486275}
   m_Layer: 0
   m_Name: Txt_Label
   m_TagString: Untagged
@@ -349,6 +378,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectLink.OutGame.UI.LocalizedText
   stringId: common.play
+--- !u!114 &393423916225486275
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1131678769287702740}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0a80c20dfecbaf4197b8b375e7e6381, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectLink.GeneratedUIMarker
+  stableId: 628c4d51
 --- !u!1 &1660920736801397646
 GameObject:
   m_ObjectHideFlags: 0
@@ -363,6 +405,7 @@ GameObject:
   - component: {fileID: 4608090291118176274}
   - component: {fileID: 5852036455246508189}
   - component: {fileID: 7419885172971812304}
+  - component: {fileID: 2373176306018548960}
   m_Layer: 0
   m_Name: Btn_Play
   m_TagString: Untagged
@@ -504,6 +547,19 @@ MonoBehaviour:
   m_FlexibleWidth: 1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
+--- !u!114 &2373176306018548960
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1660920736801397646}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0a80c20dfecbaf4197b8b375e7e6381, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectLink.GeneratedUIMarker
+  stableId: f39853d5
 --- !u!1 &1956459752966746157
 GameObject:
   m_ObjectHideFlags: 0
@@ -516,6 +572,7 @@ GameObject:
   - component: {fileID: 5241909323083513571}
   - component: {fileID: 5585179725380010023}
   - component: {fileID: 5905624089254446442}
+  - component: {fileID: 6586923638186148446}
   m_Layer: 0
   m_Name: Txt_Title
   m_TagString: Untagged
@@ -655,6 +712,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectLink.OutGame.UI.LocalizedText
   stringId: popup.stage.title_fmt
+--- !u!114 &6586923638186148446
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1956459752966746157}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0a80c20dfecbaf4197b8b375e7e6381, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectLink.GeneratedUIMarker
+  stableId: 82046db7
 --- !u!1 &3558131490049419834
 GameObject:
   m_ObjectHideFlags: 0
@@ -666,6 +736,7 @@ GameObject:
   - component: {fileID: 5734091210624877477}
   - component: {fileID: 8037210278454167771}
   - component: {fileID: 255913844857678582}
+  - component: {fileID: 3403569198897254961}
   m_Layer: 0
   m_Name: Img_Star_2
   m_TagString: Untagged
@@ -730,6 +801,19 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &3403569198897254961
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3558131490049419834}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0a80c20dfecbaf4197b8b375e7e6381, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectLink.GeneratedUIMarker
+  stableId: e1c0fd99
 --- !u!1 &3947381345968143746
 GameObject:
   m_ObjectHideFlags: 0
@@ -740,6 +824,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6925835217367141590}
   - component: {fileID: 8929934354365064684}
+  - component: {fileID: 5878314777125150775}
   m_Layer: 0
   m_Name: Header
   m_TagString: Untagged
@@ -788,6 +873,19 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
+--- !u!114 &5878314777125150775
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3947381345968143746}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0a80c20dfecbaf4197b8b375e7e6381, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectLink.GeneratedUIMarker
+  stableId: 70ed464e
 --- !u!1 &4327438417664078605
 GameObject:
   m_ObjectHideFlags: 0
@@ -799,6 +897,7 @@ GameObject:
   - component: {fileID: 2220766138855606750}
   - component: {fileID: 5676157714162312976}
   - component: {fileID: 145869843879258366}
+  - component: {fileID: 1461146037233530029}
   m_Layer: 0
   m_Name: Img_Star_0
   m_TagString: Untagged
@@ -863,6 +962,19 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &1461146037233530029
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4327438417664078605}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0a80c20dfecbaf4197b8b375e7e6381, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectLink.GeneratedUIMarker
+  stableId: ba35bb2f
 --- !u!1 &4508899280022832940
 GameObject:
   m_ObjectHideFlags: 0
@@ -876,6 +988,7 @@ GameObject:
   - component: {fileID: 2589800107334253323}
   - component: {fileID: 6670233646577615097}
   - component: {fileID: 7223891153189351514}
+  - component: {fileID: 6301823321460929183}
   m_Layer: 0
   m_Name: Panel
   m_TagString: Untagged
@@ -985,6 +1098,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.ContentSizeFitter
   m_HorizontalFit: 0
   m_VerticalFit: 2
+--- !u!114 &6301823321460929183
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4508899280022832940}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0a80c20dfecbaf4197b8b375e7e6381, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectLink.GeneratedUIMarker
+  stableId: 6b5ea7c6
 --- !u!1 &4535299840402969828
 GameObject:
   m_ObjectHideFlags: 0
@@ -995,6 +1121,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1208599329550915061}
   - component: {fileID: 7717957114818327913}
+  - component: {fileID: 8864418978318262919}
   m_Layer: 0
   m_Name: StageDetailPopup
   m_TagString: Untagged
@@ -1041,6 +1168,19 @@ MonoBehaviour:
   rankContent: {fileID: 0}
   starOnSprite: {fileID: 21300000, guid: 2d235c84e7ee2224e9e14082c015c97b, type: 3}
   starOffSprite: {fileID: 21300000, guid: 1c92590b05efb1c4a9f19cfc32d6b59a, type: 3}
+--- !u!114 &8864418978318262919
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4535299840402969828}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0a80c20dfecbaf4197b8b375e7e6381, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectLink.GeneratedUIMarker
+  stableId: 1a6787f3
 --- !u!1 &4891631474430737379
 GameObject:
   m_ObjectHideFlags: 0
@@ -1052,6 +1192,7 @@ GameObject:
   - component: {fileID: 503073278788191426}
   - component: {fileID: 1809312625581021084}
   - component: {fileID: 8319983141250777453}
+  - component: {fileID: 4406299219956355945}
   m_Layer: 0
   m_Name: Img_Star_1
   m_TagString: Untagged
@@ -1116,6 +1257,19 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &4406299219956355945
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4891631474430737379}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0a80c20dfecbaf4197b8b375e7e6381, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectLink.GeneratedUIMarker
+  stableId: 66d451f5
 --- !u!1 &5015322211562698294
 GameObject:
   m_ObjectHideFlags: 0
@@ -1130,6 +1284,7 @@ GameObject:
   - component: {fileID: 5402677732236534139}
   - component: {fileID: 3346788337715957024}
   - component: {fileID: 3511146611038508780}
+  - component: {fileID: 3362232606139787655}
   m_Layer: 0
   m_Name: Btn_Close
   m_TagString: Untagged
@@ -1267,6 +1422,19 @@ MonoBehaviour:
   bounceDuration: 0.8
   shimmerDuration: 0.65
   shimmerWidth: 0.35
+--- !u!114 &3362232606139787655
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5015322211562698294}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0a80c20dfecbaf4197b8b375e7e6381, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectLink.GeneratedUIMarker
+  stableId: d5d8cba2
 --- !u!1 &5618507660317738703
 GameObject:
   m_ObjectHideFlags: 0
@@ -1279,6 +1447,7 @@ GameObject:
   - component: {fileID: 2049885496611643392}
   - component: {fileID: 3651401004426323430}
   - component: {fileID: 1194004121441273182}
+  - component: {fileID: 6731258853951922882}
   m_Layer: 0
   m_Name: Divider_Top
   m_TagString: Untagged
@@ -1363,6 +1532,19 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
+--- !u!114 &6731258853951922882
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5618507660317738703}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0a80c20dfecbaf4197b8b375e7e6381, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectLink.GeneratedUIMarker
+  stableId: 6f736866
 --- !u!1 &5741867193656902412
 GameObject:
   m_ObjectHideFlags: 0
@@ -1374,6 +1556,7 @@ GameObject:
   - component: {fileID: 7371876749808117178}
   - component: {fileID: 3382575080913489708}
   - component: {fileID: 6692406650191651248}
+  - component: {fileID: 8623224212146694488}
   m_Layer: 0
   m_Name: Content
   m_TagString: Untagged
@@ -1441,6 +1624,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.ContentSizeFitter
   m_HorizontalFit: 0
   m_VerticalFit: 2
+--- !u!114 &8623224212146694488
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5741867193656902412}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0a80c20dfecbaf4197b8b375e7e6381, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectLink.GeneratedUIMarker
+  stableId: 349051e3
 --- !u!1 &5779410854563445020
 GameObject:
   m_ObjectHideFlags: 0
@@ -1453,6 +1649,7 @@ GameObject:
   - component: {fileID: 8949027782194975065}
   - component: {fileID: 5865167147924207444}
   - component: {fileID: 5097282586344087958}
+  - component: {fileID: 4872044208115086949}
   m_Layer: 0
   m_Name: Divider_Bot
   m_TagString: Untagged
@@ -1537,6 +1734,19 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
+--- !u!114 &4872044208115086949
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5779410854563445020}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0a80c20dfecbaf4197b8b375e7e6381, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectLink.GeneratedUIMarker
+  stableId: b09a7be7
 --- !u!1 &5901796558336448268
 GameObject:
   m_ObjectHideFlags: 0
@@ -1548,6 +1758,7 @@ GameObject:
   - component: {fileID: 4132673658199293297}
   - component: {fileID: 3692133713451664720}
   - component: {fileID: 2131129818830177073}
+  - component: {fileID: 2524708281587360159}
   m_Layer: 0
   m_Name: Group_Stars
   m_TagString: Untagged
@@ -1623,3 +1834,16 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
+--- !u!114 &2524708281587360159
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5901796558336448268}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0a80c20dfecbaf4197b8b375e7e6381, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectLink.GeneratedUIMarker
+  stableId: 7a1edd93

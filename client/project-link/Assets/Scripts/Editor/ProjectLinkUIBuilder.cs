@@ -113,8 +113,15 @@ namespace ProjectLink.EditorTools
         public static void BuildCurrentSceneUI()
         {
             _skin = null;
-            BuildScene(SceneManager.GetActiveScene().name);
+            var sceneName = SceneManager.GetActiveScene().name;
+            if (UIBaselineSnapshot.LoadOrCreate().records.Count > 0)
+                ProjectLinkUIOverrideCapture.CaptureCurrentScene(sceneName);
+            ProjectLinkUIOverrideApply.BeginReport();
+            BuildScene(sceneName);
             EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
+            var report = ProjectLinkUIOverrideApply.EndReport();
+            if (!Application.isBatchMode && report != null && report.HasAny)
+                UIMergeReportWindow.Show(report);
         }
 
         [MenuItem("Tools/Project Link/UI Build/Build All Scene UI")]
@@ -129,6 +136,12 @@ namespace ProjectLink.EditorTools
 
             if (!Application.isBatchMode)
                 EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo();
+
+            // Auto-capture user edits before overwriting so nothing is lost.
+            if (UIBaselineSnapshot.LoadOrCreate().records.Count > 0)
+                ProjectLinkUIOverrideCapture.CaptureAllOverrides();
+
+            ProjectLinkUIOverrideApply.BeginReport();
 
             string[] scenePaths =
             {
@@ -169,6 +182,9 @@ namespace ProjectLink.EditorTools
             }
 
             AssetDatabase.SaveAssets();
+            var mergeReport = ProjectLinkUIOverrideApply.EndReport();
+            if (!Application.isBatchMode && mergeReport != null && mergeReport.HasAny)
+                UIMergeReportWindow.Show(mergeReport);
             if (!Application.isBatchMode)
                 EditorSceneManager.OpenScene("Assets/Scenes/Bootstrap.unity", OpenSceneMode.Single);
         }
@@ -446,6 +462,7 @@ namespace ProjectLink.EditorTools
             NormalizeLayoutText(canvas);
             EnsureLocalizedFonts(canvas);
             AddAnimatorToIconImages(canvas);
+            AssignStableIds(canvas, $"Scene:{sceneName}");
             ProjectLinkUIOverrideApply.SaveBaselineForScene(sceneName);
             ProjectLinkUIOverrideApply.ApplySceneOverrides(sceneName);
         }
@@ -2339,6 +2356,9 @@ namespace ProjectLink.EditorTools
 
             string cardPath = $"{PopupPrefabRoot}/RankingCard.prefab";
             string prevCard = System.IO.File.Exists(cardPath) ? System.IO.File.ReadAllText(cardPath) : null;
+            AssignStableIds(root, "Prefab:RankingCard");
+            ProjectLinkUIOverrideApply.SaveBaselineForPrefab(root, "RankingCard");
+            ProjectLinkUIOverrideApply.ApplyPrefabOverrides(root, "RankingCard");
             PrefabUtility.SaveAsPrefabAsset(root, cardPath);
             Object.DestroyImmediate(root);
             RestoreIfUnchanged(cardPath, prevCard);
@@ -2353,6 +2373,7 @@ namespace ProjectLink.EditorTools
             string path = $"{PopupPrefabRoot}/{prefabName}.prefab";
             string prev = System.IO.File.Exists(path) ? System.IO.File.ReadAllText(path) : null;
 
+            AssignStableIds(root, $"Prefab:{prefabName}");
             ProjectLinkUIOverrideApply.SaveBaselineForPrefab(root, prefabName);
             ProjectLinkUIOverrideApply.ApplyPrefabOverrides(root, prefabName);
             PrefabUtility.SaveAsPrefabAsset(root, path);
@@ -2832,6 +2853,20 @@ namespace ProjectLink.EditorTools
             }
             sigs.Sort(System.StringComparer.Ordinal);
             return sigs;
+        }
+
+        static void AssignStableIds(GameObject root, string target)
+            => AssignStableIdWalk(root, root.name, target);
+
+        static void AssignStableIdWalk(GameObject go, string path, string target)
+        {
+            var marker = go.GetComponent<GeneratedUIMarker>() ?? go.AddComponent<GeneratedUIMarker>();
+            marker.stableId = GeneratedUIMarker.ComputeId(target, path);
+            for (int i = 0; i < go.transform.childCount; i++)
+            {
+                var child = go.transform.GetChild(i);
+                AssignStableIdWalk(child.gameObject, path + "/" + child.name, target);
+            }
         }
 
         static void RestoreIfUnchanged(string path, string previousContent)

@@ -6,6 +6,7 @@ Unity 6000.4.5f1 | URP 2D (17.4.0) | C# | New Input System (1.19.0)
 ## Nav
 | path | role |
 |---|---|
+| `project-link/Assets/Scripts/` | Root-level shared runtime scripts (GeneratedUIMarker) -> `Scripts/AGENTS.md` |
 | `project-link/Assets/Scripts/Core/` | App lifecycle, singletons, FSM, popups -> `Core/AGENTS.md` |
 | `project-link/Assets/Scripts/InGame/` | In-game gameplay domain nav -> `InGame/AGENTS.md` |
 | `project-link/Assets/Scripts/InGame/Board/` | Grid data model + cell rendering -> `InGame/Board/AGENTS.md` |

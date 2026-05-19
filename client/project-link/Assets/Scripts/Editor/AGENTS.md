@@ -10,8 +10,12 @@
 | `UIBaselineSnapshot.cs` | `UIBaselineSnapshot` | ScriptableObject; clean-build hierarchy snapshot (target/path/comp/key→val); `Assets/Editor/UIBaselineSnapshot.asset` |
 | `UIOverrideManifest.cs` | `UIOverrideManifest` | ScriptableObject; pending/promoted override entries; also writes `Assets/Editor/UIOverrideManifest.json` for AI agent |
 | `UIPropertySerializer.cs` | `UIPropertySerializer` | Static; get/set tracked component properties (RectTransform, Image, TMP, LayoutGroup, etc.) as strings |
-| `ProjectLinkUIOverrideCapture.cs` | `ProjectLinkUIOverrideCapture` | [MenuItem] CaptureAllOverrides, ClearPromoted |
-| `ProjectLinkUIOverrideCapture.cs` | `ProjectLinkUIOverrideApply` | Called by Builder; apply pending prop overrides + save baseline after build/restore |
+| `ProjectLinkUIOverrideCapture.cs` | `ProjectLinkUIOverrideCapture` | CaptureAllOverrides (auto, no MenuItem), CaptureCurrentScene; [MenuItem] ClearPromoted |
+| `ProjectLinkUIOverrideCapture.cs` | `ProjectLinkUIOverrideApply` | Called by Builder; 3-way merge apply + baseline save; static BeginReport/EndReport accumulator |
+| `UIMergePolicy.cs` | `MergePolicy` | Enum: OverwriteGeneratedOnly / SkipUserEdited / ThreeWayMerge / ReportOnly |
+| `UIMergePolicy.cs` | `UIBuildSettings` | ScriptableObject; global mergePolicy setting; `Assets/Editor/UIBuildSettings.asset` |
+| `UIMergePolicy.cs` | `UIMergeReport` | Data bag: updated/skipped/conflicts lists of Entry structs |
+| `UIMergeReportWindow.cs` | `UIMergeReportWindow` | EditorWindow; shown after build when merge events exist |
 
 ## Symbols
 | symbol | kind | note |
@@ -50,12 +54,17 @@
 | `ProjectLinkUIImageResourceExtractor.ParseAllSources()` | method | parses every added image into alpha-connected resource components |
 | `ProjectLinkUIImageResourceExtractor.AddDraggedItems()` | method | accepts multiple dragged Texture assets, image files, or image folders |
 | `ProjectLinkUIImageResourceExtractor.SaveResources()` | method | saves parsed previews as `baseFileName_1.png` style PNG files |
-| `ProjectLinkUIOverrideCapture.CaptureAllOverrides()` | method | [MenuItem] diffs all scenes+prefabs vs baseline → writes manifest; replaces all pending entries fresh each run |
+| `ProjectLinkUIOverrideCapture.CaptureAllOverrides()` | method | diffs all scenes+prefabs vs baseline → writes manifest; auto-called by BuildAllSceneUI when baseline exists (no MenuItem — not exposed as manual action) |
+| `ProjectLinkUIOverrideCapture.CaptureCurrentScene(sceneName)` | method | captures only the active scene (no scene-switching); called by BuildCurrentSceneUI |
 | `ProjectLinkUIOverrideCapture.ClearPromoted()` | method | [MenuItem] removes entries with status="promoted" from manifest |
-| `ProjectLinkUIOverrideApply.ApplySceneOverrides(sceneName)` | method | called by BuildScene; applies pending prop overrides to active scene (no snapshot) |
-| `ProjectLinkUIOverrideApply.SaveBaselineForScene(sceneName)` | method | called by BuildScene before ApplySceneOverrides; snapshots clean build state (override-free) to baseline |
-| `ProjectLinkUIOverrideApply.ApplyPrefabOverrides(root,prefabName)` | method | called by SavePopupPrefab after SaveBaselineForPrefab; applies pending prop overrides to in-memory prefab root |
-| `ProjectLinkUIOverrideApply.SaveBaselineForPrefab(root,prefabName)` | method | called by SavePopupPrefab before ApplyPrefabOverrides; snapshots clean builder GO to baseline |
+| `ProjectLinkUIOverrideApply.BeginReport()` | method | resets static UIMergeReport accumulator; call before build |
+| `ProjectLinkUIOverrideApply.EndReport()` | method | returns accumulated UIMergeReport and clears accumulator; call after build |
+| `ProjectLinkUIOverrideApply.ApplySceneOverrides(sceneName)` | method | 3-way merge apply (baseVal vs userVal vs newToolVal); appends to current report |
+| `ProjectLinkUIOverrideApply.SaveBaselineForScene(sceneName)` | method | called by BuildScene before ApplySceneOverrides; snapshots clean build state |
+| `ProjectLinkUIOverrideApply.ApplyPrefabOverrides(root,prefabName)` | method | 3-way merge apply for prefab; appends to current report |
+| `ProjectLinkUIOverrideApply.SaveBaselineForPrefab(root,prefabName)` | method | called by SavePopupPrefab before ApplyPrefabOverrides; snapshots clean builder GO |
+| `ProjectLinkUIBuilder.AssignStableIds(root,target)` | method | walks GO hierarchy post-build; adds/updates GeneratedUIMarker.stableId = ComputeId(target,path) |
+| `UIMergeReportWindow.Show(report)` | method | opens EditorWindow with Updated/Skipped/Conflicts sections |
 | `UIBaselineSnapshot.TryGet(target,path,comp,key,val)` | method | lookup in index; returns false if not found |
 | `UIBaselineSnapshot.ContainsPath(target,path)` | method | true if any record exists for target+path (new_go detection) |
 | `UIBaselineSnapshot.GetPathsForTarget(target)` | method | returns all GO paths in baseline for a target (remove_go detection) |
@@ -83,6 +92,7 @@
 - All builder-created TMP center alignment uses `TextAlignmentOptions.Midline` (geometry center, TMP 3.x); left/right variants use `MidlineLeft`/`MidlineRight`. Never use bare `Center` (= bounding-box Middle, visually different).
 - Star images in popup Group_Stars use skin keys `slot_star_on` (earned) / `slot_star_off` (empty). Builder pre-creates three `Img_Star_0/1/2` Image slots; runtime popups update them in-place or fallback to dynamic creation. Popups expose `[SerializeField] Sprite starOnSprite, starOffSprite` assigned by builder from UISpriteSkin.
 - Ranking tab/cards use UISpriteSkin keys `slot_ranking_card`, `slot_rank_avatar_frame`, `slot_rank_segment_bg`, `slot_rank_segment_selected`, `slot_rank_segment_idle`, and `slot_rank_medal_1/2/3`.
-- UI Override system: BuildAllSceneUI saves clean-build baseline then re-applies manifest overrides — manual UI changes persist across builds automatically (prop ops only). new_go/remove_go ops require AI or manual promotion to builder code.
-- Override workflow: manual edit → CaptureAllOverrides → manifest updated → AI reads manifest+method hint → updates builder code → marks entry promoted → ClearPromoted.
+- UI Override system: BuildAllSceneUI auto-captures user edits before overwriting (3-way merge: baseVal vs userVal vs newToolVal). Updated/Skipped/Conflicts shown in UIMergeReportWindow after build. MergePolicy set in `Assets/Editor/UIBuildSettings.asset` (default: ThreeWayMerge). prop ops only; new_go/remove_go require AI or manual promotion.
+- Override workflow: manual edit → run Build (auto-captures) → report window shows merge result → AI reads manifest+method hint → updates builder code → marks entry promoted → ClearPromoted.
+- GeneratedUIMarker: MonoBehaviour attached to every builder-created GO; stableId = hash(target+path); used for GO lookup before path fallback.
 - Baseline (UIBaselineSnapshot.asset) + Manifest (UIOverrideManifest.asset/json) live in `Assets/Editor/`; never edit them directly.

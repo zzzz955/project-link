@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using ProjectLink;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -19,7 +20,6 @@ namespace ProjectLink.EditorTools
         };
         const string PrefabRoot = "Assets/Resources/Prefabs/UI";
 
-        [MenuItem("Tools/Project Link/UI Overrides/Capture All Overrides")]
         public static void CaptureAllOverrides()
         {
             var baseline = UIBaselineSnapshot.LoadOrCreate();
@@ -32,9 +32,6 @@ namespace ProjectLink.EditorTools
 
             var prevScene = SceneManager.GetActiveScene().path;
 
-            // Collect into a temporary list — scene/prefab operations can destroy Unity objects
-            // mid-loop (Unity may invalidate ScriptableObject refs during OpenScene), so we
-            // defer touching the manifest until all risky operations are done.
             var newEntries = new List<UIOverrideManifest.Entry>();
 
             foreach (var path in ScenePaths)
@@ -54,7 +51,6 @@ namespace ProjectLink.EditorTools
                 PrefabUtility.UnloadPrefabContents(go);
             }
 
-            // Load manifest fresh after all OpenScene/prefab operations
             var manifest = UIOverrideManifest.LoadOrCreate();
             manifest.entries.RemoveAll(e => e.status == "pending");
             manifest.entries.AddRange(newEntries);
@@ -67,6 +63,26 @@ namespace ProjectLink.EditorTools
                 EditorSceneManager.OpenScene(prevScene, OpenSceneMode.Single);
 
             Debug.Log($"[UIOverride] {manifest.entries.Count} override entries → {UIOverrideManifest.JsonPath}");
+        }
+
+        // Called by BuildCurrentSceneUI — captures only the active scene without opening others.
+        public static void CaptureCurrentScene(string sceneName)
+        {
+            var baseline = UIBaselineSnapshot.LoadOrCreate();
+            if (baseline.records.Count == 0) return;
+            baseline.RebuildIndex();
+
+            var scene = SceneManager.GetActiveScene();
+            var target = $"Scene:{sceneName}";
+            var newEntries = new List<UIOverrideManifest.Entry>();
+            CaptureScene(scene, target, baseline, newEntries);
+
+            var manifest = UIOverrideManifest.LoadOrCreate();
+            manifest.entries.RemoveAll(e => e.target == target && e.status == "pending");
+            manifest.entries.AddRange(newEntries);
+            EditorUtility.SetDirty(manifest);
+            AssetDatabase.SaveAssets();
+            manifest.WriteJson();
         }
 
         [MenuItem("Tools/Project Link/UI Overrides/Clear Promoted Entries")]
@@ -104,6 +120,9 @@ namespace ProjectLink.EditorTools
             visited.Add(path);
             bool existsInBaseline = baseline.ContainsPath(target, path);
 
+            var sid = go.GetComponent<GeneratedUIMarker>()?.stableId
+                      ?? GeneratedUIMarker.ComputeId(target, path);
+
             if (existsInBaseline)
             {
                 foreach (var (comp, compType, keys) in UIPropertySerializer.TrackedComponents(go))
@@ -117,16 +136,17 @@ namespace ProjectLink.EditorTools
 
                         results.Add(new UIOverrideManifest.Entry
                         {
-                            id      = MakeId(target),
-                            target  = target,
-                            method  = MethodFor(target),
-                            path    = path,
-                            op      = "prop",
-                            comp    = compType,
-                            key     = key,
-                            baseVal = baseVal,
-                            currVal = curr,
-                            status  = "pending"
+                            id       = MakeId(target),
+                            stableId = sid,
+                            target   = target,
+                            method   = MethodFor(target),
+                            path     = path,
+                            op       = "prop",
+                            comp     = compType,
+                            key      = key,
+                            baseVal  = baseVal,
+                            currVal  = curr,
+                            status   = "pending"
                         });
                     }
                 }
@@ -144,6 +164,7 @@ namespace ProjectLink.EditorTools
                 results.Add(new UIOverrideManifest.Entry
                 {
                     id         = MakeId(target),
+                    stableId   = sid,
                     target     = target,
                     method     = MethodFor(target),
                     path       = path,
@@ -170,12 +191,13 @@ namespace ProjectLink.EditorTools
             {
                 results.Add(new UIOverrideManifest.Entry
                 {
-                    id     = MakeId(target),
-                    target = target,
-                    method = MethodFor(target),
-                    path   = removedPath,
-                    op     = "remove_go",
-                    status = "pending"
+                    id       = MakeId(target),
+                    stableId = GeneratedUIMarker.ComputeId(target, removedPath),
+                    target   = target,
+                    method   = MethodFor(target),
+                    path     = removedPath,
+                    op       = "remove_go",
+                    status   = "pending"
                 });
             }
         }
@@ -198,27 +220,42 @@ namespace ProjectLink.EditorTools
 
     public static class ProjectLinkUIOverrideApply
     {
-        // Called from BuildScene — apply pending prop overrides to active scene (NO snapshot here)
+        static UIMergeReport _currentReport;
+
+        public static void BeginReport() => _currentReport = new UIMergeReport();
+
+        public static UIMergeReport EndReport()
+        {
+            var r = _currentReport;
+            _currentReport = null;
+            return r;
+        }
+
+        // Called from BuildScene — apply pending prop overrides to active scene with 3-way merge.
         public static void ApplySceneOverrides(string sceneName)
         {
-            var scene = SceneManager.GetActiveScene();
+            var scene    = SceneManager.GetActiveScene();
             var manifest = UIOverrideManifest.LoadOrCreate();
-            var target = $"Scene:{sceneName}";
+            var policy   = UIBuildSettings.Instance.mergePolicy;
+            var target   = $"Scene:{sceneName}";
+
             foreach (var entry in manifest.entries)
             {
                 if (entry.target != target || entry.status != "pending" || entry.op != "prop") continue;
-                var t = FindByPath(scene, entry.path);
+
+                var t = FindByStableId(scene, entry.stableId) ?? FindByPath(scene, entry.path);
                 if (t == null) { Debug.LogWarning($"[UIOverride] Path not found: {entry.path}"); continue; }
-                ApplyProp(t.gameObject, entry.comp, entry.key, entry.currVal);
+
+                var newToolVal = GetCurrentVal(t.gameObject, entry.comp, entry.key);
+                ApplyMerge(t.gameObject, entry, newToolVal, policy);
             }
         }
 
-        // Called from BuildAllSceneUI AFTER the restore check — baseline is saved from whatever
-        // is actually on disk, so CaptureAllOverrides will always diff against the correct state
+        // Called from BuildAllSceneUI AFTER the restore check.
         public static void SaveBaselineForScene(string sceneName)
         {
-            var scene = SceneManager.GetActiveScene();
-            var target = $"Scene:{sceneName}";
+            var scene    = SceneManager.GetActiveScene();
+            var target   = $"Scene:{sceneName}";
             var baseline = UIBaselineSnapshot.LoadOrCreate();
             baseline.RebuildIndex();
             baseline.ClearTarget(target);
@@ -228,25 +265,29 @@ namespace ProjectLink.EditorTools
             EditorUtility.SetDirty(baseline);
         }
 
-        // Called from SavePopupPrefab before SaveAsPrefabAsset — apply pending prop overrides
+        // Called from SavePopupPrefab before SaveAsPrefabAsset.
         public static void ApplyPrefabOverrides(GameObject root, string prefabName)
         {
             var manifest = UIOverrideManifest.LoadOrCreate();
-            var target = $"Prefab:{prefabName}";
+            var policy   = UIBuildSettings.Instance.mergePolicy;
+            var target   = $"Prefab:{prefabName}";
+
             foreach (var entry in manifest.entries)
             {
                 if (entry.target != target || entry.status != "pending" || entry.op != "prop") continue;
-                var t = FindByPath(root, entry.path);
+
+                var t = FindByStableId(root, entry.stableId) ?? FindByPath(root, entry.path);
                 if (t == null) { Debug.LogWarning($"[UIOverride] Path not found in prefab: {entry.path}"); continue; }
-                ApplyProp(t.gameObject, entry.comp, entry.key, entry.currVal);
+
+                var newToolVal = GetCurrentVal(t.gameObject, entry.comp, entry.key);
+                ApplyMerge(t.gameObject, entry, newToolVal, policy);
             }
         }
 
-        // Called from SavePopupPrefab BEFORE ApplyPrefabOverrides — snapshots clean builder
-        // output so CaptureAllOverrides always diffs against the correct baseline
+        // Called from SavePopupPrefab BEFORE ApplyPrefabOverrides.
         public static void SaveBaselineForPrefab(GameObject root, string prefabName)
         {
-            var target = $"Prefab:{prefabName}";
+            var target   = $"Prefab:{prefabName}";
             var baseline = UIBaselineSnapshot.LoadOrCreate();
             baseline.RebuildIndex();
             baseline.ClearTarget(target);
@@ -255,20 +296,79 @@ namespace ProjectLink.EditorTools
             EditorUtility.SetDirty(baseline);
         }
 
-        // ─── Apply helper ─────────────────────────────────────────────────
+        // ─── 3-way merge ──────────────────────────────────────────────────
+
+        static void ApplyMerge(GameObject go, UIOverrideManifest.Entry entry, string newToolVal, MergePolicy policy)
+        {
+            bool toolChanged = newToolVal != null && newToolVal != entry.baseVal;
+            bool userChanged = entry.currVal != entry.baseVal;
+
+            if (!userChanged)
+            {
+                // Tool may have updated → keep tool value (already in scene).
+                if (toolChanged)
+                    _currentReport?.updated.Add(MakeReportEntry(entry, newToolVal));
+                return;
+            }
+
+            if (!toolChanged)
+            {
+                // User changed, tool didn't → restore user value.
+                ApplyProp(go, entry.comp, entry.key, entry.currVal);
+                _currentReport?.skipped.Add(MakeReportEntry(entry, newToolVal));
+                return;
+            }
+
+            // Both sides changed → conflict.
+            switch (policy)
+            {
+                case MergePolicy.OverwriteGeneratedOnly:
+                    // Tool wins — already in scene, don't apply user val.
+                    break;
+                case MergePolicy.SkipUserEdited:
+                case MergePolicy.ThreeWayMerge:
+                    // User wins.
+                    ApplyProp(go, entry.comp, entry.key, entry.currVal);
+                    break;
+                case MergePolicy.ReportOnly:
+                    // Don't apply — just report.
+                    break;
+            }
+            _currentReport?.conflicts.Add(MakeReportEntry(entry, newToolVal));
+        }
+
+        static UIMergeReport.Entry MakeReportEntry(UIOverrideManifest.Entry e, string toolVal) =>
+            new UIMergeReport.Entry
+            {
+                target  = e.target,
+                path    = e.path,
+                comp    = e.comp,
+                key     = e.key,
+                baseVal = e.baseVal,
+                userVal = e.currVal,
+                toolVal = toolVal ?? e.baseVal
+            };
+
+        // ─── Apply prop ───────────────────────────────────────────────────
 
         static void ApplyProp(GameObject go, string compType, string key, string val)
         {
             foreach (var c in go.GetComponents<Component>())
             {
                 if (c.GetType().Name != compType) continue;
-                // Skip if value already matches — prevents marking scene/font assets dirty
                 if (UIPropertySerializer.Get(c, key) == val) return;
                 if (!UIPropertySerializer.Set(c, key, val))
                     Debug.LogWarning($"[UIOverride] Set failed: {compType}.{key}={val} on {go.name}");
                 return;
             }
             Debug.LogWarning($"[UIOverride] Component not found: {compType} on {go.name}");
+        }
+
+        static string GetCurrentVal(GameObject go, string compType, string key)
+        {
+            foreach (var c in go.GetComponents<Component>())
+                if (c.GetType().Name == compType) return UIPropertySerializer.Get(c, key);
+            return null;
         }
 
         // ─── Snapshot ─────────────────────────────────────────────────────
@@ -311,6 +411,32 @@ namespace ProjectLink.EditorTools
             if (prefabRoot.name != rootName) return null;
             if (slash < 0) return prefabRoot.transform;
             return prefabRoot.transform.Find(path.Substring(slash + 1));
+        }
+
+        // ─── StableId resolution ──────────────────────────────────────────
+
+        static Transform FindByStableId(Scene scene, string stableId)
+        {
+            if (string.IsNullOrEmpty(stableId)) return null;
+            foreach (var root in scene.GetRootGameObjects())
+            {
+                var found = FindByStableId(root, stableId);
+                if (found != null) return found;
+            }
+            return null;
+        }
+
+        static Transform FindByStableId(GameObject go, string stableId)
+        {
+            if (string.IsNullOrEmpty(stableId)) return null;
+            var marker = go.GetComponent<GeneratedUIMarker>();
+            if (marker != null && marker.stableId == stableId) return go.transform;
+            for (int i = 0; i < go.transform.childCount; i++)
+            {
+                var found = FindByStableId(go.transform.GetChild(i).gameObject, stableId);
+                if (found != null) return found;
+            }
+            return null;
         }
     }
 }

@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 6221977768942602316}
   - component: {fileID: 1627128242369434317}
   - component: {fileID: 7717072132727572720}
+  - component: {fileID: 4528775757096160513}
   m_Layer: 0
   m_Name: Txt_DisplayName
   m_TagString: Untagged
@@ -171,6 +172,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d7832219fbdb624a8f611ef40ac0572, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectLink.OutGame.UI.LocalizedFont
+--- !u!114 &4528775757096160513
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 522478860418655359}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0a80c20dfecbaf4197b8b375e7e6381, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectLink.GeneratedUIMarker
+  stableId: 42ce7556
 --- !u!1 &605380312047408303
 GameObject:
   m_ObjectHideFlags: 0
@@ -183,6 +197,7 @@ GameObject:
   - component: {fileID: 6794952164873281332}
   - component: {fileID: 894995208009352193}
   - component: {fileID: 7152297476770058570}
+  - component: {fileID: 5205709501620631745}
   m_Layer: 0
   m_Name: Txt_LevelValue
   m_TagString: Untagged
@@ -321,6 +336,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d7832219fbdb624a8f611ef40ac0572, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectLink.OutGame.UI.LocalizedFont
+--- !u!114 &5205709501620631745
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 605380312047408303}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0a80c20dfecbaf4197b8b375e7e6381, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectLink.GeneratedUIMarker
+  stableId: e2b4faf4
 --- !u!1 &903589967462777451
 GameObject:
   m_ObjectHideFlags: 0
@@ -333,6 +361,7 @@ GameObject:
   - component: {fileID: 5736652387163113457}
   - component: {fileID: 6947037816213303558}
   - component: {fileID: 1610225229657200869}
+  - component: {fileID: 2351756007190142392}
   m_Layer: 0
   m_Name: Txt_Rank
   m_TagString: Untagged
@@ -471,6 +500,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d7832219fbdb624a8f611ef40ac0572, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectLink.OutGame.UI.LocalizedFont
+--- !u!114 &2351756007190142392
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 903589967462777451}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0a80c20dfecbaf4197b8b375e7e6381, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectLink.GeneratedUIMarker
+  stableId: f08c3e65
 --- !u!1 &1061632704528073961
 GameObject:
   m_ObjectHideFlags: 0
@@ -481,6 +523,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8033141625201902535}
   - component: {fileID: 8868347021780697894}
+  - component: {fileID: 8588126942132775968}
   m_Layer: 0
   m_Name: Slot_Rank
   m_TagString: Untagged
@@ -529,6 +572,19 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
+--- !u!114 &8588126942132775968
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1061632704528073961}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0a80c20dfecbaf4197b8b375e7e6381, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectLink.GeneratedUIMarker
+  stableId: a1df3b17
 --- !u!1 &1077390925469539636
 GameObject:
   m_ObjectHideFlags: 0
@@ -540,6 +596,7 @@ GameObject:
   - component: {fileID: 5385870527245235767}
   - component: {fileID: 7897090185798141908}
   - component: {fileID: 5339614163850369712}
+  - component: {fileID: 5860910805242722107}
   m_Layer: 0
   m_Name: Img_Rank
   m_TagString: Untagged
@@ -604,6 +661,19 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &5860910805242722107
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1077390925469539636}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0a80c20dfecbaf4197b8b375e7e6381, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectLink.GeneratedUIMarker
+  stableId: 94848031
 --- !u!1 &1106279524546052212
 GameObject:
   m_ObjectHideFlags: 0
@@ -616,6 +686,7 @@ GameObject:
   - component: {fileID: 261278005096236630}
   - component: {fileID: 8626199417962037669}
   - component: {fileID: 5123619133962944055}
+  - component: {fileID: 4765457361623659896}
   m_Layer: 0
   m_Name: Txt_LevelLabel
   m_TagString: Untagged
@@ -754,6 +825,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d7832219fbdb624a8f611ef40ac0572, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectLink.OutGame.UI.LocalizedFont
+--- !u!114 &4765457361623659896
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1106279524546052212}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0a80c20dfecbaf4197b8b375e7e6381, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectLink.GeneratedUIMarker
+  stableId: 285d48ea
 --- !u!1 &1745679469911412128
 GameObject:
   m_ObjectHideFlags: 0
@@ -768,6 +852,7 @@ GameObject:
   - component: {fileID: 5200908751369302151}
   - component: {fileID: 489014122824045340}
   - component: {fileID: 6569591033017971094}
+  - component: {fileID: 3709471216394984152}
   m_Layer: 0
   m_Name: RankingCard
   m_TagString: Untagged
@@ -899,6 +984,19 @@ MonoBehaviour:
   levelLabelText: {fileID: 8626199417962037669}
   levelValueText: {fileID: 894995208009352193}
   backgroundImage: {fileID: 7411048398000416224}
+--- !u!114 &3709471216394984152
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1745679469911412128}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0a80c20dfecbaf4197b8b375e7e6381, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectLink.GeneratedUIMarker
+  stableId: 87f151ab
 --- !u!1 &8802533937639849352
 GameObject:
   m_ObjectHideFlags: 0
@@ -910,6 +1008,7 @@ GameObject:
   - component: {fileID: 5981271794405617945}
   - component: {fileID: 9153073119122830932}
   - component: {fileID: 7122846802858909398}
+  - component: {fileID: 5001336580703657047}
   m_Layer: 0
   m_Name: Group_Level
   m_TagString: Untagged
@@ -984,3 +1083,16 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!114 &5001336580703657047
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8802533937639849352}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0a80c20dfecbaf4197b8b375e7e6381, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectLink.GeneratedUIMarker
+  stableId: 15ff46ae

@@ -51,8 +51,9 @@
 | `RuntimeNavigationButtons.OpenAccountPopup()` | method | requests `PopupId.Account` |
 | `RuntimeNavigationButtons.OpenStreakChallengePopup()` | method | requests `PopupId.StreakChallenge` |
 | `RuntimeNavigationButtons.OpenPausePopup()` | method | delegates to InGameController in Game scene or requests `PopupId.Pause` |
-| `BootstrapWireframeController.Start()` | method | creates `BootstrapViewModel`, binds retry button, starts bootstrap load |
-| `BootstrapWireframeController.Render()` | method | renders loading/error/version and opens ForceUpdate or Title scene |
+| `BootstrapWireframeController.Start()` | method | creates `BootstrapViewModel`, binds retry button, resolves all 5 SerializeField refs via fallback Find, starts bootstrap load |
+| `BootstrapWireframeController.Render()` | method | renders status text/version/error, animates progress fill (0.45 s lerp), opens ForceUpdate or Title scene |
+| `BootstrapWireframeController.AnimateProgress(float)` | method | stops any running progress coroutine and starts lerp coroutine to new target |
 | `TitleWireframeController.Start()` | method | creates `TitleViewModel`, owns auth button listeners |
 | `TitleWireframeController.Render()` | method | renders auth loading state and opens ForceUpdate/Maintenance/Lobby after scene transition is idle |
 | `LobbyTabController.Configure(...)` | method | assigns tab buttons and tab panels from generated UI builder |

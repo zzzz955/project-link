@@ -1,3 +1,4 @@
+using System.Collections;
 using ProjectLink.Services;
 using TMPro;
 using UnityEngine;
@@ -17,11 +18,16 @@ namespace ProjectLink.OutGame.UI
         BootstrapViewModel _viewModel;
         bool _forceUpdateShown;
         bool _titleLoadRequested;
+        Coroutine _progressCoroutine;
 
         void Start()
         {
+            progressFillImage ??= FindImage("Fill");
             retryButton ??= FindButton("Btn_Retry");
             networkErrorText ??= FindText("Txt_NetworkError");
+            loadingLabelText ??= FindText("Txt_Loading");
+            versionText ??= FindText("Txt_Version");
+
             if (retryButton != null)
             {
                 retryButton.onClick.RemoveAllListeners();
@@ -55,8 +61,8 @@ namespace ProjectLink.OutGame.UI
                 networkErrorText.gameObject.SetActive(!string.IsNullOrEmpty(_viewModel.ErrorCode));
             if (retryButton != null)
                 retryButton.gameObject.SetActive(_viewModel.RetryVisible);
-            if (progressFillImage != null)
-                progressFillImage.fillAmount = _viewModel.Progress;
+
+            AnimateProgress(_viewModel.Progress);
 
             if (_viewModel.RequiresForceUpdate)
             {
@@ -75,10 +81,38 @@ namespace ProjectLink.OutGame.UI
             }
         }
 
+        void AnimateProgress(float target)
+        {
+            if (progressFillImage == null) return;
+            if (_progressCoroutine != null) StopCoroutine(_progressCoroutine);
+            _progressCoroutine = StartCoroutine(ProgressRoutine(target));
+        }
+
+        IEnumerator ProgressRoutine(float target)
+        {
+            float start = progressFillImage.fillAmount;
+            float elapsed = 0f;
+            const float duration = 0.45f;
+            while (elapsed < duration)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                progressFillImage.fillAmount = Mathf.Lerp(start, target, elapsed / duration);
+                yield return null;
+            }
+            progressFillImage.fillAmount = target;
+        }
+
         static void SetText(TextMeshProUGUI label, string value)
         {
             if (label != null)
                 label.text = value ?? "";
+        }
+
+        Image FindImage(string childName)
+        {
+            foreach (var img in GetComponentsInChildren<Image>(true))
+                if (img.name == childName) return img;
+            return null;
         }
 
         Button FindButton(string childName)

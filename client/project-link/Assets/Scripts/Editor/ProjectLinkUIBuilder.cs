@@ -435,9 +435,18 @@ namespace ProjectLink.EditorTools
         static void BuildBootstrap(RectTransform safe, GameObject canvasRoot)
         {
             // Slot_Logo — center placeholder (SpineGraphic at runtime)
-            var logo = MakeSlot(safe, "Slot_Logo", new Vector2(0, 200), new Vector2(560, 560));
+            MakeSlot(safe, "Slot_Logo", new Vector2(0, 200), new Vector2(560, 560));
 
-            // ProgressBar — bottom, Slider
+            // Txt_Loading — status text just above the progress bar
+            var loadingGo = MakeText(safe, "Txt_Loading", "", 30, TextCol, TextAlignmentOptions.Midline);
+            var loadingRect = loadingGo.GetComponent<RectTransform>();
+            SetAnchor(loadingRect, new Vector2(0, 0), new Vector2(1, 0), new Vector2(0.5f, 0));
+            loadingRect.sizeDelta = new Vector2(0, 50);
+            loadingRect.anchoredPosition = new Vector2(0, 295);
+            loadingRect.offsetMin = new Vector2(80, loadingRect.offsetMin.y);
+            loadingRect.offsetMax = new Vector2(-80, loadingRect.offsetMax.y);
+
+            // ProgressBar — bottom
             var bar = MakeChild(safe, "ProgressBar");
             SetAnchor(bar, new Vector2(0, 0), new Vector2(1, 0), new Vector2(0.5f, 0));
             bar.sizeDelta = new Vector2(0, 24);
@@ -453,31 +462,41 @@ namespace ProjectLink.EditorTools
             fillImg.color = AccentA;
             fillImg.type = Image.Type.Filled;
             fillImg.fillMethod = Image.FillMethod.Horizontal;
-            fillImg.fillAmount = 0.4f;
+            fillImg.fillAmount = 0f;
             var slider = bar.gameObject.AddComponent<Slider>();
-            slider.minValue = 0; slider.maxValue = 1; slider.value = 0.4f;
+            slider.minValue = 0; slider.maxValue = 1; slider.value = 0f;
             slider.direction = Slider.Direction.LeftToRight;
             slider.interactable = false;
             slider.fillRect = fill;
             slider.handleRect = null;
 
+            // Txt_Version — bottom-right
+            var verGo = MakeText(safe, "Txt_Version", "", 22, TextDisabled, TextAlignmentOptions.MidlineRight);
+            var verRect = verGo.GetComponent<RectTransform>();
+            verRect.sizeDelta = new Vector2(240, 40);
+            SetAnchor(verRect, new Vector2(1, 0), new Vector2(1, 0), new Vector2(1, 0));
+            verRect.anchoredPosition = new Vector2(-32, 32);
+
             // Btn_Retry — hidden by default
             var retry = MakeButton(safe, "Btn_Retry", "common.retry", new Vector2(400, 128), "btn_primary");
-            retry.transform.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -120);
             Center(retry.transform.GetComponent<RectTransform>(), new Vector2(0, -120), new Vector2(400, 128));
             retry.gameObject.SetActive(false);
 
-            // Txt_NetworkError — hidden by default
-            var errText = MakeText(safe, "Txt_NetworkError", "bootstrap.network_error", 28, Danger, TextAlignmentOptions.Midline);
-            Center(errText.GetComponent<RectTransform>(), new Vector2(0, -40), new Vector2(800, 60));
-            errText.gameObject.SetActive(false);
+            // Txt_NetworkError — hidden by default; text set dynamically by controller
+            var errGo = MakeText(safe, "Txt_NetworkError", "", 28, Danger, TextAlignmentOptions.Midline);
+            Center(errGo.GetComponent<RectTransform>(), new Vector2(0, -40), new Vector2(800, 60));
+            errGo.gameObject.SetActive(false);
 
             // PopupLayer
             AddPopupLayer(canvasRoot, 100);
 
             // Controller refs
             var ctrl = safe.gameObject.AddComponent<BootstrapWireframeController>();
+            Assign(ctrl, "loadingLabelText", loadingGo.GetComponent<TextMeshProUGUI>());
             Assign(ctrl, "progressFillImage", fillImg);
+            Assign(ctrl, "versionText", verGo.GetComponent<TextMeshProUGUI>());
+            Assign(ctrl, "retryButton", retry);
+            Assign(ctrl, "networkErrorText", errGo.GetComponent<TextMeshProUGUI>());
         }
 
         // ─── Title ────────────────────────────────────────────────────────

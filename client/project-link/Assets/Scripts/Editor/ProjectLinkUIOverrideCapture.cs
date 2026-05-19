@@ -28,18 +28,20 @@ namespace ProjectLink.EditorTools
                 Debug.LogWarning("[UIOverride] No baseline. Run 'Build All Scene UI' first.");
                 return;
             }
-
-            var manifest = UIOverrideManifest.LoadOrCreate();
             baseline.RebuildIndex();
-            manifest.entries.RemoveAll(e => e.status == "pending");
 
             var prevScene = SceneManager.GetActiveScene().path;
+
+            // Collect into a temporary list — scene/prefab operations can destroy Unity objects
+            // mid-loop (Unity may invalidate ScriptableObject refs during OpenScene), so we
+            // defer touching the manifest until all risky operations are done.
+            var newEntries = new List<UIOverrideManifest.Entry>();
 
             foreach (var path in ScenePaths)
             {
                 var sceneName = System.IO.Path.GetFileNameWithoutExtension(path);
                 var scene = EditorSceneManager.OpenScene(path, OpenSceneMode.Single);
-                CaptureScene(scene, $"Scene:{sceneName}", baseline, manifest);
+                CaptureScene(scene, $"Scene:{sceneName}", baseline, newEntries);
             }
 
             var guids = AssetDatabase.FindAssets("t:Prefab", new[] { PrefabRoot });
@@ -48,9 +50,14 @@ namespace ProjectLink.EditorTools
                 var prefabPath = AssetDatabase.GUIDToAssetPath(guid);
                 var prefabName = System.IO.Path.GetFileNameWithoutExtension(prefabPath);
                 var go = PrefabUtility.LoadPrefabContents(prefabPath);
-                CapturePrefabGO(go, $"Prefab:{prefabName}", baseline, manifest);
+                CapturePrefabGO(go, $"Prefab:{prefabName}", baseline, newEntries);
                 PrefabUtility.UnloadPrefabContents(go);
             }
+
+            // Load manifest fresh after all OpenScene/prefab operations
+            var manifest = UIOverrideManifest.LoadOrCreate();
+            manifest.entries.RemoveAll(e => e.status == "pending");
+            manifest.entries.AddRange(newEntries);
 
             EditorUtility.SetDirty(manifest);
             AssetDatabase.SaveAssets();
@@ -76,30 +83,29 @@ namespace ProjectLink.EditorTools
 
         // ─── Capture helpers ──────────────────────────────────────────────
 
-        static void CaptureScene(Scene scene, string target, UIBaselineSnapshot baseline, UIOverrideManifest manifest)
+        static void CaptureScene(Scene scene, string target, UIBaselineSnapshot baseline, List<UIOverrideManifest.Entry> results)
         {
             var visited = new HashSet<string>();
             foreach (var root in scene.GetRootGameObjects())
-                WalkGO(root, root.name, target, baseline, manifest, visited);
-            DetectRemovedGOs(target, visited, baseline, manifest);
+                WalkGO(root, root.name, target, baseline, results, visited);
+            DetectRemovedGOs(target, visited, baseline, results);
         }
 
-        static void CapturePrefabGO(GameObject root, string target, UIBaselineSnapshot baseline, UIOverrideManifest manifest)
+        static void CapturePrefabGO(GameObject root, string target, UIBaselineSnapshot baseline, List<UIOverrideManifest.Entry> results)
         {
             var visited = new HashSet<string>();
-            WalkGO(root, root.name, target, baseline, manifest, visited);
-            DetectRemovedGOs(target, visited, baseline, manifest);
+            WalkGO(root, root.name, target, baseline, results, visited);
+            DetectRemovedGOs(target, visited, baseline, results);
         }
 
         static void WalkGO(GameObject go, string path, string target,
-            UIBaselineSnapshot baseline, UIOverrideManifest manifest, HashSet<string> visited)
+            UIBaselineSnapshot baseline, List<UIOverrideManifest.Entry> results, HashSet<string> visited)
         {
             visited.Add(path);
             bool existsInBaseline = baseline.ContainsPath(target, path);
 
             if (existsInBaseline)
             {
-                // Diff tracked properties
                 foreach (var (comp, compType, keys) in UIPropertySerializer.TrackedComponents(go))
                 {
                     foreach (var key in keys)
@@ -109,9 +115,9 @@ namespace ProjectLink.EditorTools
                         if (!baseline.TryGet(target, path, compType, key, out var baseVal)) continue;
                         if (curr == baseVal) continue;
 
-                        manifest.entries.Add(new UIOverrideManifest.Entry
+                        results.Add(new UIOverrideManifest.Entry
                         {
-                            id      = manifest.NextId(target),
+                            id      = MakeId(target),
                             target  = target,
                             method  = MethodFor(target),
                             path    = path,
@@ -127,7 +133,6 @@ namespace ProjectLink.EditorTools
             }
             else
             {
-                // Not in baseline → manually added GO
                 var props = new List<UIOverrideManifest.PropSnapshot>();
                 foreach (var (comp, compType, keys) in UIPropertySerializer.TrackedComponents(go))
                     foreach (var key in keys)
@@ -136,9 +141,9 @@ namespace ProjectLink.EditorTools
                         if (val != null) props.Add(new UIOverrideManifest.PropSnapshot { comp = compType, key = key, val = val });
                     }
 
-                manifest.entries.Add(new UIOverrideManifest.Entry
+                results.Add(new UIOverrideManifest.Entry
                 {
-                    id         = manifest.NextId(target),
+                    id         = MakeId(target),
                     target     = target,
                     method     = MethodFor(target),
                     path       = path,
@@ -152,20 +157,20 @@ namespace ProjectLink.EditorTools
             for (int i = 0; i < go.transform.childCount; i++)
             {
                 var child = go.transform.GetChild(i);
-                WalkGO(child.gameObject, path + "/" + child.name, target, baseline, manifest, visited);
+                WalkGO(child.gameObject, path + "/" + child.name, target, baseline, results, visited);
             }
         }
 
         static void DetectRemovedGOs(string target, HashSet<string> visited,
-            UIBaselineSnapshot baseline, UIOverrideManifest manifest)
+            UIBaselineSnapshot baseline, List<UIOverrideManifest.Entry> results)
         {
             var baselinePaths = baseline.GetPathsForTarget(target);
             baselinePaths.ExceptWith(visited);
             foreach (var removedPath in baselinePaths)
             {
-                manifest.entries.Add(new UIOverrideManifest.Entry
+                results.Add(new UIOverrideManifest.Entry
                 {
-                    id     = manifest.NextId(target),
+                    id     = MakeId(target),
                     target = target,
                     method = MethodFor(target),
                     path   = removedPath,
@@ -180,50 +185,25 @@ namespace ProjectLink.EditorTools
             var name = target.Contains(":") ? target.Substring(target.IndexOf(':') + 1) : target;
             return $"Build{name}";
         }
+
+        static string MakeId(string target)
+        {
+            var name = target.Contains(":") ? target.Substring(target.IndexOf(':') + 1) : target;
+            var prefix = name.Length >= 3 ? name.Substring(0, 3).ToUpper() : name.ToUpper();
+            return $"{prefix}-{System.Guid.NewGuid().ToString("N").Substring(0, 8).ToUpper()}";
+        }
     }
 
     // ── Runtime apply helpers — called by ProjectLinkUIBuilder ────────────────
 
     public static class ProjectLinkUIOverrideApply
     {
-        const string PrefabRoot = "Assets/Resources/Prefabs/UI";
-
-        // Called from BuildScene — snapshot clean build state, then apply prop overrides
-        public static void SnapshotAndApplyScene(string sceneName)
+        // Called from BuildScene — apply pending prop overrides to active scene (NO snapshot here)
+        public static void ApplySceneOverrides(string sceneName)
         {
             var scene = SceneManager.GetActiveScene();
-
-            var baseline = UIBaselineSnapshot.LoadOrCreate();
-            baseline.RebuildIndex();
-            baseline.ClearTarget($"Scene:{sceneName}");
-            foreach (var root in scene.GetRootGameObjects())
-                SnapshotGO(root, root.name, $"Scene:{sceneName}", baseline);
-            baseline.Flush();
-            EditorUtility.SetDirty(baseline);
-
-            ApplyToScene(scene, $"Scene:{sceneName}");
-        }
-
-        // Called from SavePopupPrefab — snapshot clean build state, then apply prop overrides
-        public static void SnapshotAndApplyPrefab(GameObject root, string prefabName)
-        {
-            var target = $"Prefab:{prefabName}";
-
-            var baseline = UIBaselineSnapshot.LoadOrCreate();
-            baseline.RebuildIndex();
-            baseline.ClearTarget(target);
-            SnapshotGO(root, root.name, target, baseline);
-            baseline.Flush();
-            EditorUtility.SetDirty(baseline);
-
-            ApplyToGO(root, root.name, target);
-        }
-
-        // ─── Apply ────────────────────────────────────────────────────────
-
-        static void ApplyToScene(Scene scene, string target)
-        {
             var manifest = UIOverrideManifest.LoadOrCreate();
+            var target = $"Scene:{sceneName}";
             foreach (var entry in manifest.entries)
             {
                 if (entry.target != target || entry.status != "pending" || entry.op != "prop") continue;
@@ -233,9 +213,26 @@ namespace ProjectLink.EditorTools
             }
         }
 
-        static void ApplyToGO(GameObject root, string rootName, string target)
+        // Called from BuildAllSceneUI AFTER the restore check — baseline is saved from whatever
+        // is actually on disk, so CaptureAllOverrides will always diff against the correct state
+        public static void SaveBaselineForScene(string sceneName)
+        {
+            var scene = SceneManager.GetActiveScene();
+            var target = $"Scene:{sceneName}";
+            var baseline = UIBaselineSnapshot.LoadOrCreate();
+            baseline.RebuildIndex();
+            baseline.ClearTarget(target);
+            foreach (var root in scene.GetRootGameObjects())
+                SnapshotGO(root, root.name, target, baseline);
+            baseline.Flush();
+            EditorUtility.SetDirty(baseline);
+        }
+
+        // Called from SavePopupPrefab before SaveAsPrefabAsset — apply pending prop overrides
+        public static void ApplyPrefabOverrides(GameObject root, string prefabName)
         {
             var manifest = UIOverrideManifest.LoadOrCreate();
+            var target = $"Prefab:{prefabName}";
             foreach (var entry in manifest.entries)
             {
                 if (entry.target != target || entry.status != "pending" || entry.op != "prop") continue;
@@ -245,11 +242,33 @@ namespace ProjectLink.EditorTools
             }
         }
 
+        // Called from SavePopupPrefab AFTER RestoreIfUnchanged — loads from disk so baseline
+        // always matches the file that was actually committed (original or new)
+        public static void SaveBaselineForPrefab(string prefabPath, string prefabName)
+        {
+            var target = $"Prefab:{prefabName}";
+            var baseline = UIBaselineSnapshot.LoadOrCreate();
+            baseline.RebuildIndex();
+            baseline.ClearTarget(target);
+            if (System.IO.File.Exists(prefabPath))
+            {
+                var go = PrefabUtility.LoadPrefabContents(prefabPath);
+                SnapshotGO(go, go.name, target, baseline);
+                PrefabUtility.UnloadPrefabContents(go);
+            }
+            baseline.Flush();
+            EditorUtility.SetDirty(baseline);
+        }
+
+        // ─── Apply helper ─────────────────────────────────────────────────
+
         static void ApplyProp(GameObject go, string compType, string key, string val)
         {
             foreach (var c in go.GetComponents<Component>())
             {
                 if (c.GetType().Name != compType) continue;
+                // Skip if value already matches — prevents marking scene/font assets dirty
+                if (UIPropertySerializer.Get(c, key) == val) return;
                 if (!UIPropertySerializer.Set(c, key, val))
                     Debug.LogWarning($"[UIOverride] Set failed: {compType}.{key}={val} on {go.name}");
                 return;

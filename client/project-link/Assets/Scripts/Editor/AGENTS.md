@@ -11,7 +11,7 @@
 | `UIOverrideManifest.cs` | `UIOverrideManifest` | ScriptableObject; pending/promoted override entries; also writes `Assets/Editor/UIOverrideManifest.json` for AI agent |
 | `UIPropertySerializer.cs` | `UIPropertySerializer` | Static; get/set tracked component properties (RectTransform, Image, TMP, LayoutGroup, etc.) as strings |
 | `ProjectLinkUIOverrideCapture.cs` | `ProjectLinkUIOverrideCapture` | [MenuItem] CaptureAllOverrides, ClearPromoted |
-| `ProjectLinkUIOverrideCapture.cs` | `ProjectLinkUIOverrideApply` | Called by Builder; SnapshotAndApplyScene/Prefab — save baseline then re-apply pending prop overrides |
+| `ProjectLinkUIOverrideCapture.cs` | `ProjectLinkUIOverrideApply` | Called by Builder; apply pending prop overrides + save baseline after build/restore |
 
 ## Symbols
 | symbol | kind | note |
@@ -52,8 +52,10 @@
 | `ProjectLinkUIImageResourceExtractor.SaveResources()` | method | saves parsed previews as `baseFileName_1.png` style PNG files |
 | `ProjectLinkUIOverrideCapture.CaptureAllOverrides()` | method | [MenuItem] diffs all scenes+prefabs vs baseline → writes manifest; replaces all pending entries fresh each run |
 | `ProjectLinkUIOverrideCapture.ClearPromoted()` | method | [MenuItem] removes entries with status="promoted" from manifest |
-| `ProjectLinkUIOverrideApply.SnapshotAndApplyScene(sceneName)` | method | called by BuildScene; saves clean-build baseline then applies pending prop overrides to active scene |
-| `ProjectLinkUIOverrideApply.SnapshotAndApplyPrefab(root,prefabName)` | method | called by SavePopupPrefab; saves clean-build baseline then applies pending prop overrides to in-memory prefab root |
+| `ProjectLinkUIOverrideApply.ApplySceneOverrides(sceneName)` | method | called by BuildScene; applies pending prop overrides to active scene (no snapshot) |
+| `ProjectLinkUIOverrideApply.SaveBaselineForScene(sceneName)` | method | called by BuildAllSceneUI after restore check; snapshots active scene (matches disk) to baseline |
+| `ProjectLinkUIOverrideApply.ApplyPrefabOverrides(root,prefabName)` | method | called by SavePopupPrefab; applies pending prop overrides to in-memory prefab root (no snapshot) |
+| `ProjectLinkUIOverrideApply.SaveBaselineForPrefab(prefabPath,prefabName)` | method | called by SavePopupPrefab after RestoreIfUnchanged; loads prefab from disk, snapshots to baseline |
 | `UIBaselineSnapshot.TryGet(target,path,comp,key,val)` | method | lookup in index; returns false if not found |
 | `UIBaselineSnapshot.ContainsPath(target,path)` | method | true if any record exists for target+path (new_go detection) |
 | `UIBaselineSnapshot.GetPathsForTarget(target)` | method | returns all GO paths in baseline for a target (remove_go detection) |

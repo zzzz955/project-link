@@ -121,7 +121,11 @@ namespace ProjectLink.EditorTools
         public static void BuildAllSceneUI()
         {
             _skin = null;
-            BuildPopupPrefabs();
+            // Pre-create override assets once before any build loop — prevents AssetDatabase.SaveAssets
+            // being called inside the loop which can trigger reimport / domain reload
+            UIBaselineSnapshot.LoadOrCreate();
+            UIOverrideManifest.LoadOrCreate();
+            AssetDatabase.SaveAssets();
 
             if (!Application.isBatchMode)
                 EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo();
@@ -134,9 +138,20 @@ namespace ProjectLink.EditorTools
                 "Assets/Scenes/Game.unity"
             };
 
+            // Capture original scene contents before BuildPopupPrefabs — that method creates
+            // temp GameObjects in the active scene (marking it dirty) then calls SaveAssets,
+            // which can re-serialize and overwrite the active scene file on disk.
+            // Reading prev here guarantees we always diff/restore against the true git-committed content.
+            var prevContents = new System.Collections.Generic.Dictionary<string, string>(scenePaths.Length);
+            foreach (string p in scenePaths)
+                prevContents[p] = System.IO.File.Exists(p) ? System.IO.File.ReadAllText(p) : null;
+
+            BuildPopupPrefabs();
+
             foreach (string path in scenePaths)
             {
-                string prev = System.IO.File.Exists(path) ? System.IO.File.ReadAllText(path) : null;
+                string sceneName = System.IO.Path.GetFileNameWithoutExtension(path);
+                string prev = prevContents[path];
 
                 var scene = EditorSceneManager.OpenScene(path, OpenSceneMode.Single);
                 BuildScene(scene.name);
@@ -146,9 +161,15 @@ namespace ProjectLink.EditorTools
                 if (prev != null && ContentMatchesIgnoringFileIds(System.IO.File.ReadAllText(path), prev))
                 {
                     System.IO.File.WriteAllText(path, prev);
-                    // Reload from disk so the in-memory scene is clean (no "unsaved changes" prompt)
+                    // ImportAsset must be called after File.WriteAllText — otherwise SourceAssetDB
+                    // modification time diverges from disk and causes Import Error Code 4
+                    AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
                     EditorSceneManager.OpenScene(path, OpenSceneMode.Single);
                 }
+
+                // Baseline reflects whatever is now on disk: post-build or restored original.
+                // Active scene always matches disk at this point (either unchanged or re-opened).
+                ProjectLinkUIOverrideApply.SaveBaselineForScene(sceneName);
             }
 
             AssetDatabase.SaveAssets();
@@ -429,7 +450,7 @@ namespace ProjectLink.EditorTools
             NormalizeLayoutText(canvas);
             EnsureLocalizedFonts(canvas);
             AddAnimatorToIconImages(canvas);
-            ProjectLinkUIOverrideApply.SnapshotAndApplyScene(sceneName);
+            ProjectLinkUIOverrideApply.ApplySceneOverrides(sceneName);
         }
 
         // ─── Bootstrap ────────────────────────────────────────────────────
@@ -2335,11 +2356,13 @@ namespace ProjectLink.EditorTools
             string path = $"{PopupPrefabRoot}/{prefabName}.prefab";
             string prev = System.IO.File.Exists(path) ? System.IO.File.ReadAllText(path) : null;
 
-            ProjectLinkUIOverrideApply.SnapshotAndApplyPrefab(root, prefabName);
+            ProjectLinkUIOverrideApply.ApplyPrefabOverrides(root, prefabName);
             PrefabUtility.SaveAsPrefabAsset(root, path);
             Object.DestroyImmediate(root);
 
             RestoreIfUnchanged(path, prev);
+            // Baseline reflects whatever file is now on disk (post-build or restored original)
+            ProjectLinkUIOverrideApply.SaveBaselineForPrefab(path, prefabName);
         }
 
         // ─── Shared canvas / layer helpers ───────────────────────────────

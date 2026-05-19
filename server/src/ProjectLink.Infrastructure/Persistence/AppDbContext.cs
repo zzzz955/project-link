@@ -9,7 +9,6 @@ public class AppDbContext : DbContext
 
     public DbSet<Session>          Sessions         => Set<Session>();
     public DbSet<StageProgress>    StageProgress    => Set<StageProgress>();
-    public DbSet<ClientMeta>       ClientMeta       => Set<ClientMeta>();
     public DbSet<UserCurrency>     UserCurrencies   => Set<UserCurrency>();
     public DbSet<CurrencyLog>      CurrencyLogs     => Set<CurrencyLog>();
     public DbSet<StaminaState>     StaminaStates    => Set<StaminaState>();
@@ -48,16 +47,6 @@ public class AppDbContext : DbContext
             e.Property(x => x.StageId).HasColumnName("stage_id");
             e.Property(x => x.Stars).HasColumnName("stars");
             e.Property(x => x.ClearedAt).HasColumnName("cleared_at");
-        });
-
-        modelBuilder.Entity<ClientMeta>(e =>
-        {
-            e.ToTable("client_meta");
-            e.HasKey(x => x.ClientVersion);
-            e.Property(x => x.ClientVersion).HasColumnName("client_version").HasMaxLength(20);
-            e.Property(x => x.MetaHash).HasColumnName("meta_hash");
-            e.Property(x => x.ProtocolVersion).HasColumnName("protocol_version").HasMaxLength(20);
-            e.Property(x => x.CreatedAt).HasColumnName("created_at");
         });
 
         modelBuilder.Entity<UserCurrency>(e =>

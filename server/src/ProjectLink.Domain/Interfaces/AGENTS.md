@@ -30,6 +30,9 @@
 | `IStreakChallengeTransaction.ActivateAsync` | method | creates new cycle + level rows; idempotent on duplicate cycleId |
 | `IStreakChallengeTransaction.ClaimRewardAsync` | method | marks level reward claimed; deduplicates via correlation_id |
 | `IStaminaRefillTransaction.ExecuteAsync` | method | throws `StaminaAlreadyFullException` or `InsufficientFundsException` |
+| `IStaticDataService.MetaHash` | property | SHA-256 hex of all CS data values; `""` if not generated yet |
+| `IStaticDataService.DataSchemaVersion` | property | SHA-256 hex of CS column headers; `""` if not generated yet |
+| `IStaticDataService.GetClientBundle` | method | returns pre-built `client_bundle.json` string (C+CS CSV data for client patching); `""` if not generated |
 | `IStaticDataService.GetTimeExtendConfig` | method | O(1) lookup by extensionCount; null if not configured; used by `StageService.ExtendAsync` |
 
 ## Cross-refs

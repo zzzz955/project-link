@@ -2,6 +2,7 @@ using System;
 using ProjectLink.Contracts.Bootstrap;
 using ProjectLink.Contracts.Ranking;
 using ProjectLink.Core;
+using ProjectLink.Utils;
 using UnityEngine;
 
 namespace ProjectLink.Services
@@ -95,12 +96,76 @@ namespace ProjectLink.Services
         {
             Version = config?.ClientVersion ?? "";
             MaintenanceMessage = config?.MaintenanceMessage ?? "";
-            Progress = 1f;
 
-            RequiresForceUpdate = IsVersionGreater(config?.RequiredClientVersion, config?.ClientVersion);
-            ReadyToEnterTitle = !RequiresForceUpdate;
-            StatusStringId = RequiresForceUpdate ? "popup.force_update.title" : "bootstrap.ready";
+            if (IsVersionGreater(config?.RequiredClientVersion, config?.ClientVersion))
+            {
+                RequiresForceUpdate = true;
+                Progress = 1f;
+                StatusStringId = "popup.force_update.title";
+                CsvLoader.ClearPatch();
+                NotifyChanged();
+                return;
+            }
+
+            // DataSchemaVersion mismatch means client code change is needed — force update
+            var embeddedSchema = LoadEmbeddedText("data/data_schema_version");
+            if (!string.IsNullOrEmpty(config?.DataSchemaVersion)
+                && !string.IsNullOrEmpty(embeddedSchema)
+                && config.DataSchemaVersion != embeddedSchema)
+            {
+                RequiresForceUpdate = true;
+                Progress = 1f;
+                StatusStringId = "popup.force_update.title";
+                CsvLoader.ClearPatch();
+                NotifyChanged();
+                return;
+            }
+
+            // MetaHash mismatch — data values changed, patch without binary update
+            var localMetaHash = CsvLoader.GetPatchedMetaHash();
+            if (string.IsNullOrEmpty(localMetaHash))
+                localMetaHash = LoadEmbeddedText("data/meta_hash_cs");
+
+            if (!string.IsNullOrEmpty(config?.MetaHash)
+                && !string.IsNullOrEmpty(localMetaHash)
+                && config.MetaHash != localMetaHash)
+            {
+                Progress = 0.6f;
+                StatusStringId = "bootstrap.patching";
+                NotifyChanged();
+
+                _uiData.GetDataBundle(bundleResult =>
+                {
+                    if (bundleResult.IsSuccess)
+                        ApplyPatch(bundleResult.Value);
+                    else
+                        Debug.LogWarning($"[Bootstrap] Patch download failed: {bundleResult.ErrorCode}. Proceeding with bundled data.");
+
+                    Progress = 1f;
+                    StatusStringId = "bootstrap.ready";
+                    ReadyToEnterTitle = true;
+                    NotifyChanged();
+                });
+                return;
+            }
+
+            Progress = 1f;
+            StatusStringId = "bootstrap.ready";
+            ReadyToEnterTitle = true;
             NotifyChanged();
+        }
+
+        static void ApplyPatch(DataBundleResponse bundle)
+        {
+            foreach (var kv in bundle.Files)
+                CsvLoader.WritePatchFile(kv.Key, kv.Value);
+            CsvLoader.SavePatchedMetaHash(bundle.MetaHash);
+        }
+
+        static string LoadEmbeddedText(string resourcePath)
+        {
+            var asset = UnityEngine.Resources.Load<UnityEngine.TextAsset>(resourcePath);
+            return asset != null ? asset.text.Trim() : "";
         }
 
         static bool IsVersionGreater(string required, string current)

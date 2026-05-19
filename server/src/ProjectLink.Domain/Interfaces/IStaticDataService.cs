@@ -4,6 +4,10 @@ namespace ProjectLink.Domain.Interfaces;
 
 public interface IStaticDataService
 {
+    string MetaHash          { get; }
+    string DataSchemaVersion { get; }
+    string GetClientBundle();
+
     IngameStageData?               GetStage(int stageId);
     IngameItemData?                GetItem(int itemId);
     IReadOnlyList<IngameStageData> GetAllStages();

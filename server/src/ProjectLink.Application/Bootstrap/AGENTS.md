@@ -14,5 +14,6 @@
 - Consumed by: server `API.Controllers.BootstrapController` → `GET /api/bootstrap/config`
 
 ## Rules
-- IConfiguration keys: `Bootstrap:ClientVersion`, `Bootstrap:RequiredClientVersion`, `Bootstrap:ProtocolVersion`, `Bootstrap:MetaHash`, `Bootstrap:Maintenance`, `Bootstrap:MaintenanceMessage`
+- IConfiguration keys: `Bootstrap:ClientVersion`, `Bootstrap:RequiredClientVersion`, `Bootstrap:ProtocolVersion`, `Bootstrap:Maintenance`, `Bootstrap:MaintenanceMessage`
+- `MetaHash` and `DataSchemaVersion` are read from `IStaticDataService` (loaded from generated files at startup), NOT from IConfiguration
 - No authentication required on this endpoint

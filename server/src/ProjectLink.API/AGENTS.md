@@ -19,6 +19,6 @@
 
 ## Rules
 - `userId` extracted from authenticated claims in every authenticated controller; never from request body.
-- Unauthenticated endpoints: `GET /health`, `GET /api/bootstrap/config`, `GET /api/events/season`, `POST /api/auth/guest`, `POST /api/auth/refresh`, `POST /api/auth/google`, `POST /api/auth/logout`.
-- Middleware order in `Program.cs`: CorrelationId -> SerilogRequestLogging -> GlobalException -> HTTPS -> Auth -> Authorization -> RateLimit -> VersionCheck -> MetaHash -> SessionValidation -> Controllers.
+- Unauthenticated endpoints: `GET /health`, `GET /api/bootstrap/config`, `GET /api/data/bundle`, `GET /api/events/season`, `POST /api/auth/guest`, `POST /api/auth/refresh`, `POST /api/auth/google`, `POST /api/auth/logout`.
+- Middleware order in `Program.cs`: CorrelationId -> SerilogRequestLogging -> GlobalException -> HTTPS -> Auth -> Authorization -> RateLimit -> VersionCheck -> SessionValidation -> Controllers.
 - `LOG_LEVEL` env var overrides `appsettings.*.json` Serilog minimum level; `ProjectLinkConfiguration` must be loaded before `UseSerilog` for this to take effect.

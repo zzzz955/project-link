@@ -24,6 +24,7 @@
 | symbol | kind | note |
 |--------|------|------|
 | `BootstrapController.GetConfig` | method | `GET /api/bootstrap/config`; no auth; returns `BootstrapConfigResponse` |
+| `DataController.GetBundle` | method | `GET /api/data/bundle`; no auth; returns pre-built `client_bundle.json` (C+CS CSV data for client patching) |
 | `AuthController.Guest` | method | `POST /api/auth/guest`; mock: returns `AuthResponse` with mock:guest token; real: proxies to platform, transforms `AuthSessionResponse` → `AuthResponse` |
 | `AuthController.Refresh` | method | `POST /api/auth/refresh`; mock: returns fresh mock `AuthResponse`; real: proxies to `{authority}/auth/refresh`, transforms response |
 | `AuthController.Google` | method | `POST /api/auth/google`; mock: 400 PROVIDER_UNAVAILABLE; real: proxies to `{authority}/auth/google`, transforms response |
@@ -58,6 +59,7 @@
 | `PlayerSettingsController.Get` | method | `GET /api/settings` |
 | `PlayerSettingsController.Update` | method | `PATCH /api/settings`; partial update |
 | `EventController.GetSeasonEvents` | method | `GET /api/events/season`; no auth |
+| `DataController` | class | `/api/data`; no auth |
 
 ## Cross-refs
 - Depends on: all `Application.*Service` and `Application.*Query/Command` types.

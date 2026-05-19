@@ -1,15 +1,24 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Reflection;
+using System.Text;
 using UnityEngine;
 
 namespace ProjectLink.Utils
 {
     public static class CsvLoader
     {
+        static string PatchDir => Path.Combine(Application.persistentDataPath, "data_patch");
+        static string PatchHashPath => Path.Combine(PatchDir, "meta_hash.txt");
+
         public static T[] Load<T>(string resourcePath) where T : new()
         {
+            var patchFile = Path.Combine(PatchDir, resourcePath + ".csv");
+            if (File.Exists(patchFile))
+                return Parse<T>(File.ReadAllText(patchFile, Encoding.UTF8));
+
             var asset = Resources.Load<TextAsset>(resourcePath);
             if (asset == null)
             {
@@ -17,6 +26,30 @@ namespace ProjectLink.Utils
                 return Array.Empty<T>();
             }
             return Parse<T>(asset.text);
+        }
+
+        public static void WritePatchFile(string resourcePath, string csvContent)
+        {
+            var filePath = Path.Combine(PatchDir, resourcePath + ".csv");
+            Directory.CreateDirectory(Path.GetDirectoryName(filePath));
+            File.WriteAllText(filePath, csvContent, Encoding.UTF8);
+        }
+
+        public static string GetPatchedMetaHash()
+        {
+            return File.Exists(PatchHashPath) ? File.ReadAllText(PatchHashPath).Trim() : "";
+        }
+
+        public static void SavePatchedMetaHash(string metaHash)
+        {
+            Directory.CreateDirectory(PatchDir);
+            File.WriteAllText(PatchHashPath, metaHash, Encoding.UTF8);
+        }
+
+        public static void ClearPatch()
+        {
+            if (Directory.Exists(PatchDir))
+                Directory.Delete(PatchDir, true);
         }
 
         static T[] Parse<T>(string text) where T : new()

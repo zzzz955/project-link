@@ -42,6 +42,9 @@ namespace ProjectLink.Services
         public void GetBootstrapConfig(Action<ServiceResult<BootstrapConfigResponse>> onComplete)
             => Get(UiDataRoutes.BootstrapConfig, onComplete, false);
 
+        public void GetDataBundle(Action<ServiceResult<DataBundleResponse>> onComplete)
+            => Get(UiDataRoutes.DataBundle, onComplete, false);
+
         public void GetAccountMe(Action<ServiceResult<AccountMeResponse>> onComplete)
             => Get(UiDataRoutes.AccountMe, onComplete);
 

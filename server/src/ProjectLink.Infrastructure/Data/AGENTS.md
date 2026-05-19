@@ -18,6 +18,9 @@
 | `StaticDataService.GetLatestEnabledStreakChallengeEvent` | method | returns the latest enabled event row |
 | `StaticDataService.GetStreakChallengeLevels` | method | all level rows for an (eventId, version) ordered by levelIndex |
 | `StaticDataService.GetStreakChallengeRewardItems` | method | all items for a (rewardGroupId, rewardGroupVersion) |
+| `StaticDataService.MetaHash` | property | SHA-256 of CS data values; read from `generated/data/meta_hash_cs.txt` at startup |
+| `StaticDataService.DataSchemaVersion` | property | SHA-256 of CS column headers; read from `generated/data/data_schema_version.txt` at startup |
+| `StaticDataService.GetClientBundle` | method | returns raw JSON string from `generated/data/client_bundle.json`; served as-is by DataController |
 | `StaticDataService.GetShopCatalog` | method | all enabled + disabled products |
 | `StaticDataService.GetShopProduct` | method | O(1) lookup by productId |
 | `StaticDataService.GetAllSeasonEvents` | method | ordered list of all season events |

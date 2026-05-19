@@ -42,6 +42,7 @@ namespace ProjectLink.Services
     public interface IUiDataService
     {
         void GetBootstrapConfig(Action<ServiceResult<BootstrapConfigResponse>> onComplete);
+        void GetDataBundle(Action<ServiceResult<DataBundleResponse>> onComplete);
         void GetAccountMe(Action<ServiceResult<AccountMeResponse>> onComplete);
         void GetLobbyState(Action<ServiceResult<LobbyStateResponse>> onComplete);
         void GetProgress(Action<ServiceResult<ProgressResponse>> onComplete);

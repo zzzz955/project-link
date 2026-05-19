@@ -16,13 +16,19 @@ public class StaticDataService : IStaticDataService
     private readonly IReadOnlyDictionary<(int, int), StreakChallengeEventData>         _streakEvents;
     private readonly IReadOnlyDictionary<(int, int), List<StreakChallengeLevelData>>   _streakLevels;
     private readonly IReadOnlyDictionary<(int, int), List<StreakChallengeRewardItemData>> _streakRewardItems;
+    private readonly string _clientBundle;
+
+    public string MetaHash          { get; }
+    public string DataSchemaVersion { get; }
+    public string GetClientBundle() => _clientBundle;
 
     public StaticDataService(ILogger<StaticDataService> logger)
     {
         var basePath    = AppContext.BaseDirectory;
-        var ingamePath  = Path.Combine(basePath, "generated", "data", "ingame");
-        var outgamePath = Path.Combine(basePath, "generated", "data", "outgame");
-        var streakPath  = Path.Combine(basePath, "generated", "data", "streak_challenge");
+        var dataRoot    = Path.Combine(basePath, "generated", "data");
+        var ingamePath  = Path.Combine(dataRoot, "ingame");
+        var outgamePath = Path.Combine(dataRoot, "outgame");
+        var streakPath  = Path.Combine(dataRoot, "streak_challenge");
 
         _stages            = LoadStages(Path.Combine(ingamePath, "ingame_stage.csv"), logger);
         _items             = LoadItems(Path.Combine(ingamePath, "ingame_item.csv"), logger);
@@ -34,6 +40,23 @@ public class StaticDataService : IStaticDataService
         _streakEvents      = LoadStreakEvents(Path.Combine(streakPath, "streak_challenge_event.csv"), logger);
         _streakLevels      = LoadStreakLevels(Path.Combine(streakPath, "streak_challenge_level.csv"), logger);
         _streakRewardItems = LoadStreakRewardItems(Path.Combine(streakPath, "streak_challenge_reward_item.csv"), logger);
+
+        MetaHash          = ReadTextFile(Path.Combine(dataRoot, "meta_hash_cs.txt"), logger);
+        DataSchemaVersion = ReadTextFile(Path.Combine(dataRoot, "data_schema_version.txt"), logger);
+        _clientBundle     = ReadTextFile(Path.Combine(dataRoot, "client_bundle.json"), logger);
+
+        logger.LogInformation("StaticDataService ready — dataSchemaVersion={Schema} metaHash={Hash}",
+            DataSchemaVersion, MetaHash);
+    }
+
+    private static string ReadTextFile(string filePath, ILogger logger)
+    {
+        if (!File.Exists(filePath))
+        {
+            logger.LogWarning("Static data file not found: {Path}", filePath);
+            return "";
+        }
+        return File.ReadAllText(filePath).Trim();
     }
 
     public IngameStageData?                      GetStage(int stageId)      => _stages.GetValueOrDefault(stageId);

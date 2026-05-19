@@ -3,6 +3,7 @@ namespace ProjectLink.Services
     public static class UiDataRoutes
     {
         public const string BootstrapConfig = "/api/bootstrap/config";
+        public const string DataBundle       = "/api/data/bundle";
         public const string AccountMe = "/api/account/me";
         public const string LobbyState = "/api/lobby";
         public const string Progress = "/api/progress";

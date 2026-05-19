@@ -226,7 +226,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.UseRateLimiter();
 app.UseMiddleware<VersionCheckMiddleware>();
-app.UseMiddleware<MetaHashMiddleware>();
 app.UseMiddleware<SessionValidationMiddleware>();
 
 app.UseSwagger(options =>

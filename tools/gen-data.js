@@ -11,9 +11,10 @@
  *   Row 5+: actual data
  */
 
-const fs   = require('fs');
-const path = require('path');
-const cfg  = require('./config-loader');
+const fs     = require('fs');
+const path   = require('path');
+const crypto = require('crypto');
+const cfg    = require('./config-loader');
 
 const VALID_PRIMITIVE_TYPES = new Set([
   'int8','int16','int32','int64',
@@ -266,6 +267,23 @@ function collectCSVFiles(dir, base) {
   return results;
 }
 
+// ── Hash helpers ──────────────────────────────────────────────────────────────
+const escapeCsvValue = (value) => {
+  if (value === null) return '';
+  const text = String(value);
+  return /[",\r\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+};
+
+function buildCsvText(cols, rows) {
+  const header = cols.map(c => c.name).join(',');
+  const dataLines = rows.map(row => cols.map(c => escapeCsvValue(row[c.name])).join(','));
+  return [header, ...dataLines].join('\n');
+}
+
+function sha256hex(str) {
+  return crypto.createHash('sha256').update(str, 'utf8').digest('hex');
+}
+
 // ── Main ──────────────────────────────────────────────────────────────────────
 function main() {
   const { datasDir, clientGenerated, clientScriptsGenerated, serverGenerated, serverScriptsGenerated } = cfg.paths;
@@ -278,6 +296,11 @@ function main() {
 
   let totalErrors = 0;
   const allErrors = [];
+
+  // Accumulators for hash computation (CS-scope only, sorted by resourcePath)
+  const csSchemaLines  = []; // "{resourcePath}\t{colName}\t{colType}\t{constraints}"
+  const csDataLines    = []; // "{resourcePath}\t{rowIdx}\t{colName}\t{value}"
+  const clientBundleFiles = {}; // resourcePath → client CSV text (C+CS scope)
 
   for (const { full, rel } of csvFiles) {
     const content = fs.readFileSync(full, 'utf-8');
@@ -297,23 +320,15 @@ function main() {
     ensureDir(clientDir);
     ensureDir(serverDir);
 
-    // Client: filtered CSV — header once, values only (no repeated field names per row)
     const clientCols = schema.columns.filter(c => cfg.dataGen.clientTargets.includes(c.target));
-    const escapeCsvValue = (value) => {
-      if (value === null) return '';
-      const text = String(value);
-      return /[",\r\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
-    };
+    const serverCols = schema.columns.filter(c => cfg.dataGen.serverTargets.includes(c.target));
+    const csCols     = schema.columns.filter(c => c.target === 'CS');
 
-    const csvLines = [
-      clientCols.map(c => c.name).join(','),
-      ...clientData.map(row =>
-        clientCols.map(c => escapeCsvValue(row[c.name])).join(',')
-      ),
-    ];
-    fs.writeFileSync(path.join(clientDir, `${baseName}.csv`), csvLines.join('\n'), 'utf-8');
+    // ── Client CSV ────────────────────────────────────────────────────────────
+    const clientCsvText = buildCsvText(clientCols, clientData);
+    fs.writeFileSync(path.join(clientDir, `${baseName}.csv`), clientCsvText, 'utf-8');
 
-    // Client: C# model class
+    // ── Client C# model class ─────────────────────────────────────────────────
     const className    = toPascalCase(baseName);
     const resourcePath = `data/${subDir.replace(/\\/g, '/')}/${baseName}`;
     const csContent    = generateCSharpClass(className, clientCols, resourcePath, cfg.dataGen.clientNamespace, rel);
@@ -321,25 +336,32 @@ function main() {
     ensureDir(csDir);
     fs.writeFileSync(path.join(csDir, `${className}.cs`), csContent, 'utf-8');
 
-    // Server: C# model class
-    const serverCols  = schema.columns.filter(c => cfg.dataGen.serverTargets.includes(c.target));
-
-    // Server: filtered CSV - same data file format as client
-    const serverCsvLines = [
-      serverCols.map(c => c.name).join(','),
-      ...serverData.map(row =>
-        serverCols.map(c => escapeCsvValue(row[c.name])).join(',')
-      ),
-    ];
-    fs.writeFileSync(path.join(serverDir, `${baseName}.csv`), serverCsvLines.join('\n'), 'utf-8');
+    // ── Server CSV ────────────────────────────────────────────────────────────
+    const serverCsvText = buildCsvText(serverCols, serverData);
+    fs.writeFileSync(path.join(serverDir, `${baseName}.csv`), serverCsvText, 'utf-8');
 
     const staleServerJson = path.join(serverDir, `${baseName}.json`);
     if (fs.existsSync(staleServerJson)) fs.unlinkSync(staleServerJson);
 
+    // ── Server C# model class ─────────────────────────────────────────────────
     const serverCsContent = generateServerCSharpClass(className, serverCols, cfg.dataGen.serverNamespace, rel);
     const serverCsDir = path.join(serverScriptsGenerated, subDir);
     ensureDir(serverCsDir);
     fs.writeFileSync(path.join(serverCsDir, `${className}.cs`), serverCsContent, 'utf-8');
+
+    // ── Collect CS data for hashing ───────────────────────────────────────────
+    for (const col of csCols) {
+      csSchemaLines.push(`${resourcePath}\t${col.name}\t${col.type}\t${col.constraints.join(',')}`);
+    }
+    serverData.forEach((row, rowIdx) => {
+      for (const col of csCols) {
+        const val = row[col.name];
+        csDataLines.push(`${resourcePath}\t${rowIdx}\t${col.name}\t${val === null ? '' : String(val)}`);
+      }
+    });
+
+    // ── Collect client CSV for bundle (C+CS scope) ────────────────────────────
+    clientBundleFiles[resourcePath] = clientCsvText;
 
     console.log(`[gen-data] OK: ${rel}`);
   }
@@ -356,7 +378,30 @@ function main() {
     process.exit(1);
   }
 
+  // ── Compute CS hashes ─────────────────────────────────────────────────────
+  csSchemaLines.sort();
+  csDataLines.sort();
+  const dataSchemaVersion = sha256hex(csSchemaLines.join('\n'));
+  const metaHashCs        = sha256hex(csDataLines.join('\n'));
+
+  // ── Write hash files to both outputs ─────────────────────────────────────
+  const clientDataRoot = path.join(clientGenerated, 'data');
+  const serverDataRoot = path.join(serverGenerated, 'data');
+  ensureDir(clientDataRoot);
+  ensureDir(serverDataRoot);
+
+  fs.writeFileSync(path.join(clientDataRoot, 'data_schema_version.txt'), dataSchemaVersion, 'utf-8');
+  fs.writeFileSync(path.join(clientDataRoot, 'meta_hash_cs.txt'),        metaHashCs,        'utf-8');
+  fs.writeFileSync(path.join(serverDataRoot, 'data_schema_version.txt'), dataSchemaVersion, 'utf-8');
+  fs.writeFileSync(path.join(serverDataRoot, 'meta_hash_cs.txt'),        metaHashCs,        'utf-8');
+
+  // ── Write client bundle JSON to server output ─────────────────────────────
+  const bundle = JSON.stringify({ schemaVersion: dataSchemaVersion, metaHash: metaHashCs, files: clientBundleFiles });
+  fs.writeFileSync(path.join(serverDataRoot, 'client_bundle.json'), bundle, 'utf-8');
+
   console.log(`[gen-data] Done: ${csvFiles.length} file(s) processed.`);
+  console.log(`[gen-data] dataSchemaVersion: ${dataSchemaVersion}`);
+  console.log(`[gen-data] metaHash:          ${metaHashCs}`);
 }
 
 try {

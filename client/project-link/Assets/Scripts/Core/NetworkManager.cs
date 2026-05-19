@@ -13,7 +13,6 @@ namespace ProjectLink.Core
         [SerializeField] AppEnvironment environment = AppEnvironment.Dev;
         [SerializeField] string clientVersion = "1.0.0";
         [SerializeField] string protocolVersion = "1";
-        [SerializeField] string metaHash = "";
         [SerializeField] bool httpLogging = true;
 
         string _baseUrl;
@@ -102,9 +101,6 @@ namespace ProjectLink.Core
         {
             req.SetRequestHeader("X-Client-Version", clientVersion);
             req.SetRequestHeader("X-Protocol-Version", protocolVersion);
-
-            if (!string.IsNullOrEmpty(metaHash))
-                req.SetRequestHeader("X-Meta-Hash", metaHash);
 
             var token = _authService?.GetToken();
             if (!string.IsNullOrEmpty(token))

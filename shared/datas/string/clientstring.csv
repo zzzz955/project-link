@@ -15,6 +15,7 @@ common.resume,Resume,계속,继续,繼續,เล่นต่อ
 bootstrap.loading,Loading...,로딩 중...,加载中...,載入中...,กำลังโหลด...
 bootstrap.ready,Ready,준비 완료,准备就绪,準備就緒,พร้อม
 bootstrap.network_error,Network error. Please try again.,네트워크 오류입니다. 다시 시도해 주세요.,网络错误。请重试。,網路錯誤。請重試。,เกิดข้อผิดพลาดของเครือข่าย โปรดลองอีกครั้ง
+bootstrap.patching,Updating game data...,게임 데이터 업데이트 중...,正在更新游戏数据...,正在更新遊戲資料...,กำลังอัปเดตข้อมูลเกม...
 title.tap_to_start,TAP TO START,탭해서 시작,点击开始,點擊開始,แตะเพื่อเริ่ม
 title.continue_google,Continue with Google,Google로 계속하기,使用 Google 继续,使用 Google 繼續,ดำเนินการต่อด้วย Google
 title.continue_apple,Continue with Apple,Apple로 계속하기,使用 Apple 继续,使用 Apple 繼續,ดำเนินการต่อด้วย Apple

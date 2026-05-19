@@ -90,7 +90,8 @@ namespace ProjectLink.OutGame.UI
                     var ts = System.Xml.XmlConvert.ToTimeSpan(remainingTimeIso);
                     _expiresAt = DateTimeOffset.UtcNow.Add(ts);
                     UpdateTimerText();
-                    _timerLoop = StartCoroutine(TimerLoop());
+                    if (gameObject.activeInHierarchy)
+                        _timerLoop = StartCoroutine(TimerLoop());
                 }
                 catch { SetProgressText(""); }
             }

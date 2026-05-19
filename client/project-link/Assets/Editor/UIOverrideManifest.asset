@@ -12,4 +12,5029 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7427f00c341b49241989101a78abeece, type: 3}
   m_Name: UIOverrideManifest
   m_EditorClassIdentifier: Assembly-CSharp-Editor::ProjectLink.EditorTools.UIOverrideManifest
-  entries: []
+  entries:
+  - id: BOO-2DE016A7
+    target: Scene:Bootstrap
+    method: BuildBootstrap
+    path: Main Camera
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: BOO-23A0D84D
+    target: Scene:Bootstrap
+    method: BuildBootstrap
+    path: BootstrapEntry
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 1
+    goProps: []
+    status: pending
+  - id: BOO-49644676
+    target: Scene:Bootstrap
+    method: BuildBootstrap
+    path: EventSystem
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 2
+    goProps: []
+    status: pending
+  - id: BOO-24FC2F1A
+    target: Scene:Bootstrap
+    method: BuildBootstrap
+    path: NetworkManager
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 3
+    goProps: []
+    status: pending
+  - id: TIT-3408808D
+    target: Scene:Title
+    method: BuildTitle
+    path: Main Camera
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: TIT-8274854F
+    target: Scene:Title
+    method: BuildTitle
+    path: EventSystem
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 1
+    goProps: []
+    status: pending
+  - id: LOB-819C219C
+    target: Scene:Lobby
+    method: BuildLobby
+    path: Main Camera
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: LOB-B517D101
+    target: Scene:Lobby
+    method: BuildLobby
+    path: EventSystem
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 1
+    goProps: []
+    status: pending
+  - id: LOB-A4501CCD
+    target: Scene:Lobby
+    method: BuildLobby
+    path: LobbyCanvas/SafeArea/HUD_Strip/Slot_Avatar
+    op: prop
+    comp: RectTransform
+    key: sizeDelta
+    baseVal: (80.0000,80.0000)
+    currVal: (0.0000,0.0000)
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: LOB-A99DBCC4
+    target: Scene:Lobby
+    method: BuildLobby
+    path: LobbyCanvas/SafeArea/HUD_Strip/Slot_Avatar
+    op: prop
+    comp: RectTransform
+    key: anchorMin
+    baseVal: (0.5000,0.5000)
+    currVal: (0.0000,0.0000)
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: LOB-E9C56D63
+    target: Scene:Lobby
+    method: BuildLobby
+    path: LobbyCanvas/SafeArea/HUD_Strip/Slot_Avatar
+    op: prop
+    comp: RectTransform
+    key: anchorMax
+    baseVal: (0.5000,0.5000)
+    currVal: (0.0000,0.0000)
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: LOB-81591807
+    target: Scene:Lobby
+    method: BuildLobby
+    path: LobbyCanvas/SafeArea/HUD_Strip/Group_Stamina
+    op: prop
+    comp: RectTransform
+    key: sizeDelta
+    baseVal: (0.0000,88.0000)
+    currVal: (0.0000,0.0000)
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: LOB-0C268106
+    target: Scene:Lobby
+    method: BuildLobby
+    path: LobbyCanvas/SafeArea/HUD_Strip/Group_Stamina
+    op: prop
+    comp: RectTransform
+    key: anchorMin
+    baseVal: (0.5000,0.5000)
+    currVal: (0.0000,0.0000)
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: LOB-E7ADD9EC
+    target: Scene:Lobby
+    method: BuildLobby
+    path: LobbyCanvas/SafeArea/HUD_Strip/Group_Stamina
+    op: prop
+    comp: RectTransform
+    key: anchorMax
+    baseVal: (0.5000,0.5000)
+    currVal: (0.0000,0.0000)
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: LOB-23A9BAE5
+    target: Scene:Lobby
+    method: BuildLobby
+    path: LobbyCanvas/SafeArea/HUD_Strip/Group_Stamina/Stack_Stamina
+    op: prop
+    comp: RectTransform
+    key: sizeDelta
+    baseVal: (64.0000,64.0000)
+    currVal: (64.0000,0.0000)
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: LOB-58E00D5E
+    target: Scene:Lobby
+    method: BuildLobby
+    path: LobbyCanvas/SafeArea/HUD_Strip/Group_Stamina/Stack_Stamina
+    op: prop
+    comp: RectTransform
+    key: anchorMin
+    baseVal: (0.5000,0.5000)
+    currVal: (0.0000,0.0000)
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: LOB-8F4B9369
+    target: Scene:Lobby
+    method: BuildLobby
+    path: LobbyCanvas/SafeArea/HUD_Strip/Group_Stamina/Stack_Stamina
+    op: prop
+    comp: RectTransform
+    key: anchorMax
+    baseVal: (0.5000,0.5000)
+    currVal: (0.0000,0.0000)
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: LOB-6452CB7E
+    target: Scene:Lobby
+    method: BuildLobby
+    path: LobbyCanvas/SafeArea/HUD_Strip/Group_Stamina/Stack_Stamina/Txt_StaminaCount
+    op: prop
+    comp: TextMeshProUGUI
+    key: fontSize
+    baseVal: 26.00
+    currVal: 48.00
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: LOB-85300581
+    target: Scene:Lobby
+    method: BuildLobby
+    path: LobbyCanvas/SafeArea/HUD_Strip/Group_Stamina/Txt_StaminaTimer
+    op: prop
+    comp: RectTransform
+    key: sizeDelta
+    baseVal: (136.0000,44.0000)
+    currVal: (136.0000,0.0000)
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: LOB-A091FB39
+    target: Scene:Lobby
+    method: BuildLobby
+    path: LobbyCanvas/SafeArea/HUD_Strip/Group_Stamina/Txt_StaminaTimer
+    op: prop
+    comp: RectTransform
+    key: anchorMin
+    baseVal: (0.5000,0.5000)
+    currVal: (0.0000,0.0000)
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: LOB-2F1B9B12
+    target: Scene:Lobby
+    method: BuildLobby
+    path: LobbyCanvas/SafeArea/HUD_Strip/Group_Stamina/Txt_StaminaTimer
+    op: prop
+    comp: RectTransform
+    key: anchorMax
+    baseVal: (0.5000,0.5000)
+    currVal: (0.0000,0.0000)
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: LOB-187D9DC2
+    target: Scene:Lobby
+    method: BuildLobby
+    path: LobbyCanvas/SafeArea/HUD_Strip/Group_Currency
+    op: prop
+    comp: RectTransform
+    key: sizeDelta
+    baseVal: (176.0000,88.0000)
+    currVal: (0.0000,0.0000)
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: LOB-DC445A78
+    target: Scene:Lobby
+    method: BuildLobby
+    path: LobbyCanvas/SafeArea/HUD_Strip/Group_Currency
+    op: prop
+    comp: RectTransform
+    key: anchorMin
+    baseVal: (0.5000,0.5000)
+    currVal: (0.0000,0.0000)
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: LOB-2483C6A9
+    target: Scene:Lobby
+    method: BuildLobby
+    path: LobbyCanvas/SafeArea/HUD_Strip/Group_Currency
+    op: prop
+    comp: RectTransform
+    key: anchorMax
+    baseVal: (0.5000,0.5000)
+    currVal: (0.0000,0.0000)
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: LOB-07ECCA09
+    target: Scene:Lobby
+    method: BuildLobby
+    path: LobbyCanvas/SafeArea/HUD_Strip/Group_Currency/Icon_Currency
+    op: prop
+    comp: RectTransform
+    key: sizeDelta
+    baseVal: (56.0000,56.0000)
+    currVal: (56.0000,0.0000)
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: LOB-51419CFA
+    target: Scene:Lobby
+    method: BuildLobby
+    path: LobbyCanvas/SafeArea/HUD_Strip/Group_Currency/Icon_Currency
+    op: prop
+    comp: RectTransform
+    key: anchorMin
+    baseVal: (0.5000,0.5000)
+    currVal: (0.0000,0.0000)
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: LOB-53B4EE02
+    target: Scene:Lobby
+    method: BuildLobby
+    path: LobbyCanvas/SafeArea/HUD_Strip/Group_Currency/Icon_Currency
+    op: prop
+    comp: RectTransform
+    key: anchorMax
+    baseVal: (0.5000,0.5000)
+    currVal: (0.0000,0.0000)
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: LOB-4ACF7E47
+    target: Scene:Lobby
+    method: BuildLobby
+    path: LobbyCanvas/SafeArea/HUD_Strip/Group_Currency/Txt_CurrencyCount
+    op: prop
+    comp: RectTransform
+    key: sizeDelta
+    baseVal: (96.0000,44.0000)
+    currVal: (96.0000,0.0000)
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: LOB-44580FDF
+    target: Scene:Lobby
+    method: BuildLobby
+    path: LobbyCanvas/SafeArea/HUD_Strip/Group_Currency/Txt_CurrencyCount
+    op: prop
+    comp: RectTransform
+    key: anchorMin
+    baseVal: (0.5000,0.5000)
+    currVal: (0.0000,0.0000)
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: LOB-E2E2E037
+    target: Scene:Lobby
+    method: BuildLobby
+    path: LobbyCanvas/SafeArea/HUD_Strip/Group_Currency/Txt_CurrencyCount
+    op: prop
+    comp: RectTransform
+    key: anchorMax
+    baseVal: (0.5000,0.5000)
+    currVal: (0.0000,0.0000)
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: LOB-76FA548B
+    target: Scene:Lobby
+    method: BuildLobby
+    path: LobbyCanvas/SafeArea/HUD_Strip/Btn_Menu
+    op: prop
+    comp: RectTransform
+    key: sizeDelta
+    baseVal: (80.0000,80.0000)
+    currVal: (0.0000,0.0000)
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: LOB-0483020B
+    target: Scene:Lobby
+    method: BuildLobby
+    path: LobbyCanvas/SafeArea/HUD_Strip/Btn_Menu
+    op: prop
+    comp: RectTransform
+    key: anchorMin
+    baseVal: (0.5000,0.5000)
+    currVal: (0.0000,0.0000)
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: LOB-154AB837
+    target: Scene:Lobby
+    method: BuildLobby
+    path: LobbyCanvas/SafeArea/HUD_Strip/Btn_Menu
+    op: prop
+    comp: RectTransform
+    key: anchorMax
+    baseVal: (0.5000,0.5000)
+    currVal: (0.0000,0.0000)
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: LOB-931F70F9
+    target: Scene:Lobby
+    method: BuildLobby
+    path: LobbyCanvas/SafeArea/Group_TabBodies/Tab_Home/Carousel_Stages/Group_Track/StageNode_Center
+    op: prop
+    comp: RectTransform
+    key: anchorMin
+    baseVal: (0.5000,0.5000)
+    currVal: (0.0000,0.0000)
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: LOB-F37790E2
+    target: Scene:Lobby
+    method: BuildLobby
+    path: LobbyCanvas/SafeArea/Group_TabBodies/Tab_Home/Carousel_Stages/Group_Track/StageNode_Center
+    op: prop
+    comp: RectTransform
+    key: anchorMax
+    baseVal: (0.5000,0.5000)
+    currVal: (0.0000,0.0000)
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: LOB-A730600C
+    target: Scene:Lobby
+    method: BuildLobby
+    path: LobbyCanvas/SafeArea/Group_TabBodies/Tab_Home/Carousel_Stages/Group_Track/StageNode_Center/Group_Stars/Img_Star_0
+    op: prop
+    comp: RectTransform
+    key: anchorMin
+    baseVal: (0.5000,0.5000)
+    currVal: (0.0000,0.0000)
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: LOB-383C7B95
+    target: Scene:Lobby
+    method: BuildLobby
+    path: LobbyCanvas/SafeArea/Group_TabBodies/Tab_Home/Carousel_Stages/Group_Track/StageNode_Center/Group_Stars/Img_Star_0
+    op: prop
+    comp: RectTransform
+    key: anchorMax
+    baseVal: (0.5000,0.5000)
+    currVal: (0.0000,0.0000)
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: LOB-01E1DD05
+    target: Scene:Lobby
+    method: BuildLobby
+    path: LobbyCanvas/SafeArea/Group_TabBodies/Tab_Home/Carousel_Stages/Group_Track/StageNode_Center/Group_Stars/Img_Star_1
+    op: prop
+    comp: RectTransform
+    key: anchorMin
+    baseVal: (0.5000,0.5000)
+    currVal: (0.0000,0.0000)
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: LOB-B4824FA9
+    target: Scene:Lobby
+    method: BuildLobby
+    path: LobbyCanvas/SafeArea/Group_TabBodies/Tab_Home/Carousel_Stages/Group_Track/StageNode_Center/Group_Stars/Img_Star_1
+    op: prop
+    comp: RectTransform
+    key: anchorMax
+    baseVal: (0.5000,0.5000)
+    currVal: (0.0000,0.0000)
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: LOB-C8B7DA9D
+    target: Scene:Lobby
+    method: BuildLobby
+    path: LobbyCanvas/SafeArea/Group_TabBodies/Tab_Home/Carousel_Stages/Group_Track/StageNode_Center/Group_Stars/Img_Star_2
+    op: prop
+    comp: RectTransform
+    key: anchorMin
+    baseVal: (0.5000,0.5000)
+    currVal: (0.0000,0.0000)
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: LOB-6B63411A
+    target: Scene:Lobby
+    method: BuildLobby
+    path: LobbyCanvas/SafeArea/Group_TabBodies/Tab_Home/Carousel_Stages/Group_Track/StageNode_Center/Group_Stars/Img_Star_2
+    op: prop
+    comp: RectTransform
+    key: anchorMax
+    baseVal: (0.5000,0.5000)
+    currVal: (0.0000,0.0000)
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: LOB-25E7DD91
+    target: Scene:Lobby
+    method: BuildLobby
+    path: LobbyCanvas/SafeArea/Group_TabBodies/Tab_Home/Group_Events/Badge_Streak
+    op: prop
+    comp: RectTransform
+    key: anchorMin
+    baseVal: (0.5000,0.5000)
+    currVal: (0.0000,0.0000)
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: LOB-FD957507
+    target: Scene:Lobby
+    method: BuildLobby
+    path: LobbyCanvas/SafeArea/Group_TabBodies/Tab_Home/Group_Events/Badge_Streak
+    op: prop
+    comp: RectTransform
+    key: anchorMax
+    baseVal: (0.5000,0.5000)
+    currVal: (0.0000,0.0000)
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: LOB-C7C6DF3F
+    target: Scene:Lobby
+    method: BuildLobby
+    path: LobbyCanvas/SafeArea/Group_TabBodies/Tab_Home/Group_Events/Txt_Progress
+    op: prop
+    comp: RectTransform
+    key: anchorMin
+    baseVal: (0.5000,0.5000)
+    currVal: (0.0000,0.0000)
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: LOB-0338041E
+    target: Scene:Lobby
+    method: BuildLobby
+    path: LobbyCanvas/SafeArea/Group_TabBodies/Tab_Home/Group_Events/Txt_Progress
+    op: prop
+    comp: RectTransform
+    key: anchorMax
+    baseVal: (0.5000,0.5000)
+    currVal: (0.0000,0.0000)
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: LOB-B11DDB28
+    target: Scene:Lobby
+    method: BuildLobby
+    path: LobbyCanvas/SafeArea/TabBar/Tab_Shop
+    op: prop
+    comp: RectTransform
+    key: anchorMax
+    baseVal: (1.0000,1.0000)
+    currVal: (0.0000,0.0000)
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: LOB-94C27E54
+    target: Scene:Lobby
+    method: BuildLobby
+    path: LobbyCanvas/SafeArea/TabBar/Tab_Shop/Icon
+    op: prop
+    comp: RectTransform
+    key: anchoredPosition
+    baseVal: (0.0000,-18.0000)
+    currVal: (0.0000,0.0000)
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: LOB-49760AE3
+    target: Scene:Lobby
+    method: BuildLobby
+    path: LobbyCanvas/SafeArea/TabBar/Tab_Shop/Icon
+    op: prop
+    comp: RectTransform
+    key: sizeDelta
+    baseVal: (64.0000,64.0000)
+    currVal: (0.0000,0.0000)
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: LOB-CC260993
+    target: Scene:Lobby
+    method: BuildLobby
+    path: LobbyCanvas/SafeArea/TabBar/Tab_Shop/Icon
+    op: prop
+    comp: RectTransform
+    key: anchorMin
+    baseVal: (0.5000,1.0000)
+    currVal: (0.0000,0.0000)
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: LOB-13A40EB9
+    target: Scene:Lobby
+    method: BuildLobby
+    path: LobbyCanvas/SafeArea/TabBar/Tab_Shop/Icon
+    op: prop
+    comp: RectTransform
+    key: anchorMax
+    baseVal: (0.5000,1.0000)
+    currVal: (0.0000,0.0000)
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: LOB-E07F03F2
+    target: Scene:Lobby
+    method: BuildLobby
+    path: LobbyCanvas/SafeArea/TabBar/Tab_Shop/Txt
+    op: prop
+    comp: RectTransform
+    key: anchoredPosition
+    baseVal: (0.0000,16.0000)
+    currVal: (0.0000,0.0000)
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: LOB-3F39CD3F
+    target: Scene:Lobby
+    method: BuildLobby
+    path: LobbyCanvas/SafeArea/TabBar/Tab_Shop/Txt
+    op: prop
+    comp: RectTransform
+    key: sizeDelta
+    baseVal: (140.0000,32.0000)
+    currVal: (0.0000,0.0000)
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: LOB-2278B765
+    target: Scene:Lobby
+    method: BuildLobby
+    path: LobbyCanvas/SafeArea/TabBar/Tab_Shop/Txt
+    op: prop
+    comp: RectTransform
+    key: anchorMin
+    baseVal: (0.5000,0.0000)
+    currVal: (0.0000,0.0000)
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: LOB-FB6008DA
+    target: Scene:Lobby
+    method: BuildLobby
+    path: LobbyCanvas/SafeArea/TabBar/Tab_Shop/Txt
+    op: prop
+    comp: RectTransform
+    key: anchorMax
+    baseVal: (0.5000,0.0000)
+    currVal: (0.0000,0.0000)
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: LOB-4E20AAC5
+    target: Scene:Lobby
+    method: BuildLobby
+    path: LobbyCanvas/SafeArea/TabBar/Tab_Home
+    op: prop
+    comp: RectTransform
+    key: anchorMax
+    baseVal: (1.0000,1.0000)
+    currVal: (0.0000,0.0000)
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: LOB-6686B4A9
+    target: Scene:Lobby
+    method: BuildLobby
+    path: LobbyCanvas/SafeArea/TabBar/Tab_Home/Icon
+    op: prop
+    comp: RectTransform
+    key: anchoredPosition
+    baseVal: (0.0000,-18.0000)
+    currVal: (0.0000,0.0000)
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: LOB-ACF9B7CB
+    target: Scene:Lobby
+    method: BuildLobby
+    path: LobbyCanvas/SafeArea/TabBar/Tab_Home/Icon
+    op: prop
+    comp: RectTransform
+    key: sizeDelta
+    baseVal: (64.0000,64.0000)
+    currVal: (0.0000,0.0000)
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: LOB-1B5C0310
+    target: Scene:Lobby
+    method: BuildLobby
+    path: LobbyCanvas/SafeArea/TabBar/Tab_Home/Icon
+    op: prop
+    comp: RectTransform
+    key: anchorMin
+    baseVal: (0.5000,1.0000)
+    currVal: (0.0000,0.0000)
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: LOB-B7795541
+    target: Scene:Lobby
+    method: BuildLobby
+    path: LobbyCanvas/SafeArea/TabBar/Tab_Home/Icon
+    op: prop
+    comp: RectTransform
+    key: anchorMax
+    baseVal: (0.5000,1.0000)
+    currVal: (0.0000,0.0000)
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: LOB-C9BDE2DD
+    target: Scene:Lobby
+    method: BuildLobby
+    path: LobbyCanvas/SafeArea/TabBar/Tab_Home/Txt
+    op: prop
+    comp: RectTransform
+    key: anchoredPosition
+    baseVal: (0.0000,16.0000)
+    currVal: (0.0000,0.0000)
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: LOB-2DFD0071
+    target: Scene:Lobby
+    method: BuildLobby
+    path: LobbyCanvas/SafeArea/TabBar/Tab_Home/Txt
+    op: prop
+    comp: RectTransform
+    key: sizeDelta
+    baseVal: (140.0000,32.0000)
+    currVal: (0.0000,0.0000)
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: LOB-72C76C82
+    target: Scene:Lobby
+    method: BuildLobby
+    path: LobbyCanvas/SafeArea/TabBar/Tab_Home/Txt
+    op: prop
+    comp: RectTransform
+    key: anchorMin
+    baseVal: (0.5000,0.0000)
+    currVal: (0.0000,0.0000)
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: LOB-D2D59BB2
+    target: Scene:Lobby
+    method: BuildLobby
+    path: LobbyCanvas/SafeArea/TabBar/Tab_Home/Txt
+    op: prop
+    comp: RectTransform
+    key: anchorMax
+    baseVal: (0.5000,0.0000)
+    currVal: (0.0000,0.0000)
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: LOB-C938EB4C
+    target: Scene:Lobby
+    method: BuildLobby
+    path: LobbyCanvas/SafeArea/TabBar/Tab_Ranking
+    op: prop
+    comp: RectTransform
+    key: anchorMax
+    baseVal: (1.0000,1.0000)
+    currVal: (0.0000,0.0000)
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: LOB-34CF3714
+    target: Scene:Lobby
+    method: BuildLobby
+    path: LobbyCanvas/SafeArea/TabBar/Tab_Ranking/Icon
+    op: prop
+    comp: RectTransform
+    key: anchoredPosition
+    baseVal: (0.0000,-18.0000)
+    currVal: (0.0000,0.0000)
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: LOB-07B16B78
+    target: Scene:Lobby
+    method: BuildLobby
+    path: LobbyCanvas/SafeArea/TabBar/Tab_Ranking/Icon
+    op: prop
+    comp: RectTransform
+    key: sizeDelta
+    baseVal: (64.0000,64.0000)
+    currVal: (0.0000,0.0000)
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: LOB-E69B832F
+    target: Scene:Lobby
+    method: BuildLobby
+    path: LobbyCanvas/SafeArea/TabBar/Tab_Ranking/Icon
+    op: prop
+    comp: RectTransform
+    key: anchorMin
+    baseVal: (0.5000,1.0000)
+    currVal: (0.0000,0.0000)
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: LOB-58CF063C
+    target: Scene:Lobby
+    method: BuildLobby
+    path: LobbyCanvas/SafeArea/TabBar/Tab_Ranking/Icon
+    op: prop
+    comp: RectTransform
+    key: anchorMax
+    baseVal: (0.5000,1.0000)
+    currVal: (0.0000,0.0000)
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: LOB-773EA929
+    target: Scene:Lobby
+    method: BuildLobby
+    path: LobbyCanvas/SafeArea/TabBar/Tab_Ranking/Txt
+    op: prop
+    comp: RectTransform
+    key: anchoredPosition
+    baseVal: (0.0000,16.0000)
+    currVal: (0.0000,0.0000)
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: LOB-59A6E28E
+    target: Scene:Lobby
+    method: BuildLobby
+    path: LobbyCanvas/SafeArea/TabBar/Tab_Ranking/Txt
+    op: prop
+    comp: RectTransform
+    key: sizeDelta
+    baseVal: (140.0000,32.0000)
+    currVal: (0.0000,0.0000)
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: LOB-66BACD07
+    target: Scene:Lobby
+    method: BuildLobby
+    path: LobbyCanvas/SafeArea/TabBar/Tab_Ranking/Txt
+    op: prop
+    comp: RectTransform
+    key: anchorMin
+    baseVal: (0.5000,0.0000)
+    currVal: (0.0000,0.0000)
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: LOB-28D524FF
+    target: Scene:Lobby
+    method: BuildLobby
+    path: LobbyCanvas/SafeArea/TabBar/Tab_Ranking/Txt
+    op: prop
+    comp: RectTransform
+    key: anchorMax
+    baseVal: (0.5000,0.0000)
+    currVal: (0.0000,0.0000)
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: GAM-2C47855A
+    target: Scene:Game
+    method: BuildGame
+    path: Main Camera
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 0
+    goProps: []
+    status: pending
+  - id: GAM-138091CE
+    target: Scene:Game
+    method: BuildGame
+    path: Global Light 2D
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 1
+    goProps: []
+    status: pending
+  - id: GAM-76A108CF
+    target: Scene:Game
+    method: BuildGame
+    path: InGameController
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 2
+    goProps: []
+    status: pending
+  - id: GAM-89834CB2
+    target: Scene:Game
+    method: BuildGame
+    path: EventSystem
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 3
+    goProps: []
+    status: pending
+  - id: BUY-8E61F398
+    target: Prefab:BuyItemPopup
+    method: BuildBuyItemPopup
+    path: BuyItemPopup
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 0
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,0.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (0.0000,0.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.0000,0.0000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (1.0000,1.0000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    status: pending
+  - id: BUY-149BE7C9
+    target: Prefab:BuyItemPopup
+    method: BuildBuyItemPopup
+    path: BuyItemPopup/PanelImageSlot
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 0
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,0.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (900.0000,1500.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: Image
+      key: color
+      val: '#1F59B23D'
+    - comp: Image
+      key: raycastTarget
+      val: False
+    - comp: Image
+      key: preserveAspect
+      val: True
+    status: pending
+  - id: BUY-FAAC4E90
+    target: Prefab:BuyItemPopup
+    method: BuildBuyItemPopup
+    path: BuyItemPopup/TitleImageSlot
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 1
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,610.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (520.0000,120.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: Image
+      key: color
+      val: '#1F59B23D'
+    - comp: Image
+      key: raycastTarget
+      val: False
+    - comp: Image
+      key: preserveAspect
+      val: True
+    status: pending
+  - id: BUY-A79A6665
+    target: Prefab:BuyItemPopup
+    method: BuildBuyItemPopup
+    path: BuyItemPopup/FeaturedItemCardSlot
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 2
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,285.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (660.0000,430.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: Image
+      key: color
+      val: '#1F59B23D'
+    - comp: Image
+      key: raycastTarget
+      val: False
+    - comp: Image
+      key: preserveAspect
+      val: True
+    status: pending
+  - id: BUY-3AB17EEE
+    target: Prefab:BuyItemPopup
+    method: BuildBuyItemPopup
+    path: BuyItemPopup/UndoItemSlot
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 3
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (-265.0000,-125.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (245.0000,340.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: Image
+      key: color
+      val: '#1F59B23D'
+    - comp: Image
+      key: raycastTarget
+      val: False
+    - comp: Image
+      key: preserveAspect
+      val: True
+    status: pending
+  - id: BUY-B6C74F35
+    target: Prefab:BuyItemPopup
+    method: BuildBuyItemPopup
+    path: BuyItemPopup/PaintItemSlot
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 4
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,-125.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (245.0000,340.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: Image
+      key: color
+      val: '#1F59B23D'
+    - comp: Image
+      key: raycastTarget
+      val: False
+    - comp: Image
+      key: preserveAspect
+      val: True
+    status: pending
+  - id: BUY-5430D6EA
+    target: Prefab:BuyItemPopup
+    method: BuildBuyItemPopup
+    path: BuyItemPopup/ShuffleItemSlot
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 5
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (265.0000,-125.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (245.0000,340.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: Image
+      key: color
+      val: '#1F59B23D'
+    - comp: Image
+      key: raycastTarget
+      val: False
+    - comp: Image
+      key: preserveAspect
+      val: True
+    status: pending
+  - id: BUY-8F6AEA5C
+    target: Prefab:BuyItemPopup
+    method: BuildBuyItemPopup
+    path: BuyItemPopup/PricePanelSlot
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 6
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,-535.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (760.0000,310.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: Image
+      key: color
+      val: '#1F59B23D'
+    - comp: Image
+      key: raycastTarget
+      val: False
+    - comp: Image
+      key: preserveAspect
+      val: True
+    status: pending
+  - id: BUY-810C5BB4
+    target: Prefab:BuyItemPopup
+    method: BuildBuyItemPopup
+    path: BuyItemPopup/CloseIconButton
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 7
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (338.0000,675.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (112.0000,112.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: Image
+      key: color
+      val: '#1A8CF26B'
+    - comp: Image
+      key: raycastTarget
+      val: True
+    - comp: Image
+      key: preserveAspect
+      val: False
+    - comp: Button
+      key: interactable
+      val: True
+    status: pending
+  - id: BUY-0CF65973
+    target: Prefab:BuyItemPopup
+    method: BuildBuyItemPopup
+    path: BuyItemPopup/UndoItemButton
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 8
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (-265.0000,-125.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (245.0000,340.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: Image
+      key: color
+      val: '#1A8CF26B'
+    - comp: Image
+      key: raycastTarget
+      val: True
+    - comp: Image
+      key: preserveAspect
+      val: False
+    - comp: Button
+      key: interactable
+      val: True
+    status: pending
+  - id: BUY-CA8AFEAD
+    target: Prefab:BuyItemPopup
+    method: BuildBuyItemPopup
+    path: BuyItemPopup/PaintItemButton
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 9
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,-125.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (245.0000,340.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: Image
+      key: color
+      val: '#1A8CF26B'
+    - comp: Image
+      key: raycastTarget
+      val: True
+    - comp: Image
+      key: preserveAspect
+      val: False
+    - comp: Button
+      key: interactable
+      val: True
+    status: pending
+  - id: BUY-C2725FE3
+    target: Prefab:BuyItemPopup
+    method: BuildBuyItemPopup
+    path: BuyItemPopup/ShuffleItemButton
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 10
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (265.0000,-125.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (245.0000,340.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: Image
+      key: color
+      val: '#1A8CF26B'
+    - comp: Image
+      key: raycastTarget
+      val: True
+    - comp: Image
+      key: preserveAspect
+      val: False
+    - comp: Button
+      key: interactable
+      val: True
+    status: pending
+  - id: BUY-57CF40F4
+    target: Prefab:BuyItemPopup
+    method: BuildBuyItemPopup
+    path: BuyItemPopup/BuyButton
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 11
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,-590.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (560.0000,130.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: Image
+      key: color
+      val: '#1A8CF26B'
+    - comp: Image
+      key: raycastTarget
+      val: True
+    - comp: Image
+      key: preserveAspect
+      val: False
+    - comp: Button
+      key: interactable
+      val: True
+    status: pending
+  - id: BUY-2CB27B2A
+    target: Prefab:BuyItemPopup
+    method: BuildBuyItemPopup
+    path: BuyItemPopup/BuyButton/BuyButtonText
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 0
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,0.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (560.0000,130.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: TextMeshProUGUI
+      key: text
+      val: ui_buy
+    - comp: TextMeshProUGUI
+      key: fontSize
+      val: 38.00
+    - comp: TextMeshProUGUI
+      key: color
+      val: '#F5FAFFFF'
+    - comp: TextMeshProUGUI
+      key: alignment
+      val: 514
+    - comp: TextMeshProUGUI
+      key: fontStyle
+      val: 1
+    - comp: TextMeshProUGUI
+      key: enableWordWrapping
+      val: True
+    status: pending
+  - id: BUY-47795A4D
+    target: Prefab:BuyItemPopup
+    method: BuildBuyItemPopup
+    path: BuyItemPopup/TitleText
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 12
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,610.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (520.0000,80.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: TextMeshProUGUI
+      key: text
+      val: popup_buy_item_title
+    - comp: TextMeshProUGUI
+      key: fontSize
+      val: 48.00
+    - comp: TextMeshProUGUI
+      key: color
+      val: '#F5FAFFFF'
+    - comp: TextMeshProUGUI
+      key: alignment
+      val: 514
+    - comp: TextMeshProUGUI
+      key: fontStyle
+      val: 1
+    - comp: TextMeshProUGUI
+      key: enableWordWrapping
+      val: True
+    status: pending
+  - id: BUY-FCC55D47
+    target: Prefab:BuyItemPopup
+    method: BuildBuyItemPopup
+    path: BuyItemPopup/FeaturedNameText
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 13
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,350.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (560.0000,70.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: TextMeshProUGUI
+      key: text
+      val: 
+    - comp: TextMeshProUGUI
+      key: fontSize
+      val: 38.00
+    - comp: TextMeshProUGUI
+      key: color
+      val: '#F5FAFFFF'
+    - comp: TextMeshProUGUI
+      key: alignment
+      val: 514
+    - comp: TextMeshProUGUI
+      key: fontStyle
+      val: 1
+    - comp: TextMeshProUGUI
+      key: enableWordWrapping
+      val: True
+    status: pending
+  - id: BUY-F2233F51
+    target: Prefab:BuyItemPopup
+    method: BuildBuyItemPopup
+    path: BuyItemPopup/FeaturedDescriptionText
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 14
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,260.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (560.0000,100.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: TextMeshProUGUI
+      key: text
+      val: 
+    - comp: TextMeshProUGUI
+      key: fontSize
+      val: 28.00
+    - comp: TextMeshProUGUI
+      key: color
+      val: '#F5FAFFFF'
+    - comp: TextMeshProUGUI
+      key: alignment
+      val: 514
+    - comp: TextMeshProUGUI
+      key: fontStyle
+      val: 0
+    - comp: TextMeshProUGUI
+      key: enableWordWrapping
+      val: True
+    status: pending
+  - id: BUY-C1AD720D
+    target: Prefab:BuyItemPopup
+    method: BuildBuyItemPopup
+    path: BuyItemPopup/ItemGrid
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 15
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,-125.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (770.0000,340.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: Image
+      key: color
+      val: '#1F59B23D'
+    - comp: Image
+      key: raycastTarget
+      val: False
+    - comp: Image
+      key: preserveAspect
+      val: True
+    status: pending
+  - id: BUY-5F0B3838
+    target: Prefab:BuyItemPopup
+    method: BuildBuyItemPopup
+    path: BuyItemPopup/SoftBalanceText
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 16
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (-180.0000,-485.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (270.0000,60.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: TextMeshProUGUI
+      key: text
+      val: 
+    - comp: TextMeshProUGUI
+      key: fontSize
+      val: 28.00
+    - comp: TextMeshProUGUI
+      key: color
+      val: '#F5FAFFFF'
+    - comp: TextMeshProUGUI
+      key: alignment
+      val: 513
+    - comp: TextMeshProUGUI
+      key: fontStyle
+      val: 0
+    - comp: TextMeshProUGUI
+      key: enableWordWrapping
+      val: True
+    status: pending
+  - id: BUY-93513A9C
+    target: Prefab:BuyItemPopup
+    method: BuildBuyItemPopup
+    path: BuyItemPopup/PriceText
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 17
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,-535.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (300.0000,70.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: TextMeshProUGUI
+      key: text
+      val: 
+    - comp: TextMeshProUGUI
+      key: fontSize
+      val: 38.00
+    - comp: TextMeshProUGUI
+      key: color
+      val: '#F5FAFFFF'
+    - comp: TextMeshProUGUI
+      key: alignment
+      val: 514
+    - comp: TextMeshProUGUI
+      key: fontStyle
+      val: 1
+    - comp: TextMeshProUGUI
+      key: enableWordWrapping
+      val: True
+    status: pending
+  - id: DAI-EA3EE6B2
+    target: Prefab:DailyChallengePopup
+    method: BuildDailyChallengePopup
+    path: DailyChallengePopup
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 0
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,0.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (0.0000,0.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.0000,0.0000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (1.0000,1.0000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    status: pending
+  - id: DAI-E0C0B9EF
+    target: Prefab:DailyChallengePopup
+    method: BuildDailyChallengePopup
+    path: DailyChallengePopup/Overlay
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 0
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,0.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (0.0000,0.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.0000,0.0000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (1.0000,1.0000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: Image
+      key: color
+      val: '#000000B3'
+    - comp: Image
+      key: raycastTarget
+      val: True
+    - comp: Image
+      key: preserveAspect
+      val: False
+    - comp: Button
+      key: interactable
+      val: True
+    status: pending
+  - id: DAI-5C531454
+    target: Prefab:DailyChallengePopup
+    method: BuildDailyChallengePopup
+    path: DailyChallengePopup/Panel
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 1
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,0.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (960.0000,0.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: Image
+      key: color
+      val: '#16213EFF'
+    - comp: Image
+      key: raycastTarget
+      val: True
+    - comp: Image
+      key: preserveAspect
+      val: False
+    - comp: VerticalLayoutGroup
+      key: spacing
+      val: 24.00
+    - comp: VerticalLayoutGroup
+      key: childAlignment
+      val: 1
+    - comp: VerticalLayoutGroup
+      key: paddingLeft
+      val: 40
+    - comp: VerticalLayoutGroup
+      key: paddingRight
+      val: 40
+    - comp: VerticalLayoutGroup
+      key: paddingTop
+      val: 32
+    - comp: VerticalLayoutGroup
+      key: paddingBottom
+      val: 32
+    - comp: VerticalLayoutGroup
+      key: childForceExpandWidth
+      val: True
+    - comp: VerticalLayoutGroup
+      key: childForceExpandHeight
+      val: False
+    - comp: ContentSizeFitter
+      key: horizontalFit
+      val: 0
+    - comp: ContentSizeFitter
+      key: verticalFit
+      val: 2
+    status: pending
+  - id: DAI-0639F372
+    target: Prefab:DailyChallengePopup
+    method: BuildDailyChallengePopup
+    path: DailyChallengePopup/Panel/Header
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 0
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,0.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (0.0000,80.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: HorizontalLayoutGroup
+      key: spacing
+      val: 16.00
+    - comp: HorizontalLayoutGroup
+      key: childAlignment
+      val: 3
+    - comp: HorizontalLayoutGroup
+      key: paddingLeft
+      val: 0
+    - comp: HorizontalLayoutGroup
+      key: paddingRight
+      val: 0
+    - comp: HorizontalLayoutGroup
+      key: paddingTop
+      val: 0
+    - comp: HorizontalLayoutGroup
+      key: paddingBottom
+      val: 0
+    - comp: HorizontalLayoutGroup
+      key: childForceExpandWidth
+      val: True
+    - comp: HorizontalLayoutGroup
+      key: childForceExpandHeight
+      val: True
+    - comp: LayoutElement
+      key: minWidth
+      val: -1.00
+    - comp: LayoutElement
+      key: minHeight
+      val: -1.00
+    - comp: LayoutElement
+      key: preferredWidth
+      val: -1.00
+    - comp: LayoutElement
+      key: preferredHeight
+      val: 80.00
+    - comp: LayoutElement
+      key: flexibleWidth
+      val: -1.00
+    - comp: LayoutElement
+      key: flexibleHeight
+      val: -1.00
+    - comp: LayoutElement
+      key: ignoreLayout
+      val: False
+    status: pending
+  - id: DAI-D570C69D
+    target: Prefab:DailyChallengePopup
+    method: BuildDailyChallengePopup
+    path: DailyChallengePopup/Panel/Header/Txt_Title
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 0
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,0.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (367.2000,60.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: TextMeshProUGUI
+      key: text
+      val: popup.daily.title
+    - comp: TextMeshProUGUI
+      key: fontSize
+      val: 36.00
+    - comp: TextMeshProUGUI
+      key: color
+      val: '#FFFFFFFF'
+    - comp: TextMeshProUGUI
+      key: alignment
+      val: 4097
+    - comp: TextMeshProUGUI
+      key: fontStyle
+      val: 1
+    - comp: TextMeshProUGUI
+      key: enableWordWrapping
+      val: True
+    - comp: LayoutElement
+      key: minWidth
+      val: -1.00
+    - comp: LayoutElement
+      key: minHeight
+      val: -1.00
+    - comp: LayoutElement
+      key: preferredWidth
+      val: 367.20
+    - comp: LayoutElement
+      key: preferredHeight
+      val: -1.00
+    - comp: LayoutElement
+      key: flexibleWidth
+      val: 1.00
+    - comp: LayoutElement
+      key: flexibleHeight
+      val: -1.00
+    - comp: LayoutElement
+      key: ignoreLayout
+      val: False
+    status: pending
+  - id: DAI-2AB9F76F
+    target: Prefab:DailyChallengePopup
+    method: BuildDailyChallengePopup
+    path: DailyChallengePopup/Panel/Header/Btn_Close
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 1
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,0.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (72.0000,72.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: Image
+      key: color
+      val: '#FFFFFF26'
+    - comp: Image
+      key: raycastTarget
+      val: True
+    - comp: Image
+      key: preserveAspect
+      val: False
+    - comp: Button
+      key: interactable
+      val: True
+    - comp: LayoutElement
+      key: minWidth
+      val: -1.00
+    - comp: LayoutElement
+      key: minHeight
+      val: -1.00
+    - comp: LayoutElement
+      key: preferredWidth
+      val: 72.00
+    - comp: LayoutElement
+      key: preferredHeight
+      val: -1.00
+    - comp: LayoutElement
+      key: flexibleWidth
+      val: -1.00
+    - comp: LayoutElement
+      key: flexibleHeight
+      val: -1.00
+    - comp: LayoutElement
+      key: ignoreLayout
+      val: False
+    status: pending
+  - id: DAI-DB776681
+    target: Prefab:DailyChallengePopup
+    method: BuildDailyChallengePopup
+    path: DailyChallengePopup/Panel/Divider_Top
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 1
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,0.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (0.0000,2.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: Image
+      key: color
+      val: '#FFFFFF1A'
+    - comp: Image
+      key: raycastTarget
+      val: True
+    - comp: Image
+      key: preserveAspect
+      val: False
+    - comp: LayoutElement
+      key: minWidth
+      val: -1.00
+    - comp: LayoutElement
+      key: minHeight
+      val: -1.00
+    - comp: LayoutElement
+      key: preferredWidth
+      val: -1.00
+    - comp: LayoutElement
+      key: preferredHeight
+      val: 2.00
+    - comp: LayoutElement
+      key: flexibleWidth
+      val: -1.00
+    - comp: LayoutElement
+      key: flexibleHeight
+      val: -1.00
+    - comp: LayoutElement
+      key: ignoreLayout
+      val: False
+    status: pending
+  - id: DAI-9C57262F
+    target: Prefab:DailyChallengePopup
+    method: BuildDailyChallengePopup
+    path: DailyChallengePopup/Panel/Content
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 2
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,0.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (0.0000,0.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: VerticalLayoutGroup
+      key: spacing
+      val: 16.00
+    - comp: VerticalLayoutGroup
+      key: childAlignment
+      val: 1
+    - comp: VerticalLayoutGroup
+      key: paddingLeft
+      val: 0
+    - comp: VerticalLayoutGroup
+      key: paddingRight
+      val: 0
+    - comp: VerticalLayoutGroup
+      key: paddingTop
+      val: 0
+    - comp: VerticalLayoutGroup
+      key: paddingBottom
+      val: 0
+    - comp: VerticalLayoutGroup
+      key: childForceExpandWidth
+      val: True
+    - comp: VerticalLayoutGroup
+      key: childForceExpandHeight
+      val: False
+    - comp: ContentSizeFitter
+      key: horizontalFit
+      val: 0
+    - comp: ContentSizeFitter
+      key: verticalFit
+      val: 2
+    status: pending
+  - id: DAI-3DD59113
+    target: Prefab:DailyChallengePopup
+    method: BuildDailyChallengePopup
+    path: DailyChallengePopup/Panel/Content/Txt_Streak
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 0
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,0.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (200.0000,50.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: TextMeshProUGUI
+      key: text
+      val: home.daily_streak_fmt
+    - comp: TextMeshProUGUI
+      key: fontSize
+      val: 28.00
+    - comp: TextMeshProUGUI
+      key: color
+      val: '#FFB300FF'
+    - comp: TextMeshProUGUI
+      key: alignment
+      val: 514
+    - comp: TextMeshProUGUI
+      key: fontStyle
+      val: 0
+    - comp: TextMeshProUGUI
+      key: enableWordWrapping
+      val: True
+    - comp: LayoutElement
+      key: minWidth
+      val: -1.00
+    - comp: LayoutElement
+      key: minHeight
+      val: -1.00
+    - comp: LayoutElement
+      key: preferredWidth
+      val: 352.80
+    - comp: LayoutElement
+      key: preferredHeight
+      val: 48.00
+    - comp: LayoutElement
+      key: flexibleWidth
+      val: 1.00
+    - comp: LayoutElement
+      key: flexibleHeight
+      val: -1.00
+    - comp: LayoutElement
+      key: ignoreLayout
+      val: False
+    status: pending
+  - id: DAI-EF800273
+    target: Prefab:DailyChallengePopup
+    method: BuildDailyChallengePopup
+    path: DailyChallengePopup/Panel/Content/Row_Streak_Tiles
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 1
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,0.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (0.0000,96.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: HorizontalLayoutGroup
+      key: spacing
+      val: 0.00
+    - comp: HorizontalLayoutGroup
+      key: childAlignment
+      val: 4
+    - comp: HorizontalLayoutGroup
+      key: paddingLeft
+      val: 0
+    - comp: HorizontalLayoutGroup
+      key: paddingRight
+      val: 0
+    - comp: HorizontalLayoutGroup
+      key: paddingTop
+      val: 0
+    - comp: HorizontalLayoutGroup
+      key: paddingBottom
+      val: 0
+    - comp: HorizontalLayoutGroup
+      key: childForceExpandWidth
+      val: True
+    - comp: HorizontalLayoutGroup
+      key: childForceExpandHeight
+      val: True
+    - comp: LayoutElement
+      key: minWidth
+      val: -1.00
+    - comp: LayoutElement
+      key: minHeight
+      val: -1.00
+    - comp: LayoutElement
+      key: preferredWidth
+      val: -1.00
+    - comp: LayoutElement
+      key: preferredHeight
+      val: 96.00
+    - comp: LayoutElement
+      key: flexibleWidth
+      val: -1.00
+    - comp: LayoutElement
+      key: flexibleHeight
+      val: -1.00
+    - comp: LayoutElement
+      key: ignoreLayout
+      val: False
+    status: pending
+  - id: DAI-46053670
+    target: Prefab:DailyChallengePopup
+    method: BuildDailyChallengePopup
+    path: DailyChallengePopup/Panel/Content/Txt_Today
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 2
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,0.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (200.0000,50.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: TextMeshProUGUI
+      key: text
+      val: popup.daily.today_fmt
+    - comp: TextMeshProUGUI
+      key: fontSize
+      val: 26.00
+    - comp: TextMeshProUGUI
+      key: color
+      val: '#FFFFFFFF'
+    - comp: TextMeshProUGUI
+      key: alignment
+      val: 514
+    - comp: TextMeshProUGUI
+      key: fontStyle
+      val: 0
+    - comp: TextMeshProUGUI
+      key: enableWordWrapping
+      val: True
+    - comp: LayoutElement
+      key: minWidth
+      val: -1.00
+    - comp: LayoutElement
+      key: minHeight
+      val: -1.00
+    - comp: LayoutElement
+      key: preferredWidth
+      val: 327.60
+    - comp: LayoutElement
+      key: preferredHeight
+      val: 48.00
+    - comp: LayoutElement
+      key: flexibleWidth
+      val: 1.00
+    - comp: LayoutElement
+      key: flexibleHeight
+      val: -1.00
+    - comp: LayoutElement
+      key: ignoreLayout
+      val: False
+    status: pending
+  - id: DAI-0CE218F5
+    target: Prefab:DailyChallengePopup
+    method: BuildDailyChallengePopup
+    path: DailyChallengePopup/Panel/Content/Bar_Progress
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 3
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,0.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (0.0000,24.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: Image
+      key: color
+      val: '#FFFFFF22'
+    - comp: Image
+      key: raycastTarget
+      val: True
+    - comp: Image
+      key: preserveAspect
+      val: False
+    - comp: LayoutElement
+      key: minWidth
+      val: -1.00
+    - comp: LayoutElement
+      key: minHeight
+      val: -1.00
+    - comp: LayoutElement
+      key: preferredWidth
+      val: -1.00
+    - comp: LayoutElement
+      key: preferredHeight
+      val: 24.00
+    - comp: LayoutElement
+      key: flexibleWidth
+      val: -1.00
+    - comp: LayoutElement
+      key: flexibleHeight
+      val: -1.00
+    - comp: LayoutElement
+      key: ignoreLayout
+      val: False
+    status: pending
+  - id: DAI-F52D57B6
+    target: Prefab:DailyChallengePopup
+    method: BuildDailyChallengePopup
+    path: DailyChallengePopup/Panel/Content/Txt_Reward
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 4
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,0.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (200.0000,50.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: TextMeshProUGUI
+      key: text
+      val: popup.daily.reward_fmt
+    - comp: TextMeshProUGUI
+      key: fontSize
+      val: 26.00
+    - comp: TextMeshProUGUI
+      key: color
+      val: '#00E5FFFF'
+    - comp: TextMeshProUGUI
+      key: alignment
+      val: 514
+    - comp: TextMeshProUGUI
+      key: fontStyle
+      val: 0
+    - comp: TextMeshProUGUI
+      key: enableWordWrapping
+      val: True
+    - comp: LayoutElement
+      key: minWidth
+      val: -1.00
+    - comp: LayoutElement
+      key: minHeight
+      val: -1.00
+    - comp: LayoutElement
+      key: preferredWidth
+      val: 343.20
+    - comp: LayoutElement
+      key: preferredHeight
+      val: 48.00
+    - comp: LayoutElement
+      key: flexibleWidth
+      val: 1.00
+    - comp: LayoutElement
+      key: flexibleHeight
+      val: -1.00
+    - comp: LayoutElement
+      key: ignoreLayout
+      val: False
+    status: pending
+  - id: DAI-BC4B68B3
+    target: Prefab:DailyChallengePopup
+    method: BuildDailyChallengePopup
+    path: DailyChallengePopup/Panel/Divider_Bot
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 3
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,0.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (0.0000,2.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: Image
+      key: color
+      val: '#FFFFFF1A'
+    - comp: Image
+      key: raycastTarget
+      val: True
+    - comp: Image
+      key: preserveAspect
+      val: False
+    - comp: LayoutElement
+      key: minWidth
+      val: -1.00
+    - comp: LayoutElement
+      key: minHeight
+      val: -1.00
+    - comp: LayoutElement
+      key: preferredWidth
+      val: -1.00
+    - comp: LayoutElement
+      key: preferredHeight
+      val: 2.00
+    - comp: LayoutElement
+      key: flexibleWidth
+      val: -1.00
+    - comp: LayoutElement
+      key: flexibleHeight
+      val: -1.00
+    - comp: LayoutElement
+      key: ignoreLayout
+      val: False
+    status: pending
+  - id: DAI-D46170A7
+    target: Prefab:DailyChallengePopup
+    method: BuildDailyChallengePopup
+    path: DailyChallengePopup/Panel/Footer
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 4
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,0.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (0.0000,0.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: HorizontalLayoutGroup
+      key: spacing
+      val: 16.00
+    - comp: HorizontalLayoutGroup
+      key: childAlignment
+      val: 4
+    - comp: HorizontalLayoutGroup
+      key: paddingLeft
+      val: 0
+    - comp: HorizontalLayoutGroup
+      key: paddingRight
+      val: 0
+    - comp: HorizontalLayoutGroup
+      key: paddingTop
+      val: 0
+    - comp: HorizontalLayoutGroup
+      key: paddingBottom
+      val: 0
+    - comp: HorizontalLayoutGroup
+      key: childForceExpandWidth
+      val: True
+    - comp: HorizontalLayoutGroup
+      key: childForceExpandHeight
+      val: False
+    - comp: ContentSizeFitter
+      key: horizontalFit
+      val: 0
+    - comp: ContentSizeFitter
+      key: verticalFit
+      val: 2
+    status: pending
+  - id: DAI-C38E54A4
+    target: Prefab:DailyChallengePopup
+    method: BuildDailyChallengePopup
+    path: DailyChallengePopup/Panel/Footer/Btn_Complete
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 0
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,0.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (0.0000,112.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: Image
+      key: color
+      val: '#7B2FBEFF'
+    - comp: Image
+      key: raycastTarget
+      val: True
+    - comp: Image
+      key: preserveAspect
+      val: False
+    - comp: Button
+      key: interactable
+      val: True
+    - comp: LayoutElement
+      key: minWidth
+      val: -1.00
+    - comp: LayoutElement
+      key: minHeight
+      val: -1.00
+    - comp: LayoutElement
+      key: preferredWidth
+      val: -1.00
+    - comp: LayoutElement
+      key: preferredHeight
+      val: 112.00
+    - comp: LayoutElement
+      key: flexibleWidth
+      val: 1.00
+    - comp: LayoutElement
+      key: flexibleHeight
+      val: -1.00
+    - comp: LayoutElement
+      key: ignoreLayout
+      val: False
+    status: pending
+  - id: DAI-98A196F7
+    target: Prefab:DailyChallengePopup
+    method: BuildDailyChallengePopup
+    path: DailyChallengePopup/Panel/Footer/Btn_Complete/Txt_Label
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 0
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,0.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (0.0000,0.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.0000,0.0000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (1.0000,1.0000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: TextMeshProUGUI
+      key: text
+      val: common.complete
+    - comp: TextMeshProUGUI
+      key: fontSize
+      val: 28.00
+    - comp: TextMeshProUGUI
+      key: color
+      val: '#FFFFFFFF'
+    - comp: TextMeshProUGUI
+      key: alignment
+      val: 514
+    - comp: TextMeshProUGUI
+      key: fontStyle
+      val: 1
+    - comp: TextMeshProUGUI
+      key: enableWordWrapping
+      val: True
+    status: pending
+  - id: DAI-D6417261
+    target: Prefab:DailyReward
+    method: BuildDailyReward
+    path: DailyReward
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 0
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,0.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (0.0000,0.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.0000,0.0000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (1.0000,1.0000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    status: pending
+  - id: DAI-BC0B3334
+    target: Prefab:DailyReward
+    method: BuildDailyReward
+    path: DailyReward/Overlay
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 0
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,0.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (0.0000,0.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.0000,0.0000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (1.0000,1.0000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: Image
+      key: color
+      val: '#001A33F2'
+    - comp: Image
+      key: raycastTarget
+      val: True
+    - comp: Image
+      key: preserveAspect
+      val: False
+    status: pending
+  - id: DAI-58D1DF62
+    target: Prefab:DailyReward
+    method: BuildDailyReward
+    path: DailyReward/Hud_Balance
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 1
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (-88.0000,-80.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (360.0000,96.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (1.0000,1.0000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (1.0000,1.0000)
+    - comp: RectTransform
+      key: pivot
+      val: (1.0000,1.0000)
+    - comp: Image
+      key: color
+      val: '#071F3FCC'
+    - comp: Image
+      key: raycastTarget
+      val: True
+    - comp: Image
+      key: preserveAspect
+      val: False
+    - comp: HorizontalLayoutGroup
+      key: spacing
+      val: 12.00
+    - comp: HorizontalLayoutGroup
+      key: childAlignment
+      val: 4
+    - comp: HorizontalLayoutGroup
+      key: paddingLeft
+      val: 18
+    - comp: HorizontalLayoutGroup
+      key: paddingRight
+      val: 18
+    - comp: HorizontalLayoutGroup
+      key: paddingTop
+      val: 8
+    - comp: HorizontalLayoutGroup
+      key: paddingBottom
+      val: 8
+    - comp: HorizontalLayoutGroup
+      key: childForceExpandWidth
+      val: True
+    - comp: HorizontalLayoutGroup
+      key: childForceExpandHeight
+      val: True
+    status: pending
+  - id: DAI-345E53ED
+    target: Prefab:DailyReward
+    method: BuildDailyReward
+    path: DailyReward/Hud_Balance/Icon_Coin
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 0
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,0.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (200.0000,50.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: TextMeshProUGUI
+      key: text
+      val: '*'
+    - comp: TextMeshProUGUI
+      key: fontSize
+      val: 44.00
+    - comp: TextMeshProUGUI
+      key: color
+      val: '#FFB300FF'
+    - comp: TextMeshProUGUI
+      key: alignment
+      val: 514
+    - comp: TextMeshProUGUI
+      key: fontStyle
+      val: 0
+    - comp: TextMeshProUGUI
+      key: enableWordWrapping
+      val: True
+    - comp: LayoutElement
+      key: minWidth
+      val: -1.00
+    - comp: LayoutElement
+      key: minHeight
+      val: -1.00
+    - comp: LayoutElement
+      key: preferredWidth
+      val: 64.00
+    - comp: LayoutElement
+      key: preferredHeight
+      val: -1.00
+    - comp: LayoutElement
+      key: flexibleWidth
+      val: 1.00
+    - comp: LayoutElement
+      key: flexibleHeight
+      val: -1.00
+    - comp: LayoutElement
+      key: ignoreLayout
+      val: False
+    status: pending
+  - id: DAI-ED848C2C
+    target: Prefab:DailyReward
+    method: BuildDailyReward
+    path: DailyReward/Hud_Balance/Txt_Balance
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 1
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,0.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (200.0000,50.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: TextMeshProUGUI
+      key: text
+      val: 0
+    - comp: TextMeshProUGUI
+      key: fontSize
+      val: 36.00
+    - comp: TextMeshProUGUI
+      key: color
+      val: '#FFFFFFFF'
+    - comp: TextMeshProUGUI
+      key: alignment
+      val: 514
+    - comp: TextMeshProUGUI
+      key: fontStyle
+      val: 1
+    - comp: TextMeshProUGUI
+      key: enableWordWrapping
+      val: True
+    - comp: LayoutElement
+      key: minWidth
+      val: -1.00
+    - comp: LayoutElement
+      key: minHeight
+      val: -1.00
+    - comp: LayoutElement
+      key: preferredWidth
+      val: 80.00
+    - comp: LayoutElement
+      key: preferredHeight
+      val: -1.00
+    - comp: LayoutElement
+      key: flexibleWidth
+      val: 1.00
+    - comp: LayoutElement
+      key: flexibleHeight
+      val: -1.00
+    - comp: LayoutElement
+      key: ignoreLayout
+      val: False
+    status: pending
+  - id: DAI-F0A8511E
+    target: Prefab:DailyReward
+    method: BuildDailyReward
+    path: DailyReward/Panel
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 2
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,-80.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (1010.0000,1280.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: Image
+      key: color
+      val: '#FFFFFFFF'
+    - comp: Image
+      key: raycastTarget
+      val: True
+    - comp: Image
+      key: preserveAspect
+      val: False
+    status: pending
+  - id: DAI-EA094250
+    target: Prefab:DailyReward
+    method: BuildDailyReward
+    path: DailyReward/Panel/Grid_Days
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 0
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,-130.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (-68.0000,-410.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.0000,1.0000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (1.0000,1.0000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,1.0000)
+    status: pending
+  - id: DAI-739064E7
+    target: Prefab:DailyReward
+    method: BuildDailyReward
+    path: DailyReward/Panel/Grid_Days/Day_1
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 0
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,0.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (100.0000,100.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: Image
+      key: color
+      val: '#082A4CAA'
+    - comp: Image
+      key: raycastTarget
+      val: True
+    - comp: Image
+      key: preserveAspect
+      val: False
+    status: pending
+  - id: DAI-398AF93D
+    target: Prefab:DailyReward
+    method: BuildDailyReward
+    path: DailyReward/Panel/Grid_Days/Day_1/Txt_Day
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 0
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,118.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (180.0000,58.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: TextMeshProUGUI
+      key: text
+      val: DAY 1
+    - comp: TextMeshProUGUI
+      key: fontSize
+      val: 30.00
+    - comp: TextMeshProUGUI
+      key: color
+      val: '#FFFFFFFF'
+    - comp: TextMeshProUGUI
+      key: alignment
+      val: 514
+    - comp: TextMeshProUGUI
+      key: fontStyle
+      val: 1
+    - comp: TextMeshProUGUI
+      key: enableWordWrapping
+      val: True
+    status: pending
+  - id: DAI-D5C9C347
+    target: Prefab:DailyReward
+    method: BuildDailyReward
+    path: DailyReward/Panel/Grid_Days/Day_1/Icon_Reward
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 1
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,8.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (180.0000,120.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: TextMeshProUGUI
+      key: text
+      val: '***'
+    - comp: TextMeshProUGUI
+      key: fontSize
+      val: 92.00
+    - comp: TextMeshProUGUI
+      key: color
+      val: '#FFB300FF'
+    - comp: TextMeshProUGUI
+      key: alignment
+      val: 514
+    - comp: TextMeshProUGUI
+      key: fontStyle
+      val: 0
+    - comp: TextMeshProUGUI
+      key: enableWordWrapping
+      val: True
+    status: pending
+  - id: DAI-D38132E4
+    target: Prefab:DailyReward
+    method: BuildDailyReward
+    path: DailyReward/Panel/Grid_Days/Day_1/Txt_Amount
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 2
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,-112.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (170.0000,58.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: TextMeshProUGUI
+      key: text
+      val: 100
+    - comp: TextMeshProUGUI
+      key: fontSize
+      val: 34.00
+    - comp: TextMeshProUGUI
+      key: color
+      val: '#FFFFFFFF'
+    - comp: TextMeshProUGUI
+      key: alignment
+      val: 514
+    - comp: TextMeshProUGUI
+      key: fontStyle
+      val: 1
+    - comp: TextMeshProUGUI
+      key: enableWordWrapping
+      val: True
+    status: pending
+  - id: DAI-610B05E3
+    target: Prefab:DailyReward
+    method: BuildDailyReward
+    path: DailyReward/Panel/Grid_Days/Day_2
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 1
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,0.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (100.0000,100.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: Image
+      key: color
+      val: '#082A4CAA'
+    - comp: Image
+      key: raycastTarget
+      val: True
+    - comp: Image
+      key: preserveAspect
+      val: False
+    status: pending
+  - id: DAI-A2A4DE6A
+    target: Prefab:DailyReward
+    method: BuildDailyReward
+    path: DailyReward/Panel/Grid_Days/Day_2/Txt_Day
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 0
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,118.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (180.0000,58.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: TextMeshProUGUI
+      key: text
+      val: DAY 2
+    - comp: TextMeshProUGUI
+      key: fontSize
+      val: 30.00
+    - comp: TextMeshProUGUI
+      key: color
+      val: '#FFFFFFFF'
+    - comp: TextMeshProUGUI
+      key: alignment
+      val: 514
+    - comp: TextMeshProUGUI
+      key: fontStyle
+      val: 1
+    - comp: TextMeshProUGUI
+      key: enableWordWrapping
+      val: True
+    status: pending
+  - id: DAI-10D43065
+    target: Prefab:DailyReward
+    method: BuildDailyReward
+    path: DailyReward/Panel/Grid_Days/Day_2/Icon_Reward
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 1
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,8.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (180.0000,120.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: TextMeshProUGUI
+      key: text
+      val: '***'
+    - comp: TextMeshProUGUI
+      key: fontSize
+      val: 92.00
+    - comp: TextMeshProUGUI
+      key: color
+      val: '#FFB300FF'
+    - comp: TextMeshProUGUI
+      key: alignment
+      val: 514
+    - comp: TextMeshProUGUI
+      key: fontStyle
+      val: 0
+    - comp: TextMeshProUGUI
+      key: enableWordWrapping
+      val: True
+    status: pending
+  - id: DAI-54CCE7B9
+    target: Prefab:DailyReward
+    method: BuildDailyReward
+    path: DailyReward/Panel/Grid_Days/Day_2/Txt_Amount
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 2
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,-112.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (170.0000,58.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: TextMeshProUGUI
+      key: text
+      val: 150
+    - comp: TextMeshProUGUI
+      key: fontSize
+      val: 34.00
+    - comp: TextMeshProUGUI
+      key: color
+      val: '#FFFFFFFF'
+    - comp: TextMeshProUGUI
+      key: alignment
+      val: 514
+    - comp: TextMeshProUGUI
+      key: fontStyle
+      val: 1
+    - comp: TextMeshProUGUI
+      key: enableWordWrapping
+      val: True
+    status: pending
+  - id: DAI-569FA639
+    target: Prefab:DailyReward
+    method: BuildDailyReward
+    path: DailyReward/Panel/Grid_Days/Day_3
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 2
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,0.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (100.0000,100.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: Image
+      key: color
+      val: '#082A4CAA'
+    - comp: Image
+      key: raycastTarget
+      val: True
+    - comp: Image
+      key: preserveAspect
+      val: False
+    status: pending
+  - id: DAI-7DFE64D9
+    target: Prefab:DailyReward
+    method: BuildDailyReward
+    path: DailyReward/Panel/Grid_Days/Day_3/Txt_Day
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 0
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,118.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (180.0000,58.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: TextMeshProUGUI
+      key: text
+      val: DAY 3
+    - comp: TextMeshProUGUI
+      key: fontSize
+      val: 30.00
+    - comp: TextMeshProUGUI
+      key: color
+      val: '#FFFFFFFF'
+    - comp: TextMeshProUGUI
+      key: alignment
+      val: 514
+    - comp: TextMeshProUGUI
+      key: fontStyle
+      val: 1
+    - comp: TextMeshProUGUI
+      key: enableWordWrapping
+      val: True
+    status: pending
+  - id: DAI-2BC7C233
+    target: Prefab:DailyReward
+    method: BuildDailyReward
+    path: DailyReward/Panel/Grid_Days/Day_3/Icon_Reward
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 1
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,8.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (180.0000,120.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: TextMeshProUGUI
+      key: text
+      val: '***'
+    - comp: TextMeshProUGUI
+      key: fontSize
+      val: 92.00
+    - comp: TextMeshProUGUI
+      key: color
+      val: '#FFB300FF'
+    - comp: TextMeshProUGUI
+      key: alignment
+      val: 514
+    - comp: TextMeshProUGUI
+      key: fontStyle
+      val: 0
+    - comp: TextMeshProUGUI
+      key: enableWordWrapping
+      val: True
+    status: pending
+  - id: DAI-CC51AB56
+    target: Prefab:DailyReward
+    method: BuildDailyReward
+    path: DailyReward/Panel/Grid_Days/Day_3/Txt_Amount
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 2
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,-112.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (170.0000,58.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: TextMeshProUGUI
+      key: text
+      val: 200
+    - comp: TextMeshProUGUI
+      key: fontSize
+      val: 34.00
+    - comp: TextMeshProUGUI
+      key: color
+      val: '#FFFFFFFF'
+    - comp: TextMeshProUGUI
+      key: alignment
+      val: 514
+    - comp: TextMeshProUGUI
+      key: fontStyle
+      val: 1
+    - comp: TextMeshProUGUI
+      key: enableWordWrapping
+      val: True
+    status: pending
+  - id: DAI-EA4E1854
+    target: Prefab:DailyReward
+    method: BuildDailyReward
+    path: DailyReward/Panel/Grid_Days/Day_4
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 3
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,0.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (100.0000,100.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: Image
+      key: color
+      val: '#082A4CAA'
+    - comp: Image
+      key: raycastTarget
+      val: True
+    - comp: Image
+      key: preserveAspect
+      val: False
+    status: pending
+  - id: DAI-3CA3F682
+    target: Prefab:DailyReward
+    method: BuildDailyReward
+    path: DailyReward/Panel/Grid_Days/Day_4/Txt_Day
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 0
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,118.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (180.0000,58.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: TextMeshProUGUI
+      key: text
+      val: DAY 4
+    - comp: TextMeshProUGUI
+      key: fontSize
+      val: 30.00
+    - comp: TextMeshProUGUI
+      key: color
+      val: '#FFFFFFFF'
+    - comp: TextMeshProUGUI
+      key: alignment
+      val: 514
+    - comp: TextMeshProUGUI
+      key: fontStyle
+      val: 1
+    - comp: TextMeshProUGUI
+      key: enableWordWrapping
+      val: True
+    status: pending
+  - id: DAI-985A9C5F
+    target: Prefab:DailyReward
+    method: BuildDailyReward
+    path: DailyReward/Panel/Grid_Days/Day_4/Icon_Reward
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 1
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,8.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (180.0000,120.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: TextMeshProUGUI
+      key: text
+      val: '***'
+    - comp: TextMeshProUGUI
+      key: fontSize
+      val: 92.00
+    - comp: TextMeshProUGUI
+      key: color
+      val: '#FFB300FF'
+    - comp: TextMeshProUGUI
+      key: alignment
+      val: 514
+    - comp: TextMeshProUGUI
+      key: fontStyle
+      val: 0
+    - comp: TextMeshProUGUI
+      key: enableWordWrapping
+      val: True
+    status: pending
+  - id: DAI-663D7805
+    target: Prefab:DailyReward
+    method: BuildDailyReward
+    path: DailyReward/Panel/Grid_Days/Day_4/Txt_Amount
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 2
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,-112.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (170.0000,58.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: TextMeshProUGUI
+      key: text
+      val: 250
+    - comp: TextMeshProUGUI
+      key: fontSize
+      val: 34.00
+    - comp: TextMeshProUGUI
+      key: color
+      val: '#FFFFFFFF'
+    - comp: TextMeshProUGUI
+      key: alignment
+      val: 514
+    - comp: TextMeshProUGUI
+      key: fontStyle
+      val: 1
+    - comp: TextMeshProUGUI
+      key: enableWordWrapping
+      val: True
+    status: pending
+  - id: DAI-079A446C
+    target: Prefab:DailyReward
+    method: BuildDailyReward
+    path: DailyReward/Panel/Grid_Days/Day_5
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 4
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,0.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (100.0000,100.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: Image
+      key: color
+      val: '#082A4CAA'
+    - comp: Image
+      key: raycastTarget
+      val: True
+    - comp: Image
+      key: preserveAspect
+      val: False
+    status: pending
+  - id: DAI-4BFDEE9C
+    target: Prefab:DailyReward
+    method: BuildDailyReward
+    path: DailyReward/Panel/Grid_Days/Day_5/Txt_Day
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 0
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,118.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (180.0000,58.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: TextMeshProUGUI
+      key: text
+      val: DAY 5
+    - comp: TextMeshProUGUI
+      key: fontSize
+      val: 30.00
+    - comp: TextMeshProUGUI
+      key: color
+      val: '#FFFFFFFF'
+    - comp: TextMeshProUGUI
+      key: alignment
+      val: 514
+    - comp: TextMeshProUGUI
+      key: fontStyle
+      val: 1
+    - comp: TextMeshProUGUI
+      key: enableWordWrapping
+      val: True
+    status: pending
+  - id: DAI-488832CB
+    target: Prefab:DailyReward
+    method: BuildDailyReward
+    path: DailyReward/Panel/Grid_Days/Day_5/Icon_Reward
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 1
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,8.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (180.0000,120.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: TextMeshProUGUI
+      key: text
+      val: '***'
+    - comp: TextMeshProUGUI
+      key: fontSize
+      val: 92.00
+    - comp: TextMeshProUGUI
+      key: color
+      val: '#FFB300FF'
+    - comp: TextMeshProUGUI
+      key: alignment
+      val: 514
+    - comp: TextMeshProUGUI
+      key: fontStyle
+      val: 0
+    - comp: TextMeshProUGUI
+      key: enableWordWrapping
+      val: True
+    status: pending
+  - id: DAI-74B165EA
+    target: Prefab:DailyReward
+    method: BuildDailyReward
+    path: DailyReward/Panel/Grid_Days/Day_5/Txt_Amount
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 2
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,-112.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (170.0000,58.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: TextMeshProUGUI
+      key: text
+      val: 300
+    - comp: TextMeshProUGUI
+      key: fontSize
+      val: 34.00
+    - comp: TextMeshProUGUI
+      key: color
+      val: '#FFFFFFFF'
+    - comp: TextMeshProUGUI
+      key: alignment
+      val: 514
+    - comp: TextMeshProUGUI
+      key: fontStyle
+      val: 1
+    - comp: TextMeshProUGUI
+      key: enableWordWrapping
+      val: True
+    status: pending
+  - id: DAI-65D0B7AB
+    target: Prefab:DailyReward
+    method: BuildDailyReward
+    path: DailyReward/Panel/Grid_Days/Day_6
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 5
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,0.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (100.0000,100.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: Image
+      key: color
+      val: '#082A4CAA'
+    - comp: Image
+      key: raycastTarget
+      val: True
+    - comp: Image
+      key: preserveAspect
+      val: False
+    status: pending
+  - id: DAI-C0990226
+    target: Prefab:DailyReward
+    method: BuildDailyReward
+    path: DailyReward/Panel/Grid_Days/Day_6/Txt_Day
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 0
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,118.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (180.0000,58.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: TextMeshProUGUI
+      key: text
+      val: DAY 6
+    - comp: TextMeshProUGUI
+      key: fontSize
+      val: 30.00
+    - comp: TextMeshProUGUI
+      key: color
+      val: '#FFFFFFFF'
+    - comp: TextMeshProUGUI
+      key: alignment
+      val: 514
+    - comp: TextMeshProUGUI
+      key: fontStyle
+      val: 1
+    - comp: TextMeshProUGUI
+      key: enableWordWrapping
+      val: True
+    status: pending
+  - id: DAI-8750D55A
+    target: Prefab:DailyReward
+    method: BuildDailyReward
+    path: DailyReward/Panel/Grid_Days/Day_6/Icon_Reward
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 1
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,8.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (180.0000,120.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: TextMeshProUGUI
+      key: text
+      val: '***'
+    - comp: TextMeshProUGUI
+      key: fontSize
+      val: 92.00
+    - comp: TextMeshProUGUI
+      key: color
+      val: '#FFB300FF'
+    - comp: TextMeshProUGUI
+      key: alignment
+      val: 514
+    - comp: TextMeshProUGUI
+      key: fontStyle
+      val: 0
+    - comp: TextMeshProUGUI
+      key: enableWordWrapping
+      val: True
+    status: pending
+  - id: DAI-CA09BD3B
+    target: Prefab:DailyReward
+    method: BuildDailyReward
+    path: DailyReward/Panel/Grid_Days/Day_6/Txt_Amount
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 2
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,-112.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (170.0000,58.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: TextMeshProUGUI
+      key: text
+      val: 350
+    - comp: TextMeshProUGUI
+      key: fontSize
+      val: 34.00
+    - comp: TextMeshProUGUI
+      key: color
+      val: '#FFFFFFFF'
+    - comp: TextMeshProUGUI
+      key: alignment
+      val: 514
+    - comp: TextMeshProUGUI
+      key: fontStyle
+      val: 1
+    - comp: TextMeshProUGUI
+      key: enableWordWrapping
+      val: True
+    status: pending
+  - id: DAI-9D6A6D9C
+    target: Prefab:DailyReward
+    method: BuildDailyReward
+    path: DailyReward/Panel/Grid_Days/Day_7
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 6
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,0.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (100.0000,100.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: Image
+      key: color
+      val: '#082A4CAA'
+    - comp: Image
+      key: raycastTarget
+      val: True
+    - comp: Image
+      key: preserveAspect
+      val: False
+    status: pending
+  - id: DAI-36024C9A
+    target: Prefab:DailyReward
+    method: BuildDailyReward
+    path: DailyReward/Panel/Grid_Days/Day_7/Txt_Day
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 0
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,96.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (180.0000,58.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: TextMeshProUGUI
+      key: text
+      val: DAY 7
+    - comp: TextMeshProUGUI
+      key: fontSize
+      val: 38.00
+    - comp: TextMeshProUGUI
+      key: color
+      val: '#FFFFFFFF'
+    - comp: TextMeshProUGUI
+      key: alignment
+      val: 514
+    - comp: TextMeshProUGUI
+      key: fontStyle
+      val: 1
+    - comp: TextMeshProUGUI
+      key: enableWordWrapping
+      val: True
+    status: pending
+  - id: DAI-74E0ACEC
+    target: Prefab:DailyReward
+    method: BuildDailyReward
+    path: DailyReward/Panel/Grid_Days/Day_7/Icon_Reward
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 1
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,-18.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (180.0000,150.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: TextMeshProUGUI
+      key: text
+      val: BOX
+    - comp: TextMeshProUGUI
+      key: fontSize
+      val: 116.00
+    - comp: TextMeshProUGUI
+      key: color
+      val: '#FFB300FF'
+    - comp: TextMeshProUGUI
+      key: alignment
+      val: 514
+    - comp: TextMeshProUGUI
+      key: fontStyle
+      val: 0
+    - comp: TextMeshProUGUI
+      key: enableWordWrapping
+      val: True
+    status: pending
+  - id: DAI-83101D1C
+    target: Prefab:DailyReward
+    method: BuildDailyReward
+    path: DailyReward/Panel/Grid_Days/Day_7/Txt_Amount
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 2
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,-120.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (170.0000,58.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: TextMeshProUGUI
+      key: text
+      val: 500
+    - comp: TextMeshProUGUI
+      key: fontSize
+      val: 42.00
+    - comp: TextMeshProUGUI
+      key: color
+      val: '#FFFFFFFF'
+    - comp: TextMeshProUGUI
+      key: alignment
+      val: 514
+    - comp: TextMeshProUGUI
+      key: fontStyle
+      val: 1
+    - comp: TextMeshProUGUI
+      key: enableWordWrapping
+      val: True
+    status: pending
+  - id: DAI-06FE154E
+    target: Prefab:DailyReward
+    method: BuildDailyReward
+    path: DailyReward/Panel/Btn_Claim
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 1
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,88.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (650.0000,130.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.0000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.0000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.0000)
+    - comp: Image
+      key: color
+      val: '#FFFFFFFF'
+    - comp: Image
+      key: raycastTarget
+      val: True
+    - comp: Image
+      key: preserveAspect
+      val: True
+    - comp: Button
+      key: interactable
+      val: True
+    status: pending
+  - id: DAI-D626D2EA
+    target: Prefab:DailyReward
+    method: BuildDailyReward
+    path: DailyReward/Panel/Btn_Claim/Txt_Label
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 0
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,0.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (0.0000,0.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.0000,0.0000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (1.0000,1.0000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: TextMeshProUGUI
+      key: text
+      val: common.claim
+    - comp: TextMeshProUGUI
+      key: fontSize
+      val: 54.00
+    - comp: TextMeshProUGUI
+      key: color
+      val: '#FFFFFFFF'
+    - comp: TextMeshProUGUI
+      key: alignment
+      val: 514
+    - comp: TextMeshProUGUI
+      key: fontStyle
+      val: 1
+    - comp: TextMeshProUGUI
+      key: enableWordWrapping
+      val: True
+    status: pending
+  - id: DAI-B7650007
+    target: Prefab:DailyReward
+    method: BuildDailyReward
+    path: DailyReward/Ribbon
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 3
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,560.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (690.0000,150.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: Image
+      key: color
+      val: '#0B8FFFFF'
+    - comp: Image
+      key: raycastTarget
+      val: True
+    - comp: Image
+      key: preserveAspect
+      val: False
+    status: pending
+  - id: DAI-94787625
+    target: Prefab:DailyReward
+    method: BuildDailyReward
+    path: DailyReward/Ribbon/Txt_Title
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 0
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,0.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (0.0000,0.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.0000,0.0000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (1.0000,1.0000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: TextMeshProUGUI
+      key: text
+      val: popup.daily_reward.title
+    - comp: TextMeshProUGUI
+      key: fontSize
+      val: 56.00
+    - comp: TextMeshProUGUI
+      key: color
+      val: '#FFFFFFFF'
+    - comp: TextMeshProUGUI
+      key: alignment
+      val: 514
+    - comp: TextMeshProUGUI
+      key: fontStyle
+      val: 1
+    - comp: TextMeshProUGUI
+      key: enableWordWrapping
+      val: True
+    status: pending
+  - id: DAI-497A4ED4
+    target: Prefab:DailyReward
+    method: BuildDailyReward
+    path: DailyReward/Btn_Close
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 4
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (-72.0000,-72.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (86.0000,86.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (1.0000,1.0000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (1.0000,1.0000)
+    - comp: RectTransform
+      key: pivot
+      val: (1.0000,1.0000)
+    - comp: Image
+      key: color
+      val: '#FFFFFFFF'
+    - comp: Image
+      key: raycastTarget
+      val: True
+    - comp: Image
+      key: preserveAspect
+      val: True
+    - comp: Button
+      key: interactable
+      val: True
+    status: pending
+  - id: RAN-052EE12E
+    target: Prefab:RankingCard
+    method: BuildRankingCard
+    path: RankingCard
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 0
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,0.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (1000.0000,168.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: Image
+      key: color
+      val: '#FAE8D1F5'
+    - comp: Image
+      key: raycastTarget
+      val: True
+    - comp: Image
+      key: preserveAspect
+      val: False
+    - comp: HorizontalLayoutGroup
+      key: spacing
+      val: 18.00
+    - comp: HorizontalLayoutGroup
+      key: childAlignment
+      val: 3
+    - comp: HorizontalLayoutGroup
+      key: paddingLeft
+      val: 18
+    - comp: HorizontalLayoutGroup
+      key: paddingRight
+      val: 22
+    - comp: HorizontalLayoutGroup
+      key: paddingTop
+      val: 16
+    - comp: HorizontalLayoutGroup
+      key: paddingBottom
+      val: 16
+    - comp: HorizontalLayoutGroup
+      key: childForceExpandWidth
+      val: True
+    - comp: HorizontalLayoutGroup
+      key: childForceExpandHeight
+      val: True
+    - comp: LayoutElement
+      key: minWidth
+      val: -1.00
+    - comp: LayoutElement
+      key: minHeight
+      val: -1.00
+    - comp: LayoutElement
+      key: preferredWidth
+      val: -1.00
+    - comp: LayoutElement
+      key: preferredHeight
+      val: 168.00
+    - comp: LayoutElement
+      key: flexibleWidth
+      val: 1.00
+    - comp: LayoutElement
+      key: flexibleHeight
+      val: -1.00
+    - comp: LayoutElement
+      key: ignoreLayout
+      val: False
+    status: pending
+  - id: RAN-4B1B489C
+    target: Prefab:RankingCard
+    method: BuildRankingCard
+    path: RankingCard/Slot_Rank
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 0
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,0.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (76.0000,112.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: LayoutElement
+      key: minWidth
+      val: -1.00
+    - comp: LayoutElement
+      key: minHeight
+      val: -1.00
+    - comp: LayoutElement
+      key: preferredWidth
+      val: 76.00
+    - comp: LayoutElement
+      key: preferredHeight
+      val: 112.00
+    - comp: LayoutElement
+      key: flexibleWidth
+      val: -1.00
+    - comp: LayoutElement
+      key: flexibleHeight
+      val: -1.00
+    - comp: LayoutElement
+      key: ignoreLayout
+      val: False
+    status: pending
+  - id: RAN-CB31FE88
+    target: Prefab:RankingCard
+    method: BuildRankingCard
+    path: RankingCard/Slot_Rank/Img_Rank
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 0
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,0.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (0.0000,0.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.0000,0.0000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (1.0000,1.0000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: Image
+      key: color
+      val: '#FFFFFF00'
+    - comp: Image
+      key: raycastTarget
+      val: True
+    - comp: Image
+      key: preserveAspect
+      val: True
+    status: pending
+  - id: RAN-38DA1F74
+    target: Prefab:RankingCard
+    method: BuildRankingCard
+    path: RankingCard/Slot_Rank/Txt_Rank
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 1
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,0.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (0.0000,0.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.0000,0.0000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (1.0000,1.0000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: TextMeshProUGUI
+      key: text
+      val: --
+    - comp: TextMeshProUGUI
+      key: fontSize
+      val: 38.00
+    - comp: TextMeshProUGUI
+      key: color
+      val: '#5E4B57FF'
+    - comp: TextMeshProUGUI
+      key: alignment
+      val: 4098
+    - comp: TextMeshProUGUI
+      key: fontStyle
+      val: 1
+    - comp: TextMeshProUGUI
+      key: enableWordWrapping
+      val: True
+    status: pending
+  - id: RAN-541AD663
+    target: Prefab:RankingCard
+    method: BuildRankingCard
+    path: RankingCard/Txt_DisplayName
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 1
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,0.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (0.0000,88.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: TextMeshProUGUI
+      key: text
+      val: Player
+    - comp: TextMeshProUGUI
+      key: fontSize
+      val: 36.00
+    - comp: TextMeshProUGUI
+      key: color
+      val: '#073653FF'
+    - comp: TextMeshProUGUI
+      key: alignment
+      val: 4097
+    - comp: TextMeshProUGUI
+      key: fontStyle
+      val: 1
+    - comp: TextMeshProUGUI
+      key: enableWordWrapping
+      val: True
+    - comp: LayoutElement
+      key: minWidth
+      val: 100.00
+    - comp: LayoutElement
+      key: minHeight
+      val: -1.00
+    - comp: LayoutElement
+      key: preferredWidth
+      val: 400.00
+    - comp: LayoutElement
+      key: preferredHeight
+      val: -1.00
+    - comp: LayoutElement
+      key: flexibleWidth
+      val: 1.00
+    - comp: LayoutElement
+      key: flexibleHeight
+      val: -1.00
+    - comp: LayoutElement
+      key: ignoreLayout
+      val: False
+    status: pending
+  - id: RAN-CCB2B441
+    target: Prefab:RankingCard
+    method: BuildRankingCard
+    path: RankingCard/Group_Level
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 2
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,0.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (176.0000,112.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: LayoutElement
+      key: minWidth
+      val: -1.00
+    - comp: LayoutElement
+      key: minHeight
+      val: -1.00
+    - comp: LayoutElement
+      key: preferredWidth
+      val: 176.00
+    - comp: LayoutElement
+      key: preferredHeight
+      val: -1.00
+    - comp: LayoutElement
+      key: flexibleWidth
+      val: -1.00
+    - comp: LayoutElement
+      key: flexibleHeight
+      val: -1.00
+    - comp: LayoutElement
+      key: ignoreLayout
+      val: False
+    - comp: VerticalLayoutGroup
+      key: spacing
+      val: 0.00
+    - comp: VerticalLayoutGroup
+      key: childAlignment
+      val: 5
+    - comp: VerticalLayoutGroup
+      key: paddingLeft
+      val: 0
+    - comp: VerticalLayoutGroup
+      key: paddingRight
+      val: 0
+    - comp: VerticalLayoutGroup
+      key: paddingTop
+      val: 0
+    - comp: VerticalLayoutGroup
+      key: paddingBottom
+      val: 0
+    - comp: VerticalLayoutGroup
+      key: childForceExpandWidth
+      val: True
+    - comp: VerticalLayoutGroup
+      key: childForceExpandHeight
+      val: True
+    status: pending
+  - id: RAN-B27A9F7F
+    target: Prefab:RankingCard
+    method: BuildRankingCard
+    path: RankingCard/Group_Level/Txt_LevelLabel
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 0
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,0.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (176.0000,42.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: TextMeshProUGUI
+      key: text
+      val: 
+    - comp: TextMeshProUGUI
+      key: fontSize
+      val: 26.00
+    - comp: TextMeshProUGUI
+      key: color
+      val: '#073653FF'
+    - comp: TextMeshProUGUI
+      key: alignment
+      val: 4100
+    - comp: TextMeshProUGUI
+      key: fontStyle
+      val: 1
+    - comp: TextMeshProUGUI
+      key: enableWordWrapping
+      val: True
+    status: pending
+  - id: RAN-E0999831
+    target: Prefab:RankingCard
+    method: BuildRankingCard
+    path: RankingCard/Group_Level/Txt_LevelValue
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 1
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,0.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (176.0000,64.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: TextMeshProUGUI
+      key: text
+      val: 0
+    - comp: TextMeshProUGUI
+      key: fontSize
+      val: 44.00
+    - comp: TextMeshProUGUI
+      key: color
+      val: '#7B5560FF'
+    - comp: TextMeshProUGUI
+      key: alignment
+      val: 4100
+    - comp: TextMeshProUGUI
+      key: fontStyle
+      val: 1
+    - comp: TextMeshProUGUI
+      key: enableWordWrapping
+      val: True
+    status: pending
+  - id: SHO-73B5FC76
+    target: Prefab:ShopProductCard
+    method: BuildShopProductCard
+    path: ShopProductCard
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 0
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,0.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (280.0000,500.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: Image
+      key: color
+      val: '#0F2947E6'
+    - comp: Image
+      key: raycastTarget
+      val: True
+    - comp: Image
+      key: preserveAspect
+      val: False
+    - comp: Button
+      key: interactable
+      val: True
+    - comp: LayoutElement
+      key: minWidth
+      val: -1.00
+    - comp: LayoutElement
+      key: minHeight
+      val: -1.00
+    - comp: LayoutElement
+      key: preferredWidth
+      val: 280.00
+    - comp: LayoutElement
+      key: preferredHeight
+      val: 500.00
+    - comp: LayoutElement
+      key: flexibleWidth
+      val: -1.00
+    - comp: LayoutElement
+      key: flexibleHeight
+      val: -1.00
+    - comp: LayoutElement
+      key: ignoreLayout
+      val: False
+    status: pending
+  - id: SHO-04BC89B7
+    target: Prefab:ShopProductCard
+    method: BuildShopProductCard
+    path: ShopProductCard/Txt_Title
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 0
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,-36.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (0.0000,88.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.0000,1.0000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (1.0000,1.0000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,1.0000)
+    - comp: TextMeshProUGUI
+      key: text
+      val: 
+    - comp: TextMeshProUGUI
+      key: fontSize
+      val: 46.00
+    - comp: TextMeshProUGUI
+      key: color
+      val: '#FFD114FF'
+    - comp: TextMeshProUGUI
+      key: alignment
+      val: 4098
+    - comp: TextMeshProUGUI
+      key: fontStyle
+      val: 1
+    - comp: TextMeshProUGUI
+      key: enableWordWrapping
+      val: True
+    status: pending
+  - id: SHO-B1A875C5
+    target: Prefab:ShopProductCard
+    method: BuildShopProductCard
+    path: ShopProductCard/Img_ItemIcon
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 1
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,16.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (190.0000,190.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (0.5000,0.5000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.5000)
+    - comp: Image
+      key: color
+      val: '#FFBF05CC'
+    - comp: Image
+      key: raycastTarget
+      val: True
+    - comp: Image
+      key: preserveAspect
+      val: True
+    status: pending
+  - id: SHO-E4FC0469
+    target: Prefab:ShopProductCard
+    method: BuildShopProductCard
+    path: ShopProductCard/Txt_Price
+    op: new_go
+    comp: 
+    key: 
+    baseVal: 
+    currVal: 
+    siblingIdx: 2
+    goProps:
+    - comp: RectTransform
+      key: anchoredPosition
+      val: (0.0000,26.0000)
+    - comp: RectTransform
+      key: sizeDelta
+      val: (-36.0000,96.0000)
+    - comp: RectTransform
+      key: anchorMin
+      val: (0.0000,0.0000)
+    - comp: RectTransform
+      key: anchorMax
+      val: (1.0000,0.0000)
+    - comp: RectTransform
+      key: pivot
+      val: (0.5000,0.0000)
+    - comp: TextMeshProUGUI
+      key: text
+      val: 
+    - comp: TextMeshProUGUI
+      key: fontSize
+      val: 36.00
+    - comp: TextMeshProUGUI
+      key: color
+      val: '#FFFFFFFF'
+    - comp: TextMeshProUGUI
+      key: alignment
+      val: 4098
+    - comp: TextMeshProUGUI
+      key: fontStyle
+      val: 1
+    - comp: TextMeshProUGUI
+      key: enableWordWrapping
+      val: True
+    status: pending

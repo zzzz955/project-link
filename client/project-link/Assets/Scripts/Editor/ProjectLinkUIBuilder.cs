@@ -166,10 +166,6 @@ namespace ProjectLink.EditorTools
                     AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
                     EditorSceneManager.OpenScene(path, OpenSceneMode.Single);
                 }
-
-                // Baseline reflects whatever is now on disk: post-build or restored original.
-                // Active scene always matches disk at this point (either unchanged or re-opened).
-                ProjectLinkUIOverrideApply.SaveBaselineForScene(sceneName);
             }
 
             AssetDatabase.SaveAssets();
@@ -450,6 +446,7 @@ namespace ProjectLink.EditorTools
             NormalizeLayoutText(canvas);
             EnsureLocalizedFonts(canvas);
             AddAnimatorToIconImages(canvas);
+            ProjectLinkUIOverrideApply.SaveBaselineForScene(sceneName);
             ProjectLinkUIOverrideApply.ApplySceneOverrides(sceneName);
         }
 
@@ -2356,13 +2353,12 @@ namespace ProjectLink.EditorTools
             string path = $"{PopupPrefabRoot}/{prefabName}.prefab";
             string prev = System.IO.File.Exists(path) ? System.IO.File.ReadAllText(path) : null;
 
+            ProjectLinkUIOverrideApply.SaveBaselineForPrefab(root, prefabName);
             ProjectLinkUIOverrideApply.ApplyPrefabOverrides(root, prefabName);
             PrefabUtility.SaveAsPrefabAsset(root, path);
             Object.DestroyImmediate(root);
 
             RestoreIfUnchanged(path, prev);
-            // Baseline reflects whatever file is now on disk (post-build or restored original)
-            ProjectLinkUIOverrideApply.SaveBaselineForPrefab(path, prefabName);
         }
 
         // ─── Shared canvas / layer helpers ───────────────────────────────

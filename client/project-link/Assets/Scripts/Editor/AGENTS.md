@@ -53,9 +53,9 @@
 | `ProjectLinkUIOverrideCapture.CaptureAllOverrides()` | method | [MenuItem] diffs all scenes+prefabs vs baseline → writes manifest; replaces all pending entries fresh each run |
 | `ProjectLinkUIOverrideCapture.ClearPromoted()` | method | [MenuItem] removes entries with status="promoted" from manifest |
 | `ProjectLinkUIOverrideApply.ApplySceneOverrides(sceneName)` | method | called by BuildScene; applies pending prop overrides to active scene (no snapshot) |
-| `ProjectLinkUIOverrideApply.SaveBaselineForScene(sceneName)` | method | called by BuildAllSceneUI after restore check; snapshots active scene (matches disk) to baseline |
-| `ProjectLinkUIOverrideApply.ApplyPrefabOverrides(root,prefabName)` | method | called by SavePopupPrefab; applies pending prop overrides to in-memory prefab root (no snapshot) |
-| `ProjectLinkUIOverrideApply.SaveBaselineForPrefab(prefabPath,prefabName)` | method | called by SavePopupPrefab after RestoreIfUnchanged; loads prefab from disk, snapshots to baseline |
+| `ProjectLinkUIOverrideApply.SaveBaselineForScene(sceneName)` | method | called by BuildScene before ApplySceneOverrides; snapshots clean build state (override-free) to baseline |
+| `ProjectLinkUIOverrideApply.ApplyPrefabOverrides(root,prefabName)` | method | called by SavePopupPrefab after SaveBaselineForPrefab; applies pending prop overrides to in-memory prefab root |
+| `ProjectLinkUIOverrideApply.SaveBaselineForPrefab(root,prefabName)` | method | called by SavePopupPrefab before ApplyPrefabOverrides; snapshots clean builder GO to baseline |
 | `UIBaselineSnapshot.TryGet(target,path,comp,key,val)` | method | lookup in index; returns false if not found |
 | `UIBaselineSnapshot.ContainsPath(target,path)` | method | true if any record exists for target+path (new_go detection) |
 | `UIBaselineSnapshot.GetPathsForTarget(target)` | method | returns all GO paths in baseline for a target (remove_go detection) |

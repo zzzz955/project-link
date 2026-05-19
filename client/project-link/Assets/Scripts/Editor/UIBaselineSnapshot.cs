@@ -89,11 +89,13 @@ namespace ProjectLink.EditorTools
         {
             if (_index == null) return;
             records.Clear();
-            foreach (var kv in _index)
+            var keys = new System.Collections.Generic.List<string>(_index.Keys);
+            keys.Sort(System.StringComparer.Ordinal);
+            foreach (var k in keys)
             {
-                var p = kv.Key.Split('\x01');
+                var p = k.Split('\x01');
                 if (p.Length != 4) continue;
-                records.Add(new Record { target = p[0], path = p[1], comp = p[2], key = p[3], val = kv.Value });
+                records.Add(new Record { target = p[0], path = p[1], comp = p[2], key = p[3], val = _index[k] });
             }
         }
 

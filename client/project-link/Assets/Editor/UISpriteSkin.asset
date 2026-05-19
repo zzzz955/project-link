@@ -84,7 +84,7 @@ MonoBehaviour:
   - elementName: slot_provider_google
     sprite: {fileID: 21300000, guid: 65344ce8d1705314295109e5c2698438, type: 3}
   - elementName: slot_resource_bg
-    sprite: {fileID: 21300000, guid: bb8c57b93d50fee49a1b2f78babb350e, type: 3}
+    sprite: {fileID: 21300000, guid: aa4710a9cf0473d45ad583c8b30bb9ff, type: 3}
   - elementName: slot_stage_node
     sprite: {fileID: 21300000, guid: c1ddcf33f3623344887245a348d4289c, type: 3}
   - elementName: slot_stamina_icon

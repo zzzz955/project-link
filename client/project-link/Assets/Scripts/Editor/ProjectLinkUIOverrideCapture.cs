@@ -242,20 +242,15 @@ namespace ProjectLink.EditorTools
             }
         }
 
-        // Called from SavePopupPrefab AFTER RestoreIfUnchanged — loads from disk so baseline
-        // always matches the file that was actually committed (original or new)
-        public static void SaveBaselineForPrefab(string prefabPath, string prefabName)
+        // Called from SavePopupPrefab BEFORE ApplyPrefabOverrides — snapshots clean builder
+        // output so CaptureAllOverrides always diffs against the correct baseline
+        public static void SaveBaselineForPrefab(GameObject root, string prefabName)
         {
             var target = $"Prefab:{prefabName}";
             var baseline = UIBaselineSnapshot.LoadOrCreate();
             baseline.RebuildIndex();
             baseline.ClearTarget(target);
-            if (System.IO.File.Exists(prefabPath))
-            {
-                var go = PrefabUtility.LoadPrefabContents(prefabPath);
-                SnapshotGO(go, go.name, target, baseline);
-                PrefabUtility.UnloadPrefabContents(go);
-            }
+            SnapshotGO(root, root.name, target, baseline);
             baseline.Flush();
             EditorUtility.SetDirty(baseline);
         }

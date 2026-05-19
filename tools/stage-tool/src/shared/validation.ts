@@ -61,6 +61,8 @@ export function normalizeAndValidateStage(stageId: number, payload: StagePayload
   const widthOk = assertInteger(payload.width, "width", issues);
   const heightOk = assertInteger(payload.height, "height", issues);
   const timeLimitOk = assertInteger(payload.timeLimit, "timeLimit", issues);
+  const moveLimitOk = assertInteger(payload.moveLimit, "moveLimit", issues);
+  const softRewardOk = assertInteger(payload.soft_reward, "soft_reward", issues);
   const difficultyOk = assertInteger(payload.difficulty, "difficulty", issues);
 
   if (widthOk && (payload.width < MIN_SIZE || payload.width > MAX_SIZE)) {
@@ -71,6 +73,12 @@ export function normalizeAndValidateStage(stageId: number, payload: StagePayload
   }
   if (timeLimitOk && (payload.timeLimit < MIN_TIME_LIMIT || payload.timeLimit > MAX_TIME_LIMIT)) {
     issues.push({ field: "timeLimit", message: `must be ${MIN_TIME_LIMIT}..${MAX_TIME_LIMIT}` });
+  }
+  if (moveLimitOk && payload.moveLimit < 0) {
+    issues.push({ field: "moveLimit", message: "must be >= 0" });
+  }
+  if (softRewardOk && payload.soft_reward < 0) {
+    issues.push({ field: "soft_reward", message: "must be >= 0" });
   }
   if (difficultyOk && (payload.difficulty < MIN_DIFFICULTY || payload.difficulty > MAX_DIFFICULTY)) {
     issues.push({ field: "difficulty", message: `must be ${MIN_DIFFICULTY}..${MAX_DIFFICULTY}` });
@@ -134,6 +142,8 @@ export function normalizeAndValidateStage(stageId: number, payload: StagePayload
     width: payload.width,
     height: payload.height,
     timeLimit: payload.timeLimit,
+    moveLimit: payload.moveLimit,
+    soft_reward: payload.soft_reward,
     difficulty: payload.difficulty,
     nodeMap,
     cellMap,

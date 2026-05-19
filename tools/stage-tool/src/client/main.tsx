@@ -11,6 +11,8 @@ type StageRecord = {
   stageId: string;
   boardSize: StageBoardSize;
   timeLimit: number;
+  moveLimit: number;
+  soft_reward: number;
   difficulty: number;
   nodeMap: number[][];
   cellMap: string[][];
@@ -42,6 +44,7 @@ type GenerateSettings = {
   height: number;
   difficulty: number;
   nodeCount: number;
+  obstacleCount: number | "";
   seed: string;
 };
 
@@ -121,6 +124,8 @@ function createStage(stageId = ""): StageRecord {
     stageId,
     boardSize: { width: DEFAULT_WIDTH, height: DEFAULT_HEIGHT },
     timeLimit: 120,
+    moveLimit: 0,
+    soft_reward: 10,
     difficulty: 1,
     nodeMap: emptyGrid(DEFAULT_WIDTH, DEFAULT_HEIGHT, 0),
     cellMap: emptyGrid(DEFAULT_WIDTH, DEFAULT_HEIGHT, "0"),
@@ -173,6 +178,8 @@ function normalizeStage(raw: unknown, fallbackStageId = ""): StageRecord {
     stageId: String(data.stageId ?? data.id ?? fallbackStageId),
     boardSize: { width, height },
     timeLimit: Number(data.timeLimit ?? 120),
+    moveLimit: Number(data.moveLimit ?? 0),
+    soft_reward: Number(data.soft_reward ?? 0),
     difficulty: Number(data.difficulty ?? 1),
     nodeMap: toRows(nodeMap, width, height, 0),
     cellMap: toRows(cellMap, width, height, "0"),
@@ -351,6 +358,8 @@ function stagePayload(stage: StageRecord) {
     width: stage.boardSize.width,
     height: stage.boardSize.height,
     timeLimit: stage.timeLimit,
+    moveLimit: stage.moveLimit,
+    soft_reward: stage.soft_reward,
     difficulty: stage.difficulty,
     nodeMap: flattenGrid(stage.nodeMap),
     cellMap: flattenGrid(stage.cellMap).map(encodeCellValue),
@@ -417,6 +426,17 @@ function normalizeGeneratedStage(raw: unknown, fallbackStageId: string): { stage
   };
 }
 
+function getSoftReward(difficulty: number): number {
+  const rewards: Record<number, number> = {
+    1: 10,
+    2: 15,
+    3: 20,
+    4: 30,
+    5: 40,
+  };
+  return rewards[difficulty] || 10;
+}
+
 function App() {
   const [editorDefaults, setEditorDefaults] = useState<EditorDefaults>({
     width: DEFAULT_WIDTH,
@@ -433,6 +453,7 @@ function App() {
     height: DEFAULT_HEIGHT,
     difficulty: 1,
     nodeCount: 4,
+    obstacleCount: "",
     seed: "",
   });
   const [generatedSeed, setGeneratedSeed] = useState("");
@@ -647,15 +668,19 @@ function App() {
     setValidationErrors([]);
     try {
       const seed = generateSettings.seed.trim();
+      const body: Record<string, unknown> = {
+        width: clampSize(generateSettings.width),
+        height: clampSize(generateSettings.height),
+        difficulty: clampDifficulty(generateSettings.difficulty),
+        nodeCount: clampNodeCount(generateSettings.nodeCount),
+        ...(seed ? { seed } : {}),
+      };
+      if (generateSettings.obstacleCount !== "") {
+        body.obstacleCount = Math.max(0, Math.floor(Number(generateSettings.obstacleCount) || 0));
+      }
       const payload = await requestJson<unknown>("/api/stages/generate", {
         method: "POST",
-        body: JSON.stringify({
-          width: clampSize(generateSettings.width),
-          height: clampSize(generateSettings.height),
-          difficulty: clampDifficulty(generateSettings.difficulty),
-          nodeCount: clampNodeCount(generateSettings.nodeCount),
-          ...(seed ? { seed } : {}),
-        }),
+        body: JSON.stringify(body),
       });
       const next = normalizeGeneratedStage(payload, draftStageId);
       setStage(next.stage);
@@ -810,15 +835,42 @@ function App() {
             />
           </label>
           <label>
+            <span>Moves</span>
+            <input
+              type="number"
+              min={0}
+              value={stage.moveLimit}
+              onChange={(event) =>
+                updateStage((current) => ({ ...current, moveLimit: Math.max(0, Number(event.target.value) || 0) }))
+              }
+            />
+          </label>
+          <label>
+            <span>Reward</span>
+            <input
+              type="number"
+              min={0}
+              value={stage.soft_reward}
+              onChange={(event) =>
+                updateStage((current) => ({ ...current, soft_reward: Math.max(0, Number(event.target.value) || 0) }))
+              }
+            />
+          </label>
+          <label>
             <span>Difficulty</span>
             <input
               type="number"
               min={1}
               max={5}
               value={stage.difficulty}
-              onChange={(event) =>
-                updateStage((current) => ({ ...current, difficulty: clampDifficulty(Number(event.target.value)) }))
-              }
+              onChange={(event) => {
+                const nextDiff = clampDifficulty(Number(event.target.value));
+                updateStage((current) => ({
+                  ...current,
+                  difficulty: nextDiff,
+                  soft_reward: getSoftReward(nextDiff),
+                }));
+              }}
             />
           </label>
           <div className="toolbar-actions">
@@ -882,6 +934,21 @@ function App() {
                 setGenerateSettings((current) => ({
                   ...current,
                   nodeCount: clampNodeCount(Number(event.target.value)),
+                }))
+              }
+            />
+          </label>
+          <label>
+            <span>Obstacles</span>
+            <input
+              type="number"
+              min={0}
+              placeholder="auto"
+              value={generateSettings.obstacleCount}
+              onChange={(event) =>
+                setGenerateSettings((current) => ({
+                  ...current,
+                  obstacleCount: event.target.value === "" ? "" : Math.max(0, Math.floor(Number(event.target.value) || 0)),
                 }))
               }
             />

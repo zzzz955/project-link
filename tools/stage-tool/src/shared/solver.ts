@@ -24,11 +24,13 @@ export interface SolverValidationResult {
 
 const MAX_PAIR_PATH_OPTIONS = 80;
 const MAX_GROUP_ROUTE_OPTIONS = 160;
-const MAX_SOLVER_STATES = 20000;
+const BASE_MAX_SOLVER_STATES = 20000;
+const MAX_SOLVER_STATES_PER_CELL = 40;
 
 export function validateStageSolvable(stage: Pick<Stage, "width" | "height" | "nodeMap" | "cellMap">): SolverValidationResult {
   const groups = [...collectNodeGroups(stage).entries()];
-  const context = { states: 0 };
+  const maxStates = Math.max(BASE_MAX_SOLVER_STATES, stage.width * stage.height * MAX_SOLVER_STATES_PER_CELL);
+  const context = { states: 0, maxStates };
   const solved = solveGroups(stage, groups, new Set(), [], context);
   if (solved !== undefined) {
     return { valid: true, issues: [], paths: solved };
@@ -49,10 +51,10 @@ function solveGroups(
   remaining: Array<[number, IndexedPoint[]]>,
   occupied: Set<number>,
   paths: SolverPath[],
-  context: { states: number }
+  context: { states: number; maxStates: number }
 ): SolverPath[] | undefined {
   context.states += 1;
-  if (context.states > MAX_SOLVER_STATES) {
+  if (context.states > context.maxStates) {
     return undefined;
   }
   if (remaining.length === 0) {
@@ -65,8 +67,12 @@ function solveGroups(
       nodeGroupId,
       options: matchGroupOptions(stage, nodeGroupId, nodes, occupied)
     }))
-    .filter((candidate) => candidate.options.length > 0)
     .sort((a, b) => a.options.length - b.options.length || a.nodeGroupId - b.nodeGroupId);
+
+  // Forward check: any group with 0 options means this branch is unsolvable
+  if (candidates[0]?.options.length === 0) {
+    return undefined;
+  }
 
   const next = candidates[0];
   if (next === undefined) {

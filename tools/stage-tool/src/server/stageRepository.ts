@@ -13,12 +13,12 @@ import {
 import { CsvTable, readCsvTable, writeCsvTableAtomic } from "./csv";
 
 const BOARD_ENCODING = "b36w2-rm-v1";
-const STAGE_COLUMNS = ["stageId", "width", "height", "timeLimit", "difficulty", "boardEncoding", "nodeMap", "cellMap", "stageMeta", "generatorSeed"];
+const STAGE_COLUMNS = ["stageId", "width", "height", "timeLimit", "moveLimit", "difficulty", "boardEncoding", "nodeMap", "cellMap", "soft_reward", "stageMeta", "generatorSeed"];
 const STAGE_METADATA: string[][] = [
   STAGE_COLUMNS,
-  ["CS", "CS", "CS", "CS", "CS", "CS", "CS", "CS", "CS", "CS"],
-  ["int32", "int32", "int32", "int32", "int32", "string(32)", "string", "string", "string", "uint32"],
-  ["PK", "NN", "NN", "NN", "NN", "NN", "NN", "NN", "NN", "NN"]
+  ["CS", "CS", "CS", "CS", "CS", "CS", "CS", "CS", "CS", "CS", "CS", "CS"],
+  ["int32", "int32", "int32", "int32", "int32", "int32", "string(32)", "string", "string", "int32", "string", "uint32"],
+  ["PK", "NN", "NN", "NN", "NN", "NN", "NN", "NN", "NN", "NN", "NN", "NN"]
 ];
 
 const NODE_COLOR_COLUMNS = ["nodeGroupId", "hexColor", "displayName"];
@@ -94,7 +94,7 @@ export class StageRepository {
     await ensureCsv(this.stageCsvPath, STAGE_METADATA);
     const table = await readCsvTable(this.stageCsvPath);
     const header = table.metadataRows[0];
-    for (const column of ["stageId", "width", "height", "timeLimit", "difficulty", "nodeMap", "cellMap"]) {
+    for (const column of ["stageId", "width", "height", "timeLimit", "moveLimit", "soft_reward", "difficulty", "nodeMap", "cellMap"]) {
       if (!header.includes(column)) {
         throw new Error(`${this.stageCsvPath} missing required column ${column}`);
       }
@@ -123,6 +123,8 @@ function recordToStage(record: Record<string, string>): Stage {
     width: parseInt(record.width, 10),
     height: parseInt(record.height, 10),
     timeLimit: parseInt(record.timeLimit, 10),
+    moveLimit: parseInt(record.moveLimit || "0", 10),
+    soft_reward: parseInt(record.soft_reward || "0", 10),
     difficulty: parseInt(record.difficulty, 10),
     nodeMap: record.nodeMap,
     cellMap: record.cellMap,
@@ -137,6 +139,8 @@ function stageToRecord(stage: Stage, existing: Record<string, string> = {}): Rec
     width: String(stage.width),
     height: String(stage.height),
     timeLimit: String(stage.timeLimit),
+    moveLimit: String(stage.moveLimit),
+    soft_reward: String(stage.soft_reward),
     difficulty: String(stage.difficulty),
     boardEncoding: existing.boardEncoding || BOARD_ENCODING,
     nodeMap: encodeFixedBase36(stage.nodeMap),

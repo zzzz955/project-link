@@ -6,6 +6,7 @@ export interface GenerateStageInput {
   height: number;
   difficulty: number;
   nodeCount?: number;
+  obstacleCount?: number;
   seed?: number | string;
 }
 
@@ -21,18 +22,18 @@ interface Point {
   y: number;
 }
 
-interface GeneratedPath {
-  group: number;
-  cells: number[];
+interface DifficultyParams {
+  minDistance: number;
+  edgePreference: boolean;
+  obstacleStyle: "edge" | "choke";
 }
 
 const MIN_GENERATOR_SIZE = 3;
 const MIN_DIFFICULTY = 1;
 const MAX_DIFFICULTY = 5;
 const OBSTACLE_CODE = 1;
-const RESERVED_GIMMICK_CODE = 2;
-const MAX_BOARD_ATTEMPTS = 160;
-const PATH_ATTEMPTS_PER_GROUP = 500;
+const MAX_BOARD_ATTEMPTS = 40;
+const ENDPOINT_ATTEMPTS = 400;
 
 export function generateStagePayload(input: GenerateStageInput): GeneratedStage {
   const width = assertGeneratorInteger(input.width, "width");
@@ -56,6 +57,14 @@ export function generateStagePayload(input: GenerateStageInput): GeneratedStage 
     issues.push({ field: "nodeCount", message: `must be 1..${maxByArea}` });
   }
 
+  let obstacleCount: number | undefined;
+  if (input.obstacleCount !== undefined) {
+    obstacleCount = assertGeneratorInteger(input.obstacleCount, "obstacleCount");
+    if (obstacleCount < 0) {
+      issues.push({ field: "obstacleCount", message: "must be >= 0" });
+    }
+  }
+
   if (issues.length > 0) {
     throw new ValidationError(issues);
   }
@@ -67,12 +76,11 @@ export function generateStagePayload(input: GenerateStageInput): GeneratedStage 
   for (let attempt = 0; attempt < MAX_BOARD_ATTEMPTS; attempt += 1) {
     const rng = createRng(`${seed}#${attempt}`);
     try {
-      const candidate = buildCandidate(width, height, difficulty, nodeCount, rng, generatorSeed);
+      const candidate = buildCandidate(width, height, difficulty, nodeCount, obstacleCount, rng, generatorSeed);
       normalizeAndValidateStage(1, candidate);
       return { payload: candidate, seed, generatorSeed, validation: { valid: true, issues: [] } };
     } catch (error) {
       lastFailure = error instanceof Error ? error.message : String(error);
-      // Retry with a deterministic sub-seed; generation must return only solver-valid boards.
     }
   }
 
@@ -84,120 +92,271 @@ export function generateStagePayload(input: GenerateStageInput): GeneratedStage 
   ]);
 }
 
+function getDifficultyParams(difficulty: number, width: number, height: number): DifficultyParams {
+  const span = width + height;
+  return {
+    minDistance: Math.max(2, Math.floor(span * (0.05 + difficulty * 0.1))),
+    edgePreference: difficulty >= 3,
+    obstacleStyle: difficulty >= 3 ? "choke" : "edge",
+  };
+}
+
 function buildCandidate(
   width: number,
   height: number,
   difficulty: number,
   nodeCount: number,
+  obstacleCount: number | undefined,
   rng: () => number,
   generatorSeed: number
 ): StagePayload {
   const area = width * height;
+  const params = getDifficultyParams(difficulty, width, height);
   const nodeMap = new Array<number>(area).fill(0);
   const cellMap = new Array<number>(area).fill(0);
-  const paths: GeneratedPath[] = [];
-  const occupied = new Set<number>();
 
+  const endpointSet = new Set<number>();
+  const committedIntermediate = new Set<number>();
+
+  // Interleaved placement + routing: place endpoints and route each group immediately.
+  // Routability is verified before committing each group, preventing topological dead ends.
   for (let group = 1; group <= nodeCount; group += 1) {
-    const path = carveGroupPath(width, height, difficulty, nodeCount, occupied, rng);
-    if (path === undefined) {
-      throw new Error("path generation failed");
+    const blocked = new Set([...endpointSet, ...committedIntermediate]);
+
+    const result = placeRoutableEndpoints(width, height, area, params, blocked, rng);
+    if (result === undefined) {
+      throw new Error(`endpoint placement failed for group ${group}`);
     }
-    paths.push({ group, cells: path });
-    for (const cell of path) {
-      occupied.add(cell);
+
+    const [startCell, endCell, path] = result;
+    endpointSet.add(startCell);
+    endpointSet.add(endCell);
+    nodeMap[startCell] = group;
+    nodeMap[endCell] = group;
+
+    for (let i = 1; i < path.length - 1; i += 1) {
+      committedIntermediate.add(path[i]);
     }
-    nodeMap[path[0]] = group;
-    nodeMap[path[path.length - 1]] = group;
   }
 
-  addDifficultyCells(cellMap, nodeMap, paths, width, height, difficulty, rng);
+  const solutionCells = new Set([...endpointSet, ...committedIntermediate]);
+  const resolvedObstacleCount = obstacleCount ?? difficultyObstacleCount(width, height, difficulty);
+  placeObstacles(cellMap, nodeMap, solutionCells, width, height, params, resolvedObstacleCount, rng);
 
   return {
     width,
     height,
     timeLimit: 45 + difficulty * 18 + nodeCount * 6,
+    moveLimit: 0,
+    soft_reward: getSoftReward(difficulty),
     difficulty,
     nodeMap,
     cellMap,
-    generatorSeed
+    generatorSeed,
   };
 }
 
-function carveGroupPath(
+function getSoftReward(difficulty: number): number {
+  const rewards: Record<number, number> = {
+    1: 10,
+    2: 15,
+    3: 20,
+    4: 30,
+    5: 40
+  };
+  return rewards[difficulty] || 10;
+}
+
+// Places a pair of endpoints satisfying difficulty constraints, verifying a valid route exists.
+// Returns [startCell, endCell, routePath] or undefined if placement is impossible.
+function placeRoutableEndpoints(
   width: number,
   height: number,
-  difficulty: number,
-  nodeCount: number,
-  occupied: ReadonlySet<number>,
+  area: number,
+  params: DifficultyParams,
+  blocked: ReadonlySet<number>,
   rng: () => number
-): number[] | undefined {
-  const area = width * height;
-  const pathBudget = Math.max(4, Math.floor((area * 0.68) / nodeCount));
-  const distanceByDifficulty = Math.max(2, Math.floor((width + height) * (0.12 + difficulty * 0.07)));
-  const densityPressure = Math.min(0.68, nodeCount / Math.max(1, area / 8));
-  const minDistance = Math.min(Math.max(2, Math.floor(distanceByDifficulty * (1 - densityPressure))), Math.max(2, pathBudget - 2));
-  const minLength = Math.min(pathBudget, minDistance + Math.ceil(difficulty * 0.8));
-  const maxLength = Math.max(minLength, Math.floor(pathBudget * 1.35) + difficulty);
-  const minTurns = pathBudget >= 12 ? Math.min(Math.max(1, difficulty - 2), Math.max(1, Math.floor(minLength / 5))) : 1;
+): [number, number, number[]] | undefined {
+  // Primary: difficulty-aware placement with minDistance + routability check
+  for (let attempt = 0; attempt < ENDPOINT_ATTEMPTS; attempt += 1) {
+    const start = pickEndpointCell(width, height, params.edgePreference, blocked, rng);
+    if (start === undefined) break;
 
-  for (let attempt = 0; attempt < PATH_ATTEMPTS_PER_GROUP; attempt += 1) {
-    const start = randomFreePoint(width, height, occupied, rng);
-    const end = randomFreePoint(width, height, occupied, rng);
-    if (!start || !end || samePoint(start, end) || manhattan(start, end) < minDistance) {
-      continue;
-    }
+    const startBlocked = new Set([...blocked, start]);
+    const end = pickEndpointCell(width, height, params.edgePreference, startBlocked, rng);
+    if (end === undefined) continue;
 
-    const path = findOpenPath(width, height, start, end, occupied, rng);
-    if (path === undefined) {
-      continue;
+    if (manhattan(indexToPoint(start, width), indexToPoint(end, width)) < params.minDistance) continue;
+
+    const path = bfsShortestPath(start, end, width, height, blocked);
+    if (path !== undefined) {
+      if (params.edgePreference) { // edgePreference is true for difficulty >= 3
+        // High difficulty: try to find a longer path by temporarily blocking cells on the shortest path
+        let bestPath = path;
+        for (let i = 0; i < 3; i += 1) {
+          if (bestPath.length <= 2) break;
+          const midIndex = 1 + randomInt(rng, bestPath.length - 2);
+          const cellToBlock = bestPath[midIndex];
+          const detourPath = bfsShortestPath(start, end, width, height, new Set([...blocked, cellToBlock]));
+          if (detourPath && detourPath.length > bestPath.length) {
+            bestPath = detourPath;
+          }
+        }
+        return [start, end, bestPath];
+      }
+      return [start, end, path];
     }
-    const uniqueCells = new Set(path);
-    if (uniqueCells.size !== path.length || path.some((cell) => occupied.has(cell))) {
-      continue;
-    }
-    if (path.length < minLength || path.length > maxLength || countTurns(path, width) < minTurns) {
-      continue;
-    }
-    return path;
+  }
+
+  // Fallback: relax placement preference and distance, keep routability check
+  for (let attempt = 0; attempt < ENDPOINT_ATTEMPTS; attempt += 1) {
+    const start = randomFreeCell(area, blocked, rng);
+    if (start === undefined) break;
+
+    const startBlocked = new Set([...blocked, start]);
+    const end = randomFreeCell(area, startBlocked, rng);
+    if (end === undefined) continue;
+
+    if (manhattan(indexToPoint(start, width), indexToPoint(end, width)) < 2) continue;
+
+    const path = bfsShortestPath(start, end, width, height, blocked);
+    if (path !== undefined) return [start, end, path];
   }
 
   return undefined;
 }
 
-function findOpenPath(
+function pickEndpointCell(
   width: number,
   height: number,
-  start: Point,
-  end: Point,
+  edgePreference: boolean,
   occupied: ReadonlySet<number>,
   rng: () => number
+): number | undefined {
+  const candidates: number[] = [];
+
+  if (edgePreference) {
+    // High difficulty: prefer edge cells
+    for (let x = 0; x < width; x += 1) {
+      candidates.push(x);
+      candidates.push((height - 1) * width + x);
+    }
+    for (let y = 1; y < height - 1; y += 1) {
+      candidates.push(y * width);
+      candidates.push(y * width + width - 1);
+    }
+  } else {
+    // Low difficulty: prefer interior cells
+    for (let y = 1; y < height - 1; y += 1) {
+      for (let x = 1; x < width - 1; x += 1) {
+        candidates.push(y * width + x);
+      }
+    }
+    // If board is very small, fallback to any cell
+    if (candidates.length < 4) {
+      for (let i = 0; i < width * height; i += 1) {
+        candidates.push(i);
+      }
+    }
+  }
+
+  shuffle(candidates, rng);
+  for (const cell of candidates) {
+    if (!occupied.has(cell)) return cell;
+  }
+  return undefined;
+}
+
+function randomFreeCell(
+  area: number,
+  occupied: ReadonlySet<number>,
+  rng: () => number
+): number | undefined {
+  for (let attempt = 0; attempt < 80; attempt += 1) {
+    const cell = randomInt(rng, area);
+    if (!occupied.has(cell)) return cell;
+  }
+  return undefined;
+}
+
+function bfsShortestPath(
+  start: number,
+  end: number,
+  width: number,
+  height: number,
+  blocked: ReadonlySet<number>
 ): number[] | undefined {
-  const startIndex = start.y * width + start.x;
-  const endIndex = end.y * width + end.x;
-  const queue: number[] = [startIndex];
-  const visited = new Set<number>([startIndex]);
+  if (start === end) return [start];
+  const queue: number[] = [start];
+  const visited = new Set<number>([start]);
   const previous = new Map<number, number>();
 
   for (let cursor = 0; cursor < queue.length; cursor += 1) {
     const current = queue[cursor];
-    if (current === endIndex) {
-      return reconstructPath(current, previous);
-    }
-
-    const nextCells = neighbors(current, width, height);
-    shuffle(nextCells, rng);
-    for (const next of nextCells) {
-      if (visited.has(next) || (next !== endIndex && occupied.has(next))) {
-        continue;
+    if (current === end) return reconstructPath(current, previous);
+    for (const next of neighbors(current, width, height)) {
+      if (!visited.has(next) && !blocked.has(next)) {
+        visited.add(next);
+        previous.set(next, current);
+        queue.push(next);
       }
-      visited.add(next);
-      previous.set(next, current);
-      queue.push(next);
+    }
+  }
+  return undefined;
+}
+
+function difficultyObstacleCount(width: number, height: number, difficulty: number): number {
+  // Increase obstacle density with difficulty to minimize empty cells
+  const density = 0.05 + difficulty * 0.08; // 1: 0.13, 2: 0.21, 3: 0.29, 4: 0.37, 5: 0.45
+  return Math.floor(width * height * density);
+}
+
+function placeObstacles(
+  cellMap: number[],
+  nodeMap: readonly number[],
+  solutionCells: ReadonlySet<number>,
+  width: number,
+  height: number,
+  params: DifficultyParams,
+  count: number,
+  rng: () => number
+): void {
+  if (count <= 0) return;
+
+  const area = width * height;
+  const candidates: number[] = [];
+  for (let i = 0; i < area; i += 1) {
+    if (nodeMap[i] === 0 && !solutionCells.has(i)) {
+      candidates.push(i);
     }
   }
 
-  return undefined;
+  shuffle(candidates, rng);
+
+  if (params.obstacleStyle === "choke") {
+    // Hard: prefer cells adjacent to many solution path cells (chokepoints)
+    candidates.sort((a, b) => {
+      const scoreA = neighbors(a, width, height).filter((n) => solutionCells.has(n)).length;
+      const scoreB = neighbors(b, width, height).filter((n) => solutionCells.has(n)).length;
+      if (scoreA !== scoreB) return scoreB - scoreA;
+      // Secondary: prefer being far from edges (interior) to stay near the path network
+      return edgeDistance(b, width, height) - edgeDistance(a, width, height);
+    });
+  } else {
+    // Easy: prefer cells close to edges (far from path network)
+    candidates.sort((a, b) => edgeDistance(a, width, height) - edgeDistance(b, width, height));
+  }
+
+  const target = Math.min(count, candidates.length);
+  for (let i = 0; i < target; i += 1) {
+    cellMap[candidates[i]] = OBSTACLE_CODE;
+  }
+}
+
+function edgeDistance(index: number, width: number, height: number): number {
+  const x = index % width;
+  const y = Math.floor(index / width);
+  return Math.min(x, width - 1 - x, y, height - 1 - y);
 }
 
 function reconstructPath(goal: number, previous: ReadonlyMap<number, number>): number[] {
@@ -208,56 +367,6 @@ function reconstructPath(goal: number, previous: ReadonlyMap<number, number>): n
     path.push(current);
   }
   return path.reverse();
-}
-
-function addDifficultyCells(
-  cellMap: number[],
-  nodeMap: readonly number[],
-  paths: readonly GeneratedPath[],
-  width: number,
-  height: number,
-  difficulty: number,
-  rng: () => number
-): void {
-  const protectedCells = new Set<number>();
-  for (const path of paths) {
-    for (const cell of path.cells) {
-      protectedCells.add(cell);
-      for (const neighbor of neighbors(cell, width, height)) {
-        if (rng() < 0.32 + difficulty * 0.06) {
-          protectedCells.add(neighbor);
-        }
-      }
-    }
-  }
-
-  const candidates: number[] = [];
-  for (let index = 0; index < cellMap.length; index += 1) {
-    if (nodeMap[index] === 0 && !protectedCells.has(index)) {
-      candidates.push(index);
-    }
-  }
-
-  shuffle(candidates, rng);
-  const obstacleBudget = Math.floor(width * height * (0.05 + difficulty * 0.055));
-  for (let index = 0; index < Math.min(obstacleBudget, candidates.length); index += 1) {
-    cellMap[candidates[index]] = difficulty >= 4 && index % 5 === 4 ? RESERVED_GIMMICK_CODE : OBSTACLE_CODE;
-  }
-}
-
-function randomFreePoint(
-  width: number,
-  height: number,
-  occupied: ReadonlySet<number>,
-  rng: () => number
-): Point | undefined {
-  for (let attempt = 0; attempt < 80; attempt += 1) {
-    const point = { x: randomInt(rng, width), y: randomInt(rng, height) };
-    if (!occupied.has(point.y * width + point.x)) {
-      return point;
-    }
-  }
-  return undefined;
 }
 
 function neighbors(index: number, width: number, height: number): number[] {
@@ -271,29 +380,8 @@ function neighbors(index: number, width: number, height: number): number[] {
   return result;
 }
 
-function countTurns(path: readonly number[], width: number): number {
-  let turns = 0;
-  let previousDirection = "";
-  for (let index = 1; index < path.length; index += 1) {
-    const delta = path[index] - path[index - 1];
-    const direction = delta === 1 || delta === -1 ? "h" : "v";
-    if (previousDirection && previousDirection !== direction) {
-      turns += 1;
-    }
-    previousDirection = direction;
-  }
-  return turns;
-}
-
-function assertGeneratorInteger(value: unknown, field: string): number {
-  if (!Number.isInteger(value)) {
-    throw new ValidationError([{ field, message: "must be an integer" }]);
-  }
-  return value as number;
-}
-
-function samePoint(a: Point, b: Point): boolean {
-  return a.x === b.x && a.y === b.y;
+function indexToPoint(index: number, width: number): Point {
+  return { x: index % width, y: Math.floor(index / width) };
 }
 
 function manhattan(a: Point, b: Point): number {
@@ -311,6 +399,13 @@ function shuffle<T>(values: T[], rng: () => number): void {
 
 function randomInt(rng: () => number, maxExclusive: number): number {
   return Math.floor(rng() * maxExclusive);
+}
+
+function assertGeneratorInteger(value: unknown, field: string): number {
+  if (!Number.isInteger(value)) {
+    throw new ValidationError([{ field, message: "must be an integer" }]);
+  }
+  return value as number;
 }
 
 function defaultSeed(width: number, height: number, difficulty: number, nodeCount: number): string {

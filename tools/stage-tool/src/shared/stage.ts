@@ -8,6 +8,8 @@ export interface Stage {
   width: number;
   height: number;
   timeLimit: number;
+  moveLimit: number;
+  soft_reward: number;
   difficulty: number;
   nodeMap: number[];
   cellMap: CellCode[];
@@ -18,6 +20,8 @@ export interface StagePayload {
   width: number;
   height: number;
   timeLimit: number;
+  moveLimit: number;
+  soft_reward: number;
   difficulty: number;
   nodeMap: number[] | string;
   cellMap: CellCode[] | number[] | string;

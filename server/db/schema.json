@@ -24,15 +24,6 @@
       ]
     },
     {
-      "name": "client_meta",
-      "columns": [
-        { "name": "client_version",   "type": "string(20)", "constraints": ["PK","NN"] },
-        { "name": "meta_hash",        "type": "string",     "constraints": ["NN"] },
-        { "name": "protocol_version", "type": "string(20)", "constraints": ["NN"] },
-        { "name": "created_at",       "type": "datetime",   "constraints": ["NN"] }
-      ]
-    },
-    {
       "name": "currency_logs",
       "comment": "Append-only audit log — never UPDATE or DELETE",
       "columns": [

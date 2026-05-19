@@ -28,6 +28,12 @@ CMD: `tools/gen-all.bat` | `tools/gen-data.bat` | `tools/gen-orm.bat` | `npm run
 - CONFIG policy: env vars own deploy/runtime values; `template.ini` owns tooling values; no hardcoded config fallbacks
 - `_` prefix files/dirs are skipped by all gen tools (examples, drafts)
 
+## Clarification Protocol
+Stop and ask **before** implementing when: requirement is ambiguous with design impact, a clearly better alternative exists (not just style), or task touches DB schema / auth / cross-service contracts.
+Format: `QUESTION: [what] | OPTIONS: A) … B) … | RECOMMEND: [A/B] — [reason]`
+Don't ask: clear best practice, cosmetic difference, same outcome different syntax.
+Small improvement spotted → implement as requested + append `NOTE: [alternative] — ask to switch`.
+
 ## Documentation Convention
 Every directory containing client/server/design/data/packet content must be documented.
 This convention is enforced by AI agents; violations should be fixed before committing.

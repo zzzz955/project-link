@@ -94,7 +94,7 @@ MonoBehaviour:
   - elementName: slot_star_on
     sprite: {fileID: 21300000, guid: 2d235c84e7ee2224e9e14082c015c97b, type: 3}
   - elementName: slot_streak_badge
-    sprite: {fileID: 21300000, guid: 9c40f6dfa61f67c4a94fd73743191899, type: 3}
+    sprite: {fileID: 21300000, guid: 0822f338f05913b47a20214bd543788d, type: 3}
   - elementName: btn_icon_info
     sprite: {fileID: 0}
   - elementName: btn_streak_claim

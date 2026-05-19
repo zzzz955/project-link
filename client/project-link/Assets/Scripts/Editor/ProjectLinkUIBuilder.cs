@@ -2356,7 +2356,7 @@ namespace ProjectLink.EditorTools
 
             string cardPath = $"{PopupPrefabRoot}/RankingCard.prefab";
             string prevCard = System.IO.File.Exists(cardPath) ? System.IO.File.ReadAllText(cardPath) : null;
-            AssignStableIds(root, "Prefab:RankingCard");
+            AssignStableIds(root, "Prefab:RankingCard", "RankingCard");
             ProjectLinkUIOverrideApply.SaveBaselineForPrefab(root, "RankingCard");
             ProjectLinkUIOverrideApply.ApplyPrefabOverrides(root, "RankingCard");
             PrefabUtility.SaveAsPrefabAsset(root, cardPath);
@@ -2373,7 +2373,7 @@ namespace ProjectLink.EditorTools
             string path = $"{PopupPrefabRoot}/{prefabName}.prefab";
             string prev = System.IO.File.Exists(path) ? System.IO.File.ReadAllText(path) : null;
 
-            AssignStableIds(root, $"Prefab:{prefabName}");
+            AssignStableIds(root, $"Prefab:{prefabName}", prefabName);
             ProjectLinkUIOverrideApply.SaveBaselineForPrefab(root, prefabName);
             ProjectLinkUIOverrideApply.ApplyPrefabOverrides(root, prefabName);
             PrefabUtility.SaveAsPrefabAsset(root, path);
@@ -2855,8 +2855,8 @@ namespace ProjectLink.EditorTools
             return sigs;
         }
 
-        static void AssignStableIds(GameObject root, string target)
-            => AssignStableIdWalk(root, root.name, target);
+        static void AssignStableIds(GameObject root, string target, string pathRoot = null)
+            => AssignStableIdWalk(root, pathRoot ?? root.name, target);
 
         static void AssignStableIdWalk(GameObject go, string path, string target)
         {
@@ -2875,7 +2875,15 @@ namespace ProjectLink.EditorTools
             string current = System.IO.File.ReadAllText(path);
             if (!ContentMatchesIgnoringFileIds(current, previousContent)) return;
 
-            System.IO.File.WriteAllText(path, previousContent);
+            // Unity keeps a memory-mapped handle on the prefab after SaveAsPrefabAsset.
+            // File.WriteAllText uses FileMode.Create (truncate) → Win32 error 1224.
+            // Write to a temp file, delete the mapped original (deferred by OS), then
+            // move temp into place — avoids truncating the mapped file entirely.
+            string tmp = path + ".tmp";
+            System.IO.File.WriteAllText(tmp, previousContent);
+            AssetDatabase.ReleaseCachedFileHandles();
+            System.IO.File.Delete(path);
+            System.IO.File.Move(tmp, path);
             AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
         }
 

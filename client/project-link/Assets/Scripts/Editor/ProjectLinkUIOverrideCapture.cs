@@ -47,7 +47,7 @@ namespace ProjectLink.EditorTools
                 var prefabPath = AssetDatabase.GUIDToAssetPath(guid);
                 var prefabName = System.IO.Path.GetFileNameWithoutExtension(prefabPath);
                 var go = PrefabUtility.LoadPrefabContents(prefabPath);
-                CapturePrefabGO(go, $"Prefab:{prefabName}", baseline, newEntries);
+                CapturePrefabGO(go, prefabName, $"Prefab:{prefabName}", baseline, newEntries);
                 PrefabUtility.UnloadPrefabContents(go);
             }
 
@@ -107,10 +107,11 @@ namespace ProjectLink.EditorTools
             DetectRemovedGOs(target, visited, baseline, results);
         }
 
-        static void CapturePrefabGO(GameObject root, string target, UIBaselineSnapshot baseline, List<UIOverrideManifest.Entry> results)
+        // prefabName is used as the path root so paths are stable regardless of root GO name.
+        static void CapturePrefabGO(GameObject root, string prefabName, string target, UIBaselineSnapshot baseline, List<UIOverrideManifest.Entry> results)
         {
             var visited = new HashSet<string>();
-            WalkGO(root, root.name, target, baseline, results, visited);
+            WalkGO(root, prefabName, target, baseline, results, visited);
             DetectRemovedGOs(target, visited, baseline, results);
         }
 
@@ -291,7 +292,8 @@ namespace ProjectLink.EditorTools
             var baseline = UIBaselineSnapshot.LoadOrCreate();
             baseline.RebuildIndex();
             baseline.ClearTarget(target);
-            SnapshotGO(root, root.name, target, baseline);
+            // Use prefabName as path root so paths are stable regardless of root GO name.
+            SnapshotGO(root, prefabName, target, baseline);
             baseline.Flush();
             EditorUtility.SetDirty(baseline);
         }
@@ -406,9 +408,9 @@ namespace ProjectLink.EditorTools
 
         static Transform FindByPath(GameObject prefabRoot, string path)
         {
+            // Root name is skipped — path root is always prefabName (stable), which may differ
+            // from the actual root GO name when naming conventions change between builds.
             var slash = path.IndexOf('/');
-            var rootName = slash < 0 ? path : path.Substring(0, slash);
-            if (prefabRoot.name != rootName) return null;
             if (slash < 0) return prefabRoot.transform;
             return prefabRoot.transform.Find(path.Substring(slash + 1));
         }
